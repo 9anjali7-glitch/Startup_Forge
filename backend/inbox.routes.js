@@ -1,13 +1,14 @@
 const express = require('express');
-
 const neo4j = require('neo4j-driver');
 require('dotenv').config();
+const uri = process.env.NEO4J_URI || 'bolt://host.docker.internal:7687';
 
-// Initialize Driver (Same as server.js)
-const uri = process.env.NEO4J_URI || 'bolt://localhost:7687';
 const driver = neo4j.driver(
   uri,
-  neo4j.auth.basic(process.env.NEO4J_USER || 'neo4j', process.env.NEO4J_PASSWORD || 'StrongPassword123'),
+  neo4j.auth.basic(
+    process.env.NEO4J_USER || 'neo4j',
+    process.env.NEO4J_PASSWORD || 'password'
+  ),
   uri.startsWith('bolt') ? { encrypted: false } : {}
 );
 
@@ -29,12 +30,12 @@ router.get('/', async (req, res) => {
     // (me)-[:CONNECTED_TO]-(other)
     const query = `
       MATCH (me {id: $userId})-[:CONNECTED_TO]-(other)
-      RETURN 
+      RETURN DISTINCT
         other.id as other_id, 
         other.name as other_name,
         other.founder as other_founder_name,
         other.firm_name as other_firm,
-        other.company as other_company,
+        coalesce(other.company, other.name) as other_company,
         labels(other) as labels
     `;
 

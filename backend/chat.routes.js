@@ -6,10 +6,10 @@ require('dotenv').config();
 const router = express.Router();
 
 // Initialize Driver (Same as server.js/inbox.routes.js)
-const uri = process.env.NEO4J_URI || 'bolt://localhost:7687';
+const uri = process.env.NEO4J_URI || 'bolt://host.docker.internal:7687';
 const driver = neo4j.driver(
   uri,
-  neo4j.auth.basic(process.env.NEO4J_USER || 'neo4j', process.env.NEO4J_PASSWORD || 'StrongPassword123'),
+  neo4j.auth.basic(process.env.NEO4J_USER || 'neo4j', process.env.NEO4J_PASSWORD || 'password'),
   uri.startsWith('bolt') ? { encrypted: false } : {}
 );
 

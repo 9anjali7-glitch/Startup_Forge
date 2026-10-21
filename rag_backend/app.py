@@ -26,6 +26,11 @@ def load_data():
     ingest_data()
 
 
+@app.get("/health")
+def health_check():
+    import os
+    return {"status": "ok", "mistral_configured": bool(os.getenv("MISTRAL_API_KEY"))}
+
 # ---------- APIs ----------
 @app.post("/search/founders")
 def search_founders(req: QueryRequest):

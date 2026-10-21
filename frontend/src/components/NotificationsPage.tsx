@@ -54,6 +54,9 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
     const [companyUpdates, setCompanyUpdates] = useState<any[]>([]);
     const [isSearchExpanded, setIsSearchExpanded] = useState(false); // Mobile search
     const [activeTab, setActiveTab] = useState<'notifications' | 'updates'>('notifications');
+    const readKey = `startupforge:read:${currentUser?.id || 'guest'}`;
+    const readIds = () => { try { return new Set<string>(JSON.parse(localStorage.getItem(readKey) || '[]')); } catch { return new Set<string>(); } };
+    const markRead = (ids: string[]) => { const saved = readIds(); ids.forEach(id => saved.add(id)); localStorage.setItem(readKey, JSON.stringify([...saved])); setNotifications(items => items.map(item => ids.includes(item.id) ? { ...item, unread: false } : item)); };
 
     // Close search when clicking outside
     useEffect(() => {
@@ -83,7 +86,7 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                     avatar: 'https://randomuser.me/api/portraits/lego/1.jpg',
                     message: `${n.receiver_name} accepted your connection request`,
                     timestamp: new Date(n.responded_at).toLocaleDateString(),
-                    unread: true,
+                    unread: !readIds().has(`conn-${n.id}`),
                     metadata: { userId: String(n.receiver_id) }
                 }));
 
@@ -214,7 +217,7 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                                     results={ragResults}
                                     isVisible={true}
                                     isLoading={isSearching || false}
-                                    onSelectResult={(id) => onNavigate('profile')}
+                                    onSelectResult={(id) => onNavigate(`profile:${id}`)}
                                 />
                             </div>
                         )}
@@ -256,7 +259,7 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 md:p-6 min-h-[500px]">
                             <div className="flex items-center justify-between mb-8 border-b border-slate-100 pb-4">
                                 <h2 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Notifications</h2>
-                                <button className="text-sm font-semibold text-slate-500 hover:text-slate-900">Mark all as read</button>
+                                <button onClick={() => markRead(notifications.map(n => n.id))} className="text-sm font-semibold text-slate-500 hover:text-slate-900">Mark all as read</button>
                             </div>
 
                             <div className="space-y-4">
@@ -269,6 +272,7 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                                             <div
                                                 key={notification.id}
                                                 onClick={() => {
+                                                    if (notification.unread) markRead([notification.id]);
                                                     if (notification.type === 'connection' && notification.metadata?.userId) {
                                                         onNavigateToChat(notification.metadata.userId);
                                                     } else if (notification.isJob) {
@@ -307,7 +311,7 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                                     <div className="space-y-2">
                                         {companyUpdates.slice(0, 4).map((update, i) => (
                                             <div
-                                                key={`inv-${i}`}
+                                                key={`inv-${i}`} onClick={() => onNavigate('messages')}
                                                 className="group p-3 md:p-4 rounded-xl border border-transparent hover:border-slate-200 hover:bg-slate-50 transition-all cursor-pointer flex items-start gap-4 bg-emerald-50/30"
                                             >
                                                 <div className="relative">

@@ -36,27 +36,14 @@ const RelationshipGraph = ({ investorName, targetCompany, conflictLevel = 0, con
   const [edges, setEdges] = useState<Edge[]>([]);
 
   useEffect(() => {
-    if (!investorName && !targetCompany) {
-      // Fallback to demo data if nothing passed
-      setNodes([
-        { id: "1", label: "Sequoia Capital", type: "investor", x: 100, y: 150 },
-        { id: "2", label: "John Smith", type: "founder", x: 280, y: 80 },
-        { id: "3", label: "TechCorp Inc.", type: "company", x: 280, y: 220 },
-        { id: "4", label: "Sarah Williams", type: "founder", x: 460, y: 150 },
-        { id: "5", label: "Acme Technologies", type: "target", x: 640, y: 150 },
-      ]);
-      setEdges([
-        { from: "1", to: "2", type: "direct", label: "Investor" },
-        { from: "1", to: "3", type: "direct", label: "Board Seat" },
-        { from: "2", to: "3", type: "direct", label: "CEO" },
-        { from: "3", to: "4", type: "indirect", label: "Advisor" },
-        { from: "4", to: "5", type: "direct", label: "Co-founder" },
-      ]);
-      return;
-    }
-
     const newNodes: Node[] = [];
     const newEdges: Edge[] = [];
+
+    if (!investorName || !targetCompany) {
+      setNodes([]);
+      setEdges([]);
+      return;
+    }
 
     // Base Nodes
     newNodes.push({ id: "inv", label: investorName || "Investor", type: "investor", x: 100, y: 150 });

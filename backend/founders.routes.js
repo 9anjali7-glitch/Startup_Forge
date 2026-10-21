@@ -31,13 +31,19 @@ router.get('/growth/:id', async (req, res) => {
 
         const founder = result.rows[0];
         const latestFunding = getLatestFunding(founder.past_funding);
+        const valuation = Number(founder.valuation || 0);
+        const fundingAmount = Number(latestFunding.amount || 0);
+
+        if (!(valuation > 0) || !(fundingAmount > 0)) {
+            return res.status(422).json({ error: "A recorded positive funding amount and company valuation are required for a growth scenario." });
+        }
 
         // Prepare payload for Python Service
         const payload = {
             company: founder.company,
             domain: founder.domain,
-            funding_amount: parseFloat(latestFunding.amount),
-            valuation: parseFloat(founder.valuation || 0),
+            funding_amount: fundingAmount,
+            valuation,
             funding_year: parseInt(latestFunding.year),
             competitors: founder.competitors || [],
             umbrella_companies: founder.umbrella_companies || []
@@ -45,22 +51,11 @@ router.get('/growth/:id', async (req, res) => {
 
         // Call Python Service
         try {
-            const pythonRes = await axios.post('http://localhost:8002/predict', payload);
+            const pythonRes = await axios.post('http://startupforge-prediction:8002/predict', payload);
             res.json(pythonRes.data);
         } catch (pyErr) {
             console.error("Python Service Error:", pyErr.message);
-            // Fallback if Python service is down
-            res.json({
-                growth_rate: 0.1,
-                growth_class: 'Low (Fallback)',
-                valuation_projection: {
-                    "3_months": (founder.valuation || 0) * 1.02,
-                    "6_months": (founder.valuation || 0) * 1.05,
-                    "1_year": (founder.valuation || 0) * 1.10,
-                    "5_years": (founder.valuation || 0) * 1.50
-                },
-                acquisition_probability: 0.1
-            });
+            res.status(503).json({ error: "The growth scenario service is unavailable. Please try again later." });
         }
 
     } catch (e) {

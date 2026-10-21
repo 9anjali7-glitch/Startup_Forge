@@ -19,6 +19,7 @@ async function seedFullDatabase(res) {
         const investorsCsvPath = path.join(__dirname, '../rag_backend/investors_cleaned.csv');
         if (fs.existsSync(investorsCsvPath)) {
             const investors = [];
+
             await new Promise((resolve, reject) => {
                 fs.createReadStream(investorsCsvPath)
                     .pipe(csv())
@@ -28,15 +29,20 @@ async function seedFullDatabase(res) {
             });
 
             console.log(`Processing ${investors.length} investors...`);
+
             for (const inv of investors) {
-                // Ensure name exists
                 if (!inv.name) continue;
 
-                // Check dupes
-                const check = await client.query("SELECT id FROM investors WHERE name = $1", [inv.name]);
+                // Check duplicate by investor name
+                const check = await client.query(
+                    "SELECT id FROM investors WHERE name = $1",
+                    [inv.name]
+                );
+
                 if (check.rows.length === 0) {
                     await client.query(`
-                        INSERT INTO investors (name, firm_name, short_bio, location, profile_url, primary_domain)
+                        INSERT INTO investors
+                        (name, firm_name, short_bio, location, profile_url, primary_domain)
                         VALUES ($1, $2, $3, $4, $5, $6)
                     `, [
                         inv.name,
@@ -54,8 +60,10 @@ async function seedFullDatabase(res) {
 
         // --- SEED FOUNDERS ---
         const foundersCsvPath = path.join(__dirname, '../rag_backend/founders_cleaned.csv');
+
         if (fs.existsSync(foundersCsvPath)) {
             const founders = [];
+
             await new Promise((resolve, reject) => {
                 fs.createReadStream(foundersCsvPath)
                     .pipe(csv())
@@ -65,37 +73,39 @@ async function seedFullDatabase(res) {
             });
 
             console.log(`Processing ${founders.length} founders...`);
+
             for (const f of founders) {
                 if (!f.name) continue;
 
-                const check = await client.query("SELECT id FROM founders WHERE name = $1", [f.name]);
+                // IMPORTANT:
+                // Check duplicate by COMPANY, not founder name.
+                // Multiple companies can have the same founder name,
+                // such as "John Smith", "Bing", etc.
+                const check = await client.query(
+                    "SELECT id FROM founders WHERE company = $1",
+                    [f.company || f.name]
+                );
+
                 if (check.rows.length === 0) {
-                    // past_funding is a string in CSV like "{'year':...}", we might need to parse it or store as string?
-                    // The schema expects JSONB. Postgres is strict.
-                    // Let's try to parse it safely, or default to empty array.
                     let pastFundingJson = '[]';
+
                     try {
-                        // Python string representation to JSON might fail (single quotes).
-                        // Simple replace for demo: ' -> "
                         if (f.past_funding) {
                             let cleanJson = f.past_funding.replace(/'/g, '"');
-                            JSON.parse(cleanJson); // Validate
+                            JSON.parse(cleanJson);
                             pastFundingJson = cleanJson;
                         }
                     } catch (e) {
-                        // Fallback: store as null or handle specifically if critical
                         pastFundingJson = '[]';
                     }
 
                     await client.query(`
-                        INSERT INTO founders (name, company, description, location, domain, valuation, round, year, past_funding)
+                        INSERT INTO founders
+                        (name, company, description, location, domain, valuation, round, year, past_funding)
                         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
                     `, [
-                        f.name, // "name" col in CSV is company name usually? No, "company" is company.
-                        // Wait, looking at CSV: id,name,company...
-                        // CSV Line 2: 781,1upHealth,1upHealth... (Name is same as company?)
-                        // Let's rely on CSV columns.
-                        f.company || f.name, // Use company name if 'company' col exists
+                        f.name,
+                        f.company || f.name,
                         f.description || `Founder of ${f.company}`,
                         f.location || 'Global',
                         f.domain || null,
@@ -125,7 +135,10 @@ async function seedFullDatabase(res) {
     } catch (e) {
         await client.query('ROLLBACK');
         console.error("❌ Seed Failed:", e);
-        if (res) res.status(500).send("Seed Failed: " + e.message);
+
+        if (res) {
+            res.status(500).send("Seed Failed: " + e.message);
+        }
     } finally {
         client.release();
     }

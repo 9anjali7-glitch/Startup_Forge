@@ -100,7 +100,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
 
 
   const [currentRoomKey, setCurrentRoomKey] = useState<string | null>(null);
-  const [currentConnectionId, setCurrentConnectionId] = useState<number | null>(null);
+  const [currentConnectionId, setCurrentConnectionId] = useState<string | null>(null);
 
   // Investment Flow State
   const [showInvModal, setShowInvModal] = useState(false);
@@ -178,7 +178,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
             'Content-Type': 'application/json',
             'x-user-id': currentUser.id
           },
-          body: JSON.stringify({ targetUserId: parseInt(targetUserId) })
+          body: JSON.stringify({ targetUserId: String(targetUserId) })
         });
 
         if (!res.ok) {
@@ -226,8 +226,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
           setInvStatus('PENDING');
         } else if (data.status === 'MATCHED') {
           setInvStatus('MATCHED');
-          // Clear after 5 seconds
-          setTimeout(() => setInvStatus('NONE'), 5000);
+          if (data.deal) setInvFormData({ round: String(data.deal.round), year: String(data.deal.year), amount: String(data.deal.amount) });
         } else {
           setInvStatus('NONE');
         }
@@ -238,6 +237,111 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
     const interval = setInterval(checkStatus, 3000); // Poll every 3s
     return () => clearInterval(interval);
   }, [currentConnectionId, currentUser.id]);
+
+  const downloadInvestmentAgreement = () => {
+    if (invStatus !== 'MATCHED') return;
+    const founder = currentUser.role === 'founder' ? currentUser : selectedUser;
+    const investor = currentUser.role === 'investor' ? currentUser : selectedUser;
+    const ascii = (value: unknown) => String(value || 'To be agreed')
+      .replace(/[\u2018\u2019]/g, "'").replace(/[\u201c\u201d]/g, '"')
+      .replace(/[\u2013\u2014]/g, '-').replace(/\u20ac/g, 'EUR').replace(/[^\x20-\x7e]/g, '?');
+    const amount = Number(String(invFormData.amount).replace(/[^0-9.]/g, ''));
+    const formattedAmount = Number.isFinite(amount) && amount > 0
+      ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount)
+      : ascii(invFormData.amount);
+    const lines: { text: string; size: number; bold?: boolean; rule?: boolean }[] = [];
+    const add = (text: string, size = 11, bold = false, rule = false) => lines.push({ text: ascii(text), size, bold, rule });
+    const wrap = (text: string, size = 10) => {
+      const value = ascii(text);
+      const max = size >= 14 ? 64 : 88;
+      const words = value.split(/\s+/);
+      let row = '';
+      for (const word of words) {
+        if (row && `${row} ${word}`.length > max) { add(row, size); row = word; }
+        else row = row ? `${row} ${word}` : word;
+      }
+      if (row) add(row, size);
+    };
+
+    add('STARTUPFORGE', 10, true);
+    add('Agreed Investment Details', 20, true);
+    add(`Record date: ${new Date().toLocaleDateString()}    Record ID: ${currentConnectionId || 'N/A'}`, 9);
+    add('MATCHED BY BOTH PARTIES', 10, true, true);
+    wrap('This record summarizes the investment details submitted by the founder and investor and matched on StartupForge. It records the fields below as entered; it does not add terms that were not submitted.', 10);
+    add('FOUNDER', 12, true, true);
+    add(`Name: ${founder?.name || founder?.userName || 'Not provided'}`);
+    add(`Company: ${founder?.company || 'Not provided'}`);
+    add(`Profile: ${founder?.headline || 'Founder'}`);
+    add('INVESTOR', 12, true, true);
+    add(`Name: ${investor?.name || investor?.userName || 'Not provided'}`);
+    add(`Company / firm: ${investor?.company || 'Not provided'}`);
+    add(`Profile: ${investor?.headline || 'Investor'}`);
+    add('MATCHED INVESTMENT DETAILS', 12, true, true);
+    add(`Funding round: ${invFormData.round}`);
+    add(`Investment amount: ${formattedAmount}${Number.isFinite(amount) && amount > 0 ? ' USD' : ''}`);
+    add(`Investment year: ${invFormData.year}`);
+    add('Agreement status: Both parties submitted matching investment details.');
+    add('Acknowledged in StartupForge by: Founder and investor');
+    add('');
+    wrap('This is a platform record of the matched details above. Any additional investment terms must be agreed and documented separately by the parties.', 9);
+    const pageLines: typeof lines[] = [];
+    for (let i = 0; i < lines.length; i += 38) pageLines.push(lines.slice(i, i + 38));
+    const pageIds = pageLines.map((_, i) => 5 + i * 2);
+    const objects: string[] = ['', '<< /Type /Catalog /Pages 2 0 R >>',
+      `<< /Type /Pages /Kids [${pageIds.map(id => `${id} 0 R`).join(' ')}] /Count ${pageIds.length} >>`,
+      '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
+      '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>'];
+    pageLines.forEach((page, pageIndex) => {
+      let y = 746;
+      const commands: string[] = [];
+      if (pageIndex > 0) {
+        commands.push(`BT /F2 8 Tf 0.40 0.44 0.50 rg 54 764 Td (STARTUPFORGE - AGREED INVESTMENT DETAILS) Tj ET`);
+        commands.push('0.78 0.82 0.88 RG 54 754 m 558 754 l S');
+        y = 738;
+      }
+      for (const line of page) {
+        if (line.rule) {
+          y -= 5;
+          commands.push(`0.78 0.82 0.88 RG 54 ${y} m 558 ${y} l S`);
+          y -= 11;
+        }
+        if (line.text) {
+          const font = line.bold ? 'F2' : 'F1';
+          const safeText = line.text.replace(/([\\()])/g, '\\$1');
+          commands.push(`BT /${font} ${line.size} Tf 0.10 0.14 0.22 rg 54 ${y} Td (${safeText}) Tj ET`);
+        }
+        y -= line.size + 4;
+      }
+      commands.push(`BT /F1 8 Tf 0.40 0.44 0.50 rg 54 34 Td (StartupForge - Matched details record - Page ${pageIndex + 1} of ${pageLines.length}) Tj ET`);
+      const stream = commands.join('\n');
+      const pageId = pageIds[pageIndex];
+      const contentId = pageId + 1;
+      objects[pageId] = `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${contentId} 0 R >>`;
+      objects[contentId] = `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`;
+    });
+
+    let pdf = '%PDF-1.4\n';
+    const offsets = [0];
+    for (let id = 1; id < objects.length; id++) {
+      offsets[id] = pdf.length;
+      pdf += `${id} 0 obj\n${objects[id]}\nendobj\n`;
+    }
+    const xrefOffset = pdf.length;
+    pdf += `xref\n0 ${objects.length}\n0000000000 65535 f \n`;
+    for (let id = 1; id < objects.length; id++) pdf += `${String(offsets[id]).padStart(10, '0')} 00000 n \n`;
+    pdf += `trailer\n<< /Size ${objects.length} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+
+    const blob = new Blob([pdf], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const companySlug = ascii(founder?.company || founder?.userName || 'startup').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '');
+    link.href = url;
+    link.download = `StartupForge_Agreed_Investment_Details_${companySlug || 'startup'}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 30_000);
+  };
 
   const handleReportInvestment = async () => {
     if (!currentConnectionId) return;
@@ -274,6 +378,8 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
       const data = await res.json();
 
       if (data.status === 'MATCHED') {
+        setInvStatus('MATCHED');
+        if (data.deal) setInvFormData({ round: String(data.deal.round), year: String(data.deal.year), amount: String(data.deal.amount) });
         setSubmissionFeedback("Investment Confirmed!");
         setTimeout(() => {
           setShowInvModal(false);
@@ -441,7 +547,8 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
         content: m.content
       }));
 
-      const res = await fetch('http://localhost:8000/chat/autocomplete', {
+      const ragUrl = import.meta.env.VITE_RAG_API_URL || 'http://localhost:8000';
+      const res = await fetch(`${ragUrl}/chat/autocomplete`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -521,7 +628,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
                   <div className="flex items-center gap-2">
                     <span className="text-slate-400 text-xs">|</span>
                     <kbd className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-800 border border-slate-600 border-b-2 rounded-lg text-[10px] font-bold text-slate-300 tracking-wider">
-                      ⌘ K
+                      âŒ˜ K
                     </kbd>
                   </div>
                 </div>
@@ -534,7 +641,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
                   results={ragResults}
                   isVisible={true}
                   isLoading={isSearching || false}
-                  onSelectResult={(id) => onNavigate('profile')} // Just navigate to profile, App handles ID if needed or we change onNavigate signature
+                  onSelectResult={(id) => onViewProfile(id)}
                 />
               </div>
             )}
@@ -683,7 +790,8 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
               {invStatus === 'MATCHED' && (
                 <div className="bg-emerald-50/80 backdrop-blur-sm border-b border-emerald-100 px-4 py-3 flex items-center justify-center animate-in slide-in-from-top-2 z-0">
                   <CheckCircle2 className="w-5 h-5 mr-2 text-emerald-600" />
-                  <span className="font-bold text-emerald-800 text-sm">Success! Investment recorded and verified on blockchain.</span>
+                  <span className="font-bold text-emerald-800 text-sm">Investment details matched by both parties.</span>
+                  <button onClick={downloadInvestmentAgreement} className="ml-3 bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold">Download matched details PDF</button>
                 </div>
               )}
 

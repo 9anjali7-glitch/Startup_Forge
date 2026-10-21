@@ -39,12 +39,33 @@ export type User = {
   linkedin?: string;
   isActive?: boolean;
   company?: string;
+  location?: string;
   // Prediction Data
   valuation?: number;
   fundingYear?: number;
   fundingRound?: string;
   competitors?: string[];
   umbrella?: string[];
+};
+
+const getInvestorProfile = (userId: string): User | undefined => {
+  if (!userId.startsWith('investor-')) return undefined;
+  const investorId = Number(userId.slice('investor-'.length));
+  const investor = (investorsData as any[]).find((entry) => entry.id === investorId);
+  if (!investor) return undefined;
+  return {
+    id: userId,
+    name: investor.name,
+    headline: investor.headline || investor.firm_name,
+    avatar: investor.avatar,
+    coverImage: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=1200&h=400',
+    connections: 0,
+    about: `${investor.name} is listed in the StartupForge investor directory.`,
+    experience: investor.firm_name,
+    education: 'Not provided',
+    role: 'investor',
+    company: investor.firm_name,
+  };
 };
 
 export type Comment = {
@@ -356,7 +377,8 @@ function App() {
   };
 
   // --- Connection Request Logic ---
-  const handleSendConnectionRequest = async (targetUserId: string) => {
+  const handleSendConnectionRequest = async (targetUserId: string, targetRole = 'founder') => {
+    console.log("targetUserId =", targetUserId);
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       const res = await fetch(`${apiUrl}/connections/request`, {
@@ -368,8 +390,8 @@ function App() {
         body: JSON.stringify({
           sender_id: currentUser.id,
           sender_role: currentUser.role,
-          receiver_id: parseInt(targetUserId),
-          receiver_role: 'founder', // simplified for MVP, ideally target user has role
+          receiver_id: String(targetUserId),
+          receiver_role: targetRole,
           message: `Hi, I'd like to connect!`
         })
       });
@@ -458,8 +480,15 @@ function App() {
     setConnectionRequests(connectionRequests.filter(req => req.id !== requestId));
   };
 
-  const handleRejectRequest = (requestId: string) => {
-    setConnectionRequests(connectionRequests.filter(req => req.id !== requestId));
+  const handleRejectRequest = async (requestId: string) => {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const res = await fetch(`${apiUrl}/connections/reject/${requestId}`, {
+        method: 'POST', headers: { 'x-user-id': currentUser.id }
+      });
+      if (res.ok) setConnectionRequests(connectionRequests.filter(req => req.id !== requestId));
+      else console.error('Failed to reject connection request:', await res.text());
+    } catch (err) { console.error('Failed to reject connection request', err); }
   };
 
   const handleSendMessage = (userId: string, content: string, type: 'text' | 'voice' | 'image' | 'file' = 'text', fileName?: string) => {
@@ -571,7 +600,7 @@ function App() {
       return;
     }
 
-    const localUser = users.find(u => u.id === viewingUserId) || extraSearchResults.find(u => u.id === viewingUserId);
+    const localUser = users.find(u => u.id === viewingUserId) || extraSearchResults.find(u => u.id === viewingUserId) || getInvestorProfile(viewingUserId);
     if (!localUser) {
       // Fetch from API
       console.log(`Fetching profile for: ${viewingUserId}`);
@@ -591,7 +620,7 @@ function App() {
 
   const viewingUser = viewingUserId === 'current-user'
     ? currentUser
-    : (users.find(u => u.id === viewingUserId) || extraSearchResults.find(u => u.id === viewingUserId) || fetchedUser || currentUser);
+    : (users.find(u => u.id === viewingUserId) || extraSearchResults.find(u => u.id === viewingUserId) || getInvestorProfile(viewingUserId) || fetchedUser || currentUser);
 
   const isOwnProfile = viewingUserId === 'current-user';
 
@@ -717,7 +746,7 @@ function App() {
           isOwnProfile={isOwnProfile}
           isFollowing={followedUsers.has(viewingUserId)}
           onUpdateProfile={handleUpdateProfile}
-          onFollowUser={() => handleSendConnectionRequest(viewingUserId)}
+          onFollowUser={() => handleSendConnectionRequest(viewingUserId, viewingUser.role)}
           userPosts={posts.filter(p => p.userId === viewingUserId)}
           onViewConflictReport={() => navigateTo('conflict-report')}
           currentUser={currentUser}
@@ -740,8 +769,10 @@ function App() {
       {currentPage === 'conflict-report' && (
         <ConflictReportPage
           currentUser={currentUser}
-          onNavigate={(page) => {
-            if (page === 'network') navigateTo('network');
+          onNavigate={(page, userId) => {
+            if (userId) navigateTo('profile', userId);
+            else if (page.startsWith('profile:')) navigateTo('profile', page.slice('profile:'.length));
+            else if (page === 'network') navigateTo('network');
             else if (page === 'notifications') navigateTo('notifications');
             else if (page === 'messages') navigateTo('messages');
             else if (page === 'profile') navigateTo('profile', 'current-user');
@@ -754,8 +785,8 @@ function App() {
           ragResults={ragResults}
           isSearching={isSearching}
           onBack={goBack}
-          currentInvestorName={coiTarget?.investor || currentUser.name}
-          targetCompanyName={coiTarget?.company || viewingUser.company || viewingUser.name}
+          currentInvestorName={coiTarget?.investor || (currentUser.role === 'investor' ? currentUser.name : '')}
+          targetCompanyName={coiTarget?.company || (currentUser.role === 'founder' ? currentUser.company || '' : (viewingUser.id !== currentUser.id ? viewingUser.company || viewingUser.name : ''))}
         />
       )}
 
@@ -806,8 +837,10 @@ function App() {
           onRejectRequest={handleRejectRequest}
           onFollowUser={handleSendConnectionRequest}
           onViewProfile={(userId) => navigateTo('profile', userId)}
-          onNavigate={(page) => {
-            if (page === 'network') navigateTo('network');
+          onNavigate={(page, userId) => {
+            if (userId) navigateTo('profile', userId);
+            else if (page.startsWith('profile:')) navigateTo('profile', page.slice('profile:'.length));
+            else if (page === 'network') navigateTo('network');
             else if (page === 'notifications') navigateTo('notifications');
             else if (page === 'messages') navigateTo('messages');
             else if (page === 'profile') navigateTo('profile', 'current-user');
@@ -826,8 +859,10 @@ function App() {
         <NotificationsPage
           currentUser={currentUser}
           onViewJob={(jobId) => navigateTo('jobs')}
-          onNavigate={(page) => {
-            if (page === 'network') navigateTo('network');
+          onNavigate={(page, userId) => {
+            if (userId) navigateTo('profile', userId);
+            else if (page.startsWith('profile:')) navigateTo('profile', page.slice('profile:'.length));
+            else if (page === 'network') navigateTo('network');
             else if (page === 'notifications') navigateTo('notifications');
             else if (page === 'messages') navigateTo('messages');
             else if (page === 'profile') navigateTo('profile', 'current-user');
@@ -849,8 +884,10 @@ function App() {
       {currentPage === 'jobs' && (
         <JobsPage
           currentUser={currentUser}
-          onNavigate={(page) => {
-            if (page === 'network') navigateTo('network');
+          onNavigate={(page, userId) => {
+            if (userId) navigateTo('profile', userId);
+            else if (page.startsWith('profile:')) navigateTo('profile', page.slice('profile:'.length));
+            else if (page === 'network') navigateTo('network');
             else if (page === 'notifications') navigateTo('notifications');
             else if (page === 'messages') navigateTo('messages');
             else if (page === 'profile') navigateTo('profile', 'current-user');

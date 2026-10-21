@@ -5,7 +5,7 @@ import { SearchResultsDropdown } from './SearchResultsDropdown';
 
 type JobsPageProps = {
   currentUser?: any;
-  onNavigate?: (page: string) => void;
+  onNavigate?: (page: string, userId?: string) => void;
   onSearch?: (query: string) => void;
   onQueryChange?: (query: string) => void;
   ragResults?: any;
@@ -222,7 +222,7 @@ export function JobsPage({ currentUser, onNavigate, onSearch, onQueryChange, rag
                   results={ragResults}
                   isVisible={true}
                   isLoading={isSearching || false}
-                  onSelectResult={(id) => onNavigate?.('profile')}
+                  onSelectResult={(id) => onNavigate?.('profile', id)}
                 />
               </div>
             )}

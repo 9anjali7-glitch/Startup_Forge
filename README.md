@@ -1,118 +1,28 @@
-# StartUp Forge
+# StartupForge
 
-A decentralized platform for startup-investor matching and secure communication.
+StartupForge is a startup and investor matching application. The local stack contains a React frontend, Node API, PostgreSQL, Neo4j, Gun relay, RAG service, and prediction service.
 
-## System Architecture
+## Run the full stack (recommended)
 
-The application consists of 5 main services:
+Prerequisites: Docker Desktop with Docker Compose enabled.
 
-| Service | Port | Description | Tech Stack |
-| :--- | :--- | :--- | :--- |
-| **Frontend** | `5173` | Main User Interface | React, Vite, Shadcn UI |
-| **Backend** | `3000` | Database & API Gatekeeper | Node.js, Express, PostgreSQL |
-| **Gun Server** | `8765` | Decentralized Chat Relay | Node.js, Gun.js |
-| **RAG Backend** | `8000` | AI Chat & Semantic Search | Python, FastAPI, Mistral AI |
-| **Prediction** | `8002` | Matches & Growth Prediction | Python, FastAPI, XGBoost |
+1. In the project root, copy `.env.example` to `.env` if you want to change the local Neo4j password or enable Mistral AI features. Founder and investor keyword search works without a Mistral key; semantic ranking and generated AI replies need `MISTRAL_API_KEY`.
+2. Start the services:
 
----
+   ```powershell
+   docker compose up --build
+   ```
 
-## Prerequisites
+3. Open <http://localhost:5173>. The API is at <http://localhost:3000>; PostgreSQL is on `5432`, Neo4j Browser on `7474`, Gun on `8765`, RAG on `8000`, and prediction on `8002`.
+4. Initialize the PostgreSQL tables and synchronize founder and investor profiles into Neo4j by opening <http://localhost:3000/setup-db>. Sign in with 1upHealth (founder) or Mark Suster (investor). PostgreSQL currently contains 159 founders and 53 investors; Neo4j also includes the restored company, investor, and domain graph.
+5. Demo workflows after setup: Mark Suster and 1upHealth have an accepted inbox connection; the conflict checker includes `Demo Direct Conflict Co` (direct portfolio/sector overlap) and `Demo Indirect Conflict Co` (invested parent → subsidiary → competitor). The setup route uses `MERGE`, so it can be rerun safely.
 
-1.  **Node.js**: v18+
-2.  **Python**: 3.10+
-3.  **PostgreSQL**: Running locally or via Docker.
-4.  **Virtual Environment**: Located at `d:\one_day_bfr\venv`.
+Stop the stack with `Ctrl+C`, or run `docker compose down`. Persistent database data is kept in Docker volumes. To remove the data volumes as well, run `docker compose down -v`.
 
----
+## Run services without Docker
 
-## 1. Setup & Installation
+Use Node.js 18 or newer, Python 3.10 or newer, PostgreSQL, and Neo4j. Install the Node dependencies in `backend`, `gun_server`, and `frontend` with `npm install`. Install Python dependencies from each service's `requirements.txt`, then start PostgreSQL and Neo4j with credentials matching `.env`.
 
-### Python Services (RAG & Prediction)
-The project shares a common virtual environment. Ensure dependencies are installed for both services.
+Start the API with `npm start` in `backend`, the relay with `npm start` in `gun_server`, the RAG service with `python -m uvicorn app:app --host 0.0.0.0 --port 8000` in `rag_backend`, the prediction service with `python -m uvicorn app:app --host 0.0.0.0 --port 8002` in `growth_predict/models/investor_backend`, and the UI with `npm run dev` in `frontend`. Open the Vite URL printed in the terminal.
 
-```powershell
-# Install RAG Backend Dependencies
-cd rag_backend
-& "d:\one_day_bfr\venv\Scripts\python.exe" -m pip install -r requirements.txt
-
-# Install Prediction Backend Dependencies
-cd ../growth_predict/models/investor_backend
-& "d:\one_day_bfr\venv\Scripts\python.exe" -m pip install -r requirements.txt
-```
-
-### Node.js Services (Backend, Gun, Frontend)
-
-```powershell
-# Root Backend
-cd ../../../backend
-npm install
-
-# Gun Relay
-cd ../gun_server
-npm install
-
-# Frontend
-cd ../frontend
-npm install
-```
-
----
-
-## 2. Running the Application
-
-You need to run these commands in **separate terminal windows**.
-
-### Terminal 1: Main Backend
-```powershell
-cd backend
-node server.js
-```
-*Runs on http://localhost:3000*
-
-### Terminal 2: Gun Relay (Chat)
-```powershell
-cd gun_server
-node gun.js
-```
-*Runs on http://localhost:8765*
-
-### Terminal 3: RAG Backend (AI Chat)
-Make sure you have `MISTRAL_API_KEY` in `rag_backend/.env`.
-```powershell
-cd rag_backend
-& "d:\one_day_bfr\venv\Scripts\python.exe" -m uvicorn app:app --reload
-```
-*Runs on http://localhost:8000*
-
-### Terminal 4: Prediction Service (StartUp Matching)
-```powershell
-cd growth_predict/models/investor_backend
-& "d:\one_day_bfr\venv\Scripts\python.exe" -m uvicorn app:app --host 0.0.0.0 --port 8002
-```
-*Runs on http://localhost:8002*
-
-### Terminal 5: Frontend
-```powershell
-cd frontend
-npm run dev
-```
-*Runs on http://localhost:5173* (or similar)
-
----
-
-## 3. Environment Variables
-
-### `rag_backend/.env`
-```
-MISTRAL_API_KEY=your_key_here
-```
-
-### `backend/.env` (If applicable)
-Ensure database credentials vary by setup, usually:
-```
-DB_USER=postgres
-DB_HOST=localhost
-DB_NAME=startupforge_db
-DB_PASSWORD=StrongPassword123
-DB_PORT=5432
-```
+If a port is already in use, stop the process using that port or change the published port in `docker-compose.yml`.

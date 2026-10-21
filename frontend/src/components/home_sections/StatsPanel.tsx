@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { User } from '../../App';
 import { ShieldCheck, Users, PieChart, ArrowUpRight } from 'lucide-react';
 
@@ -6,8 +6,8 @@ interface StatsPanelProps {
     currentUser: User;
     coiCompanyName: string;
     setCoiCompanyName: (val: string) => void;
-    coiDomain: string;
-    setCoiDomain: (val: string) => void;
+    coiInvestorName: string;
+    setCoiInvestorName: (val: string) => void;
     coiSuggestions: any[];
     showCoiSuggestions: boolean;
     setShowCoiSuggestions: (val: boolean) => void;
@@ -17,25 +17,21 @@ interface StatsPanelProps {
     handleFindInvestors: () => void;
     // Invested Companies
     investedCompanies: any[];
-    hoveredCompanyId: string | null;
-    setHoveredCompanyId: (val: string | null) => void;
 }
 
 export const StatsPanel = ({
     currentUser,
     coiCompanyName,
     setCoiCompanyName,
-    coiDomain,
-    setCoiDomain,
+    coiInvestorName,
+    setCoiInvestorName,
     coiSuggestions,
     showCoiSuggestions,
     setShowCoiSuggestions,
     onCheckConflict,
     isFindingInvestors,
     handleFindInvestors,
-    investedCompanies,
-    hoveredCompanyId,
-    setHoveredCompanyId
+    investedCompanies
 }: StatsPanelProps) => {
 
     return (
@@ -48,10 +44,17 @@ export const StatsPanel = ({
                 </div>
 
                 <div className="flex flex-col gap-3 flex-1 justify-center pt-2">
+                    {currentUser.role !== 'investor' && <input
+                        type="text"
+                        placeholder="Investor or fund name"
+                        value={coiInvestorName}
+                        onChange={(e) => setCoiInvestorName(e.target.value)}
+                        className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-1 focus:ring-slate-400 outline-none transition-all placeholder:text-gray-400"
+                    />}
                     <div className="relative">
                         <input
                             type="text"
-                            placeholder="Company Name"
+                            placeholder={currentUser.role === 'investor' ? 'Company to screen' : 'Your company to screen'}
                             value={coiCompanyName}
                             onChange={(e) => {
                                 setCoiCompanyName(e.target.value);
@@ -67,8 +70,7 @@ export const StatsPanel = ({
                                         key={idx}
                                         className="px-4 py-2 hover:bg-slate-50 cursor-pointer text-sm text-slate-700 truncate"
                                         onClick={() => {
-                                            setCoiCompanyName(s.name.replace('...', '')); // Remove truncation dots if any
-                                            setCoiDomain(s.domain || "tech.com");
+                                            setCoiCompanyName(s.name);
                                             setShowCoiSuggestions(false);
                                         }}
                                     >
@@ -78,15 +80,9 @@ export const StatsPanel = ({
                             </div>
                         )}
                     </div>
-                    <input
-                        type="text"
-                        placeholder="Domain (e.g. tech.com)"
-                        value={coiDomain}
-                        onChange={(e) => setCoiDomain(e.target.value)}
-                        className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-1 focus:ring-slate-400 outline-none transition-all placeholder:text-gray-400"
-                    />
                     <button
-                        onClick={() => onCheckConflict?.(currentUser.name, coiCompanyName)}
+                        disabled={!coiCompanyName.trim() || (currentUser.role !== 'investor' && !coiInvestorName.trim())}
+                        onClick={() => onCheckConflict?.(currentUser.role === 'investor' ? currentUser.name : coiInvestorName.trim(), coiCompanyName.trim())}
                         className="w-full mt-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold py-3 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2"
                     >
                         Check Conflict <ShieldCheck className="w-4 h-4" />
@@ -129,120 +125,35 @@ export const StatsPanel = ({
                 </div>
             </div>
 
-            {/* Invested Companies (Flex 3.5 -> ~35%) */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 flex flex-col relative z-50 flex-shrink-0">
+            {/* Matched Investment Activity */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 flex flex-col relative z-10 flex-shrink-0">
                 <div className="flex items-center gap-2 mb-3">
                     <PieChart className="w-4 h-4 text-slate-800" />
-                    <h3 className="font-bold text-gray-800 text-base"><b>My Invested Company Stats</b></h3>
+                    <h3 className="font-bold text-gray-800 text-base">Matched Investment Activity</h3>
                 </div>
-
-                <div className="flex flex-col h-full justify-center gap-4 px-1">
-                    {(() => {
-                        const defaultInvestments = [
-                            { id: 'd1', company: "Nebula AI", round: "Series A", amount: "$5M", year: "2024", img: 88, stock: '45.0M', growth: 120 },
-                            { id: 'd2', company: "Zephyr", round: "Seed", amount: "$2M", year: "2023", img: 52, stock: '12.0M', growth: 85 },
-                            { id: 'd3', company: "Flux Sys", round: "Seed", amount: "$1.2M", year: "2023", img: 33, stock: '15.5M', growth: 90 },
-                            { id: 'd4', company: "Apex Bio", round: "Series B", amount: "$15M", year: "2022", img: 11, stock: '60.0M', growth: 45 },
-                            { id: 'd5', company: "Vortex", round: "Series A", amount: "$8M", year: "2022", img: 95, stock: '32.0M', growth: 60 },
-                            { id: 'd6', company: "Horizon", round: "Seed", amount: "$500K", year: "2021", img: 61, stock: '8.0M', growth: 30 },
-                            { id: 'd7', company: "Pulse", round: "Pre-Seed", amount: "$200K", year: "2021", img: 72, stock: '2.5M', growth: 40 },
-                            { id: 'd8', company: "Echo Lab", round: "Series A", amount: "$10M", year: "2020", img: 48, stock: '50.0M', growth: 55 }
-                        ];
-
-                        // Combine API data with defaults to ensure we have a full grid if needed
-                        const uiInvestments = investedCompanies.map(c => ({
-                            id: c.founder_id,
-                            company: c.company,
-                            round: c.round,
-                            amount: typeof c.amount === 'number' ? `$${(c.amount / 1000000).toFixed(1)}M` : c.amount,
-                            year: c.year,
-                            img: c.founder_id,
-                            stock: c.valuation ? (c.valuation / 1000000).toFixed(1) + 'M' : 'N/A',
-                            growth: Math.floor(Math.random() * 40) + 10 // Mock growth if not in API
-                        }));
-
-                        // Deduplicate by ID
-                        const uniqueInvestments = Array.from(new Map(uiInvestments.map(item => [item.id, item])).values());
-
-                        let displayList = [...uniqueInvestments];
-
-                        // Fill the rest with defaults if we have space
-                        if (displayList.length < 8) {
-                            const remaining = defaultInvestments.slice(0, 8 - displayList.length);
-                            displayList = [...displayList, ...remaining];
-                        } else {
-                            displayList = displayList.slice(0, 8);
-                        }
-
-                        const renderItem = (company: any, i: number) => {
-                            const uniqueId = company.id || `default-${i}`;
-                            const isRightSide = (i % 4) >= 2;
-                            const tooltipClass = isRightSide ? "right-0 translate-x-4" : "left-0 -translate-x-4";
-                            const arrowClass = isRightSide ? "right-8" : "left-8";
-
-                            return (
-                                <div
-                                    key={i}
-                                    className="relative group flex justify-center"
-                                    onMouseEnter={() => setHoveredCompanyId(uniqueId)}
-                                    onMouseLeave={() => setHoveredCompanyId(null)}
-                                >
-                                    {hoveredCompanyId === uniqueId && (
-                                        <div
-                                            className={`absolute bottom-full mb-3 w-64 text-sm rounded-xl p-4 animate-in fade-in zoom-in-95 duration-200 pointer-events-none z-[100] shadow-2xl border border-white/20 flex flex-col gap-3 ${tooltipClass}`}
-                                            style={{ backgroundColor: '#0f172a', color: 'white' }}
-                                        >
-                                            <div className="font-bold text-base border-b border-white/20 pb-2 mb-1 tracking-wide text-white">
-                                                {company.company || company.name}
-                                            </div>
-                                            <div className="flex flex-col gap-2">
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-slate-400">Round</span>
-                                                    <span className="font-semibold text-white">{company.round}</span>
-                                                </div>
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-slate-400">Amount</span>
-                                                    <span className="font-semibold text-white">{company.amount}</span>
-                                                </div>
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-slate-400">Year</span>
-                                                    <span className="font-semibold text-white">{company.year}</span>
-                                                </div>
-                                                <div className="flex justify-between items-center border-t border-white/10 pt-2 mt-1">
-                                                    <span className="text-slate-400">Growth Prediction</span>
-                                                    <span className="font-semibold text-green-400">+{company.growth || Math.floor(Math.random() * 150) + 20}%</span>
-                                                </div>
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-slate-400">Stock Value</span>
-                                                    <span className="font-semibold text-white">${company.stock || (Math.random() * 200 + 10).toFixed(2)}</span>
-                                                </div>
-                                            </div>
-                                            {/* Arrow */}
-                                            <div
-                                                className={`absolute -bottom-1.5 w-3 h-3 rotate-45 border-r border-b border-white/20 ${arrowClass}`}
-                                                style={{ backgroundColor: '#0f172a' }}
-                                            ></div>
-                                        </div>
-                                    )}
-
-                                    <div className="relative transform transition-transform duration-300 hover:scale-110">
-                                        <img
-                                            src={`https://i.pravatar.cc/150?u=${company.id || company.img || i}`}
-                                            className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm cursor-pointer bg-white"
-                                            alt={company.company}
-                                        />
-                                    </div>
+                <p className="mb-3 text-xs leading-relaxed text-slate-500">Deals appear here after both sides submit matching round, amount, and year details.</p>
+                {investedCompanies.length ? (
+                    <div className="space-y-2">
+                        {investedCompanies.slice(0, 5).map((deal, index) => (
+                            <div key={deal.founder_id || `${deal.company}-${index}`} className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5">
+                                <div className="flex items-center justify-between gap-2">
+                                    <span className="truncate text-sm font-bold text-slate-800">{deal.company || 'Company name not provided'}</span>
+                                    <span className="shrink-0 rounded-full bg-white px-2 py-1 text-[10px] font-semibold text-slate-600">{deal.round || 'Round not provided'}</span>
                                 </div>
-                            );
-                        };
-
-                        return (
-                            <div className="grid grid-cols-4 gap-y-4 gap-x-2">
-                                {displayList.map((c, i) => renderItem(c, i))}
+                                <div className="mt-1 flex items-center justify-between gap-2 text-[11px] text-slate-500">
+                                    <span>Reported amount: {deal.amount || 'Not provided'}</span>
+                                    <span>{deal.year || 'Year not provided'}</span>
+                                </div>
                             </div>
-                        );
-                    })()}
-                </div>
+                        ))}
+                        {investedCompanies.length > 5 && <p className="text-right text-[10px] font-medium text-slate-500">+{investedCompanies.length - 5} more matched deals</p>}
+                    </div>
+                ) : (
+                    <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-5 text-center">
+                        <p className="text-sm font-semibold text-slate-700">No matched deals yet</p>
+                        <p className="mt-1 text-xs leading-relaxed text-slate-500">Confirmed details from your connected investors and founders will appear here.</p>
+                    </div>
+                )}
             </div>
         </div>
     );

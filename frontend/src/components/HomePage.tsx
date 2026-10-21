@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User } from '../App';
+import investorsData from '../data/investors.json';
 import { SearchResultsDropdown } from './SearchResultsDropdown';
 import { Bell, MessageSquare, BrainCircuit, Sparkles, Home, X, ArrowUpRight, Users } from 'lucide-react';
 import { Drawer } from 'vaul';
@@ -28,11 +29,10 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [topFounders, setTopFounders] = useState<any[]>([]);
   const [investedCompanies, setInvestedCompanies] = useState<any[]>([]);
-  const [hoveredCompanyId, setHoveredCompanyId] = useState<string | null>(null);
 
   // COI State
-  const [coiCompanyName, setCoiCompanyName] = useState('');
-  const [coiDomain, setCoiDomain] = useState('');
+  const [coiCompanyName, setCoiCompanyName] = useState(currentUser.role === 'founder' ? currentUser.company || '' : '');
+  const [coiInvestorName, setCoiInvestorName] = useState(currentUser.role === 'investor' ? currentUser.name || '' : '');
   const [coiSuggestions, setCoiSuggestions] = useState<any[]>([]);
   const [showCoiSuggestions, setShowCoiSuggestions] = useState(false);
 
@@ -40,6 +40,7 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
   const [investorMatches, setInvestorMatches] = useState<any[]>([]);
   const [showFindInvestorsModal, setShowFindInvestorsModal] = useState(false);
   const [isFindingInvestors, setIsFindingInvestors] = useState(false);
+  const [investorMatchError, setInvestorMatchError] = useState<string | null>(null);
   const [userGrowthRate, setUserGrowthRate] = useState<number>(0.24);
 
   // Mobile Drawer State
@@ -63,7 +64,27 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
 
   const handleFindInvestors = async () => {
     setIsFindingInvestors(true);
-    setInvestorMatches([]);
+    setInvestorMatchError(null);
+    const directory = investorsData as { id: number; name: string; firm_name: string; headline?: string }[];
+    const fallbackMatches = [
+      directory.find((investor) => investor.firm_name.toLowerCase().includes('sequoia')),
+      directory.find((investor) => investor.firm_name.toLowerCase().includes('andreessen')),
+      directory.find((investor) => investor.firm_name.toLowerCase().includes('y combinator')),
+    ].filter((investor): investor is NonNullable<typeof investor> => Boolean(investor)).map((investor) => ({
+      name: investor.name,
+      profileId: `investor-${investor.id}`,
+      profileName: investor.name,
+      profileHeadline: investor.headline || investor.firm_name,
+      safety_label: 'Directory profile',
+      match_score: null,
+      confidence_score: null,
+      activity_volatility: null,
+    }));
+    setInvestorMatches(fallbackMatches);
+    setShowFindInvestorsModal(true);
+
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 8000);
     try {
       // Use User data if available, or sensible defaults
       const payload = {
@@ -76,16 +97,36 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
       const res = await fetch(`${predictionUrl}/match`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        signal: controller.signal,
       });
+      if (!res.ok) throw new Error(`Match service returned ${res.status}`);
       const data = await res.json();
-      if (data.matches) {
-        setInvestorMatches(data.matches);
-        setShowFindInvestorsModal(true);
+      if (Array.isArray(data.matches) && data.matches.length) {
+        const matchesWithProfiles = data.matches.map((match: any) => {
+          const name = String(match.name || '').toLowerCase();
+          const investor = directory.find((candidate) => {
+            const firm = candidate.firm_name.toLowerCase();
+            return (name.includes('sequoia') && firm.includes('sequoia')) ||
+              (name.includes('andreessen') && firm.includes('andreessen')) ||
+              (name.includes('y combinator') && firm.includes('y combinator'));
+          });
+          return {
+            ...match,
+            profileId: investor ? `investor-${investor.id}` : undefined,
+            profileName: investor?.name,
+            profileHeadline: investor?.headline || investor?.firm_name,
+          };
+        });
+        setInvestorMatches(matchesWithProfiles);
+      } else {
+        setInvestorMatchError('Personalized scores are unavailable. Browse these investor profiles while matching reconnects.');
       }
     } catch (err) {
       console.error("Failed to find investors:", err);
+      setInvestorMatchError('Personalized scores are unavailable. Browse these investor profiles while matching reconnects.');
     } finally {
+      window.clearTimeout(timeoutId);
       setIsFindingInvestors(false);
     }
   };
@@ -104,8 +145,15 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query: coiCompanyName, top_k: 3 })
         });
+        if (!res.ok) throw new Error(`Company search returned ${res.status}`);
         const data = await res.json();
-        if (data.results) setCoiSuggestions(data.results.map((r: any) => ({ name: r.text.substring(0, 30) + "...", domain: "tech.com" }))); // Mock domain for now or extract
+        if (data.results) {
+          const suggestions = data.results.map((result: any) => {
+            const match = String(result.text || '').match(/(?:^|\\.\\s*)Company:\\s*([^.]*)/i);
+            return match?.[1]?.trim() ? { id: result.id, name: match[1].trim() } : null;
+          }).filter(Boolean);
+          setCoiSuggestions(suggestions);
+        }
       } catch (err) {
         console.error("COI Search Error", err);
       }
@@ -349,8 +397,8 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
                   currentUser={currentUser}
                   coiCompanyName={coiCompanyName}
                   setCoiCompanyName={setCoiCompanyName}
-                  coiDomain={coiDomain}
-                  setCoiDomain={setCoiDomain}
+                  coiInvestorName={coiInvestorName}
+                  setCoiInvestorName={setCoiInvestorName}
                   coiSuggestions={coiSuggestions}
                   showCoiSuggestions={showCoiSuggestions}
                   setShowCoiSuggestions={setShowCoiSuggestions}
@@ -358,8 +406,6 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
                   isFindingInvestors={isFindingInvestors}
                   handleFindInvestors={handleFindInvestors}
                   investedCompanies={investedCompanies}
-                  hoveredCompanyId={hoveredCompanyId}
-                  setHoveredCompanyId={setHoveredCompanyId}
                 />
               </div>
 
@@ -377,8 +423,8 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
               currentUser={currentUser}
               coiCompanyName={coiCompanyName}
               setCoiCompanyName={setCoiCompanyName}
-              coiDomain={coiDomain}
-              setCoiDomain={setCoiDomain}
+              coiInvestorName={coiInvestorName}
+              setCoiInvestorName={setCoiInvestorName}
               coiSuggestions={coiSuggestions}
               showCoiSuggestions={showCoiSuggestions}
               setShowCoiSuggestions={setShowCoiSuggestions}
@@ -386,8 +432,6 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
               isFindingInvestors={isFindingInvestors}
               handleFindInvestors={handleFindInvestors}
               investedCompanies={investedCompanies}
-              hoveredCompanyId={hoveredCompanyId}
-              setHoveredCompanyId={setHoveredCompanyId}
             />
           </div>
 
@@ -445,6 +489,12 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
               </button>
             </div>
 
+            {(isFindingInvestors || investorMatchError) && (
+              <div className="px-3 py-2 text-[10px] leading-relaxed text-slate-600 bg-indigo-50 border-b border-indigo-100" role="status">
+                {isFindingInvestors ? 'Checking fit… investor profiles are available now.' : investorMatchError}
+              </div>
+            )}
+
             <div className="p-3 overflow-y-auto custom-scrollbar bg-slate-50/50">
               <div className="grid grid-cols-1 gap-2">
                 {investorMatches.map((match, idx) => (
@@ -452,33 +502,42 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-xs font-bold text-slate-600">
-                          {match.name.charAt(0)}
+                          {(match.profileName || match.name).charAt(0)}
                         </div>
                         <div className="min-w-0">
-                          <h4 className="font-bold text-slate-900 leading-none text-xs truncate">{match.name}</h4>
-                          <span className={`inline-block mt-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full ${match.safety_label === 'Low Risk' ? 'bg-emerald-100 text-emerald-700' : match.safety_label === 'Moderate Risk' ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}>
-                            {match.safety_label}
+                          <h4 className="font-bold text-slate-900 leading-none text-xs truncate">{match.profileName || match.name}</h4>
+                          {match.profileHeadline && <span className="block mt-1 text-[9px] text-slate-500 truncate">{match.profileHeadline}</span>}
+                          <span className={`inline-block mt-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full ${match.safety_label === 'Low Risk' ? 'bg-emerald-100 text-emerald-700' : match.safety_label === 'Moderate Risk' ? 'bg-amber-100 text-amber-700' : match.safety_label === 'Directory profile' ? 'bg-slate-100 text-slate-600' : 'bg-red-100 text-red-700'}`}>
+                            {match.safety_label || 'Investor profile'}
                           </span>
                         </div>
                       </div>
                       <div className="flex flex-col items-end">
-                        <span className="text-lg font-black text-indigo-600">{(match.match_score * 100).toFixed(0)}%</span>
-                        <span className="text-[8px] uppercase font-bold text-slate-400 tracking-wider">Mask</span>
+                        <span className="text-lg font-black text-indigo-600">{Number.isFinite(match.match_score) ? `${(match.match_score * 100).toFixed(0)}%` : '—'}</span>
+                        <span className="text-[8px] uppercase font-bold text-slate-400 tracking-wider">{Number.isFinite(match.match_score) ? 'Match' : 'Profile'}</span>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-1.5 mt-0.5">
                       <div className="p-1.5 bg-slate-50 rounded border border-slate-100">
                         <span className="block text-[8px] text-slate-400 font-medium uppercase leading-none mb-0.5">Conf.</span>
-                        <span className="block text-[10px] font-bold text-slate-700 leading-none">{(match.confidence_score * 100).toFixed(0)}%</span>
+                        <span className="block text-[10px] font-bold text-slate-700 leading-none">{Number.isFinite(match.confidence_score) ? `${(match.confidence_score * 100).toFixed(0)}%` : '—'}</span>
                       </div>
                       <div className="p-1.5 bg-slate-50 rounded border border-slate-100">
                         <span className="block text-[8px] text-slate-400 font-medium uppercase leading-none mb-0.5">Vol.</span>
-                        <span className="block text-[10px] font-bold text-slate-700 leading-none">{match.activity_volatility.toFixed(2)}</span>
+                        <span className="block text-[10px] font-bold text-slate-700 leading-none">{Number.isFinite(match.activity_volatility) ? match.activity_volatility.toFixed(2) : '—'}</span>
                       </div>
                     </div>
 
-                    <button className="w-full mt-0.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded text-[10px] font-bold transition-colors shadow-sm opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 duration-200">
+                    <button
+                      onClick={() => {
+                        if (!match.profileId) return;
+                        setShowFindInvestorsModal(false);
+                        onNavigate('profile', match.profileId);
+                      }}
+                      disabled={!match.profileId}
+                      className="w-full mt-0.5 py-1.5 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded text-[10px] font-bold transition-colors shadow-sm"
+                    >
                       View Profile
                     </button>
                   </div>

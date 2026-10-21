@@ -4,10 +4,10 @@ const router = express.Router();
 require('dotenv').config();
 
 // Initialize Driver (Same as server.js)
-const uri = process.env.NEO4J_URI || 'bolt://localhost:7687';
+const uri = process.env.NEO4J_URI || 'bolt://host.docker.internal:7687';
 const driver = neo4j.driver(
     uri,
-    neo4j.auth.basic(process.env.NEO4J_USER || 'neo4j', process.env.NEO4J_PASSWORD || 'StrongPassword123'),
+    neo4j.auth.basic(process.env.NEO4J_USER || 'neo4j', process.env.NEO4J_PASSWORD || 'password'),
     uri.startsWith('bolt') ? { encrypted: false } : {}
 );
 
@@ -36,6 +36,8 @@ router.post('/request', async (req, res) => {
             MATCH (s:${senderLabel} {id: $senderId}), (r:${receiverLabel} {id: $receiverId})
             MERGE (s)-[rel:REQUESTED_CONNECTION]->(r)
             ON CREATE SET rel.status = 'PENDING', rel.message = $message, rel.created_at = datetime()
+            ON MATCH SET rel.status = CASE WHEN rel.status = 'REJECTED' THEN 'PENDING' ELSE rel.status END,
+                rel.message = $message
             RETURN rel.status as status
         `, { senderId: String(sender_id), receiverId: String(receiver_id), message: message || '' });
 
@@ -59,9 +61,59 @@ router.post('/request', async (req, res) => {
     }
 });
 
+/** Reject a pending connection request without deleting its audit history. */
+router.post('/reject/:id', async (req, res) => {
+    const userId = req.headers['x-user-id'];
+    const [senderId, receiverId] = req.params.id.split('_');
+    if (!userId) return res.status(400).json({ error: 'Missing x-user-id header' });
+    if (!senderId || receiverId !== String(userId)) return res.status(400).json({ error: 'Invalid request id' });
+
+    const session = driver.session();
+    try {
+        const result = await session.run(`
+            MATCH (sender {id: $senderId})-[r:REQUESTED_CONNECTION {status: 'PENDING'}]->(receiver {id: $receiverId})
+            SET r.status = 'REJECTED', r.responded_at = datetime()
+            RETURN r.status AS status
+        `, { senderId, receiverId: String(userId) });
+        if (!result.records.length) return res.status(404).json({ error: 'Pending request not found' });
+        res.json({ status: 'REJECTED' });
+    } catch (err) {
+        console.error('Reject request error:', err);
+        res.status(500).json({ error: 'Server error' });
+    } finally {
+        await session.close();
+    }
+});
+
 /**
  * Get Incoming Requests
  */
+router.get('/notifications', async (req, res) => {
+    const userId = req.headers['x-user-id'];
+    if (!userId) return res.status(400).json({ error: 'Missing x-user-id header' });
+
+    const session = driver.session();
+    try {
+        const result = await session.run(`
+            MATCH (me {id: $userId})-[r:REQUESTED_CONNECTION {status: 'ACCEPTED'}]->(receiver)
+            WITH receiver.id AS receiver_id, coalesce(receiver.name, receiver.founder, receiver.company) AS receiver_name,
+                collect(r) AS requests
+            WITH receiver_id, receiver_name, requests[0] AS r
+            RETURN elementId(r) AS id, receiver_id, receiver_name, toString(r.responded_at) AS responded_at
+            ORDER BY responded_at DESC
+        `, { userId: String(userId) });
+        res.json(result.records.map(record => ({
+            id: record.get('id'), receiver_id: record.get('receiver_id'),
+            receiver_name: record.get('receiver_name'), responded_at: record.get('responded_at')
+        })));
+    } catch (err) {
+        console.error('Notification fetch error:', err);
+        res.status(500).json({ error: 'Server error' });
+    } finally {
+        await session.close();
+    }
+});
+
 router.get('/requests/incoming', async (req, res) => {
     const userId = req.headers['x-user-id'];
     if (!userId) return res.status(400).json({ error: 'Missing x-user-id header' });
@@ -74,13 +126,19 @@ router.get('/requests/incoming', async (req, res) => {
         // Queries both possibilities:
         const query = `
             MATCH (sender)-[r:REQUESTED_CONNECTION {status: 'PENDING'}]->(me {id: $userId})
+            WITH sender.id AS sender_id, labels(sender) AS sender_labels,
+                sender.name AS sender_name, sender.firm_name AS sender_firm,
+                coalesce(sender.company, sender.name) AS sender_company,
+                sender.founder AS sender_founder, collect(r) AS requests
+            WITH sender_id, sender_labels, sender_name, sender_firm, sender_company,
+                sender_founder, requests[0] AS r
             RETURN 
-                sender.id as sender_id, 
-                labels(sender) as sender_labels,
-                sender.name as sender_name,
-                sender.firm_name as sender_firm,
-                sender.company as sender_company,
-                sender.founder as sender_founder,
+                sender_id as sender_id,
+                sender_labels,
+                sender_name,
+                sender_firm,
+                sender_company,
+                sender_founder,
                 r.message as message,
                 r.created_at as created_at
         `;
@@ -133,7 +191,7 @@ router.get('/requests/outgoing', async (req, res) => {
     try {
         const query = `
             MATCH (me {id: $userId})-[r:REQUESTED_CONNECTION {status: 'PENDING'}]->(receiver)
-            RETURN receiver.id as receiver_id, r.status as status
+            RETURN DISTINCT receiver.id as receiver_id, r.status as status
         `;
         const result = await session.run(query, { userId: String(userId) });
         res.json(result.records.map(r => ({

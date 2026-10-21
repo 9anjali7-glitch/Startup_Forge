@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 const express = require('express');
 const cors = require('cors');
 const pool = require('./db');
@@ -73,10 +73,11 @@ app.use('/api/founders', foundersRoutes);
 const neo4j = require('neo4j-driver');
 let driver;
 try {
-  const uri = process.env.NEO4J_URI || 'bolt://localhost:7687';
+  const uri = process.env.NEO4J_URI || "bolt://host.docker.internal:7687";
+
   driver = neo4j.driver(
     uri,
-    neo4j.auth.basic(process.env.NEO4J_USER || 'neo4j', process.env.NEO4J_PASSWORD || 'StrongPassword123'),
+    neo4j.auth.basic(process.env.NEO4J_USER || 'neo4j', process.env.NEO4J_PASSWORD || 'password'),
     uri.startsWith('bolt') ? { encrypted: false } : {}
   );
   console.log("✅ Neo4j Driver initialized");
@@ -139,6 +140,8 @@ app.post('/api/founders/rising', async (req, res) => {
     const query = `
       MATCH (c:Company)
       WHERE c.valuation IS NOT NULL AND c.founder IS NOT NULL
+      WITH c.name AS company, collect(c) AS copies
+      WITH company, copies[0] AS c
       RETURN c.id as id, c.founder as name, c.name as company, c.valuation as valuation, 
              c.round as round, c.year as year, c.domain as domain
       ORDER BY c.valuation DESC
@@ -190,6 +193,8 @@ app.get('/api/users/founders', async (req, res) => {
   try {
     const result = await session.run(`
       MATCH (f:Company)
+      WITH f.name AS company, collect(f) AS copies
+      WITH company, copies[0] AS f
       RETURN f.id as id, f.founder as name, f.name as headline, 'https://cdn-icons-png.flaticon.com/512/149/149071.png' as avatar
       LIMIT 50
     `);
@@ -220,6 +225,8 @@ app.get('/api/users/investors', async (req, res) => {
   try {
     const result = await session.run(`
       MATCH (i:Investor)
+      WITH i.name AS investor, collect(i) AS copies
+      WITH investor, copies[0] AS i
       RETURN i.id as id, i.name as name, i.firm_name as headline, 'https://cdn-icons-png.flaticon.com/512/147/147144.png' as avatar
       LIMIT 50
     `);

@@ -307,10 +307,10 @@ export function ProfilePage({ user, currentUser, isOwnProfile, isFollowing, onUp
               <p className="text-base md:text-lg text-slate-500 font-medium">{user.headline}</p>
 
               <div className="flex flex-wrap items-center gap-4 md:gap-6 mt-4 text-sm font-medium text-slate-500">
-                <span className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 rounded-lg border border-slate-100">
+                {user.location && <span className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 rounded-lg border border-slate-100">
                   <MapPin className="w-4 h-4 text-slate-400" />
-                  San Francisco, CA
-                </span>
+                  {user.location}
+                </span>}
                 <span className="flex items-center gap-1.5 text-indigo-600 font-bold bg-indigo-50 px-3 py-1 rounded-lg border border-indigo-100">
                   <CheckCircle2 className="w-4 h-4" />
                   {user.connections} connections

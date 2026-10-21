@@ -4,7 +4,7 @@ const pool = new Pool({
     host: 'localhost',
     port: 5432,
     user: 'postgres',
-    password: 'StrongPassword123', // Assuming same as Neo4j for now, or maybe empty? Try user's env logic? 
+    password: 'password', // Assuming same as Neo4j for now, or maybe empty? Try user's env logic?
     // Wait, db.js didn't have a password. It might be passwordless or Env var.
     // I will try adding password from common patterns or Env if db.js fails. 
     // Let's assume standard local dev: 'postgres'/'postgres' or 'postgres'/'password'

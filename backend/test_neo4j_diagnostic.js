@@ -12,7 +12,7 @@ async function runTests() {
 
     for (const conf of configs) {
         console.log(`\nTesting ${conf.name}: ${conf.url} ${JSON.stringify(conf.opts)}`);
-        const driver = neo4j.driver(conf.url, neo4j.auth.basic('neo4j', 'StrongPassword123'), conf.opts);
+        const driver = neo4j.driver(conf.url, neo4j.auth.basic('neo4j', 'password'), conf.opts);
         const session = driver.session();
         try {
             const res = await session.run('RETURN 1 AS num');

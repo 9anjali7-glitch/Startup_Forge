@@ -147,7 +147,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
             'Content-Type': 'application/json',
             'x-user-id': currentUser.id
           },
-          body: JSON.stringify({ targetUserId: parseInt(targetUserId) })
+          body: JSON.stringify({ targetUserId: String(targetUserId) })
         });
 
         if (!res.ok) {

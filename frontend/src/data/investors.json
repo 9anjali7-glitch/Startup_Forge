@@ -103,5 +103,12 @@
         "headline": "Partner at Sequoia",
         "firm_name": "Sequoia Capital",
         "avatar": "https://randomuser.me/api/portraits/men/15.jpg"
+    },
+    {
+        "id": 16,
+        "name": "Paul Graham",
+        "headline": "Co-founder at Y Combinator",
+        "firm_name": "Y Combinator",
+        "avatar": "https://randomuser.me/api/portraits/men/16.jpg"
     }
 ]

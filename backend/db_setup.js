@@ -1,4 +1,5 @@
 const pool = require('./db');
+const neo4j = require('neo4j-driver');
 
 async function setupDatabase(res) {
     try {
@@ -18,6 +19,21 @@ async function setupDatabase(res) {
           primary_domain VARCHAR(100)
         );
       `);
+
+            // Keep the restored investor archive usable on fresh installs too.
+            const investorColumns = [
+                ['investor_type', 'TEXT'], ['secondary_domains', 'TEXT[]'],
+                ['investment_stage_pref', 'TEXT[]'], ['website', 'TEXT'],
+                ['linkedin_url', 'TEXT'], ['twitter_url', 'TEXT'],
+                ['past_investments', "JSONB DEFAULT '[]'::jsonb"],
+                ['total_investments_count', 'INTEGER'], ['notable_investments', 'TEXT[]'],
+                ['is_active_investing', 'BOOLEAN'], ['investment_thesis', 'TEXT'],
+                ['tags', 'TEXT[]'], ['source', 'TEXT'], ['confidence_score', 'NUMERIC'],
+                ['created_at', 'TIMESTAMPTZ'], ['updated_at', 'TIMESTAMPTZ']
+            ];
+            for (const [column, type] of investorColumns) {
+                await client.query(`ALTER TABLE investors ADD COLUMN IF NOT EXISTS ${column} ${type}`);
+            }
 
             // 2. Founders Table
             await client.query(`
@@ -79,11 +95,101 @@ async function setupDatabase(res) {
         `);
             }
 
+            const investors = (await client.query('SELECT * FROM investors ORDER BY id')).rows;
+            const founders = (await client.query('SELECT * FROM founders ORDER BY id')).rows;
+            const neo4jUri = process.env.NEO4J_URI || 'bolt://host.docker.internal:7687';
+            const graphDriver = neo4j.driver(
+                neo4jUri,
+                neo4j.auth.basic(
+                    process.env.NEO4J_USER || 'neo4j',
+                    process.env.NEO4J_PASSWORD || 'password'
+                ),
+                neo4jUri.startsWith('bolt') ? { encrypted: false } : {}
+            );
+            try {
+                const graphSession = graphDriver.session();
+                try {
+                    for (const row of investors) {
+                        await graphSession.run(`
+                            MERGE (i:Investor {name: $name})
+                            SET i.id = toString($id), i.firm_name = $firm_name,
+                                i.short_bio = $short_bio, i.location = $location,
+                                i.profile_url = $profile_url, i.domain = $primary_domain,
+                                i.primary_domain = $primary_domain, i.investor_type = $investor_type,
+                                i.investment_stage_pref = $investment_stage_pref,
+                                i.secondary_domains = $secondary_domains,
+                                i.past_investments = $past_investments, i.investment_thesis = $investment_thesis,
+                                i.notable_investments = $notable_investments, i.tags = $tags,
+                                i.total_investments_count = $total_investments_count,
+                                i.is_active_investing = $is_active_investing
+                            RETURN i
+                        `, {
+                            id: row.id, name: row.name, firm_name: row.firm_name,
+                            short_bio: row.short_bio, location: row.location,
+                            profile_url: row.profile_url, primary_domain: row.primary_domain,
+                            investor_type: row.investor_type,
+                            investment_stage_pref: row.investment_stage_pref || [],
+                            secondary_domains: row.secondary_domains || [],
+                            past_investments: JSON.stringify(row.past_investments || []),
+                            investment_thesis: row.investment_thesis,
+                            notable_investments: row.notable_investments || [], tags: row.tags || [],
+                            total_investments_count: row.total_investments_count,
+                            is_active_investing: row.is_active_investing
+                        });
+                    }
+                    for (const row of founders) {
+                        await graphSession.run(`
+                            MERGE (c:Company {name: $company})
+                            SET c.id = toString($id), c.founder = $name,
+                                c.domain = $domain, c.location = $location,
+                                c.valuation = $valuation, c.round = $round,
+                                c.year = $year, c.description = $description
+                        `, { id: String(row.id), company: row.company || row.name,
+                            name: row.name, domain: row.domain, location: row.location,
+                            valuation: row.valuation == null ? null : Number(row.valuation),
+                            round: row.round, year: row.year, description: row.description });
+                    }
+
+                    // Repeatable local examples for direct and indirect COI checks,
+                    // plus an accepted demo connection so the inbox can be exercised.
+                    await graphSession.run(`
+                        MERGE (mark:Investor {name: 'Mark Suster'})
+                        MERGE (healthFounder:Company {name: '1upHealth'})
+                        MERGE (mark)-[:CONNECTED_TO]->(healthFounder)
+                        MERGE (healthFounder)-[:CONNECTED_TO]->(mark)
+
+                        MERGE (domain:Domain {name: 'Demo HealthTech'})
+                        MERGE (directPortfolio:Company {id: 'demo-direct-portfolio'})
+                        SET directPortfolio.name = 'Demo Direct Portfolio Co',
+                            directPortfolio.domain = 'Demo HealthTech'
+                        MERGE (directTarget:Company {id: 'demo-direct-target'})
+                        SET directTarget.name = 'Demo Direct Conflict Co',
+                            directTarget.domain = 'Demo HealthTech'
+                        MERGE (mark)-[:INVESTED_IN]->(directPortfolio)
+                        MERGE (directPortfolio)-[:OPERATES_IN]->(domain)
+                        MERGE (directTarget)-[:OPERATES_IN]->(domain)
+
+                        MERGE (parent:Company {id: 'demo-indirect-parent'})
+                        SET parent.name = 'Demo Parent Holdings'
+                        MERGE (subsidiary:Company {id: 'demo-indirect-subsidiary'})
+                        SET subsidiary.name = 'Demo Competitor Labs'
+                        MERGE (indirectTarget:Company {id: 'demo-indirect-target'})
+                        SET indirectTarget.name = 'Demo Indirect Conflict Co'
+                        MERGE (mark)-[:INVESTED_IN]->(parent)
+                        MERGE (parent)-[:HAS_SUBSIDIARY]->(subsidiary)
+                        MERGE (subsidiary)-[:COMPETES_WITH]->(indirectTarget)
+                    `);
+                } finally {
+                    await graphSession.close();
+                }
+            } finally {
+                await graphDriver.close();
+            }
             await client.query('COMMIT');
             res.send(`
         <h1>Database Setup Complete ✅</h1>
-        <p>Tables created and seed data (Mark Suster, 1upHealth) inserted.</p>
-        <p>You can now go back to the frontend and login.</p>
+        <p>Schema is ready. Synchronized ${investors.length} investors and ${founders.length} founders into Neo4j.</p>
+        <p>You can now return to the frontend and log in with a restored profile.</p>
       `);
 
         } catch (e) {

@@ -87,12 +87,15 @@ const ConflictReportPage = ({
                 })
             });
             const data = await res.json();
+            if (!res.ok || data?.error) {
+                throw new Error(data?.error || `Conflict check failed (${res.status})`);
+            }
             setConflictData(data);
             setHasResults(true);
             toast.success("Analysis Complete", { description: "Conflict detection finished successfully." });
         } catch (err) {
             console.error("COI Analysis Failed", err);
-            toast.error("Analysis Failed", { description: "Could not connect to the analysis engine." });
+            toast.error("Analysis Failed", { description: err instanceof Error ? err.message : "Could not connect to the analysis engine." });
             setConflictData(null);
         } finally {
             // Minimum loading time for UX
@@ -119,7 +122,7 @@ const ConflictReportPage = ({
     // --- Level 2 Data (Subsidiary/Competitor) ---
     const isLevel2 = currentLevel === 2;
     const level2Details = isLevel2 ? (conflictData.conflicts || []) : [];
-    const level2Tags = isLevel2 ? level2Details.map((c: any) => c.investedParent) : [];
+    const level2Tags = isLevel2 ? [...new Set(level2Details.flatMap((c: any) => [c.investedParent, c.competingSubsidiary]))] : [];
 
     // --- Calculate Score ---
     // riskScore unused
@@ -427,9 +430,9 @@ const ConflictReportPage = ({
                                         <RiskOverviewCard
                                             level={1}
                                             hasConflict={isLevel1}
-                                            riskScore={isLevel1 ? 45 : 0}
+                                            riskScore={isLevel1 ? (conflictData?.score ?? 45) : 0}
                                             relationships={level1Tags}
-                                            description={isLevel1 ? "Direct portfolio overlap." : "No direct conflict."}
+                                            description={isLevel1 ? (conflictData?.reason || "Direct portfolio overlap.") : "No direct conflict."}
                                             className="h-full shadow-sm hover:shadow-md transition-shadow"
                                         />
                                     ) : (
@@ -449,9 +452,9 @@ const ConflictReportPage = ({
                                         <RiskOverviewCard
                                             level={2}
                                             hasConflict={isLevel2}
-                                            riskScore={isLevel2 ? 85 : 0}
+                                            riskScore={isLevel2 ? (conflictData?.score ?? 85) : 0}
                                             relationships={level2Tags}
-                                            description={isLevel2 ? "Indirect subsidiary/competitor." : "No indirect conflict."}
+                                            description={isLevel2 ? (conflictData?.reason || "Indirect subsidiary/competitor.") : "No indirect conflict."}
                                             className="h-full shadow-sm hover:shadow-md transition-shadow"
                                         />
                                     ) : (

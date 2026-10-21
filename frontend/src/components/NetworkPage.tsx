@@ -34,7 +34,7 @@ interface NetworkPageProps {
   followedUsers: Set<string>;
   connectedUsers: Set<string>;
   onRejectRequest: (id: string) => void;
-  onFollowUser: (userId: string) => void;
+  onFollowUser: (userId: string, role?: string) => void;
   onViewProfile: (userId: string) => void;
   onAcceptRequest: (id: string) => void;
   onNavigate: (page: string) => void;
@@ -211,7 +211,7 @@ export function NetworkPage({
           onClick={() => {
             if (user.id === currentUser.id) return;
             if (!connectedUsers.has(user.id) && !(user as any).isConnected) {
-              onFollowUser(user.id);
+              onFollowUser(user.id, user.role || (activeTab === 'investors' ? 'investor' : 'founder'));
               // Optimistic update
               (user as any).isConnected = true;
             }
@@ -319,7 +319,7 @@ export function NetworkPage({
                   results={ragResults}
                   isVisible={true}
                   isLoading={isSearching || false}
-                  onSelectResult={(id) => onNavigate('profile')}
+                  onSelectResult={(id) => onViewProfile(id)}
                 />
               </div>
             )}

@@ -3,10 +3,10 @@ const neo4j = require('neo4j-driver');
 
 const router = express.Router();
 
-const uri = process.env.NEO4J_URI || "bolt://localhost:7687";
+const uri = process.env.NEO4J_URI || 'bolt://host.docker.internal:7687';
 const driver = neo4j.driver(
     uri,
-    neo4j.auth.basic(process.env.NEO4J_USER || "neo4j", process.env.NEO4J_PASSWORD || "StrongPassword123"),
+    neo4j.auth.basic(process.env.NEO4J_USER || "neo4j", process.env.NEO4J_PASSWORD || "password"),
     uri.startsWith('bolt') ? { encrypted: false } : {}
 );
 
@@ -21,37 +21,6 @@ router.post("/check", async (req, res) => {
 
     const session = driver.session();
 
-    // --- HARDCODED DEMO LOGIC FOR LEVEL 2 CONFLICT ---
-    if (investorName.toLowerCase().includes("mark suster")) {
-        const HARDCODED_TARGETS = {
-            "arkose labs": 65,
-            "backops ai": 75,
-            "bitmine immersion technologies": 85
-        };
-
-        const targetKey = targetCompany.toLowerCase();
-
-        if (HARDCODED_TARGETS[targetKey]) {
-            return res.json({
-                hasConflict: true,
-                conflictLevel: 2,
-                conflictType: "ownership + competition (Hardcoded Demo)",
-                confidence: "derived",
-                score: HARDCODED_TARGETS[targetKey], // User requested scores 65, 75, 85
-                investor: investorName,
-                targetCompany,
-                conflicts: [
-                    {
-                        investedParent: "SoftBank Group",
-                        competingSubsidiary: "Tech Vision Fund"
-                    }
-                ],
-                reason: `Level 2 Conflict: Investor has indirect exposure via SoftBank Group which backs a direct competitor to ${targetCompany}. (Risk Score: ${HARDCODED_TARGETS[targetKey]})`
-            });
-        }
-    }
-    // -------------------------------------------------
-
     try {
         /* ======================================================
            🔴 LEVEL 2 — HARD COI (DERIVED: Parent + Competition)
@@ -63,7 +32,7 @@ router.post("/check", async (req, res) => {
       MATCH (i)-[:INVESTED_IN]->(parent:Company)
             -[:HAS_SUBSIDIARY]->(sub:Company)
             -[:COMPETES_WITH]->(target)
-      RETURN
+      RETURN DISTINCT
         parent.name AS invested_parent,
         sub.name AS competing_subsidiary
     `;
@@ -77,8 +46,9 @@ router.post("/check", async (req, res) => {
             return res.json({
                 hasConflict: true,
                 conflictLevel: 2,
-                conflictType: "ownership + competition",
+                conflictType: "indirect ownership + competition",
                 confidence: "derived",
+                score: 90,
                 investor: investorName,
                 targetCompany,
                 conflicts: level2Result.records.map(r => ({
@@ -115,8 +85,9 @@ router.post("/check", async (req, res) => {
             return res.json({
                 hasConflict: true,
                 conflictLevel: 1,
-                conflictType: "sector overlap",
+                conflictType: "direct portfolio sector overlap",
                 confidence: "observed",
+                score: 75,
                 investor: investorName,
                 targetCompany,
                 sector: record.get("sector"),
@@ -133,6 +104,7 @@ router.post("/check", async (req, res) => {
         return res.json({
             hasConflict: false,
             conflictLevel: 0,
+            score: 0,
             investor: investorName,
             targetCompany
         });

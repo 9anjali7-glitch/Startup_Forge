@@ -1,13 +1,14 @@
 const express = require('express');
+const normalizeAmount = value => String(value ?? '').replace(/[^0-9.]/g, '').replace(/\.00$/, '');
 const router = express.Router();
 const neo4j = require('neo4j-driver');
 require('dotenv').config();
 
 // Initialize Driver
-const uri = process.env.NEO4J_URI || 'bolt://localhost:7687';
+const uri = process.env.NEO4J_URI || 'bolt://host.docker.internal:7687';
 const driver = neo4j.driver(
     uri,
-    neo4j.auth.basic(process.env.NEO4J_USER || 'neo4j', process.env.NEO4J_PASSWORD || 'StrongPassword123'),
+    neo4j.auth.basic(process.env.NEO4J_USER || 'neo4j', process.env.NEO4J_PASSWORD || 'password'),
     uri.startsWith('bolt') ? { encrypted: false } : {}
 );
 
@@ -35,10 +36,10 @@ router.get('/status/:connectionId', async (req, res) => {
             const r2 = dataReports[1];
 
             // Loose comparison since Neo4j might store numbers differently
-            if (String(r1.amount) === String(r2.amount) &&
+            if (normalizeAmount(r1.amount) === normalizeAmount(r2.amount) &&
                 String(r1.year) === String(r2.year) &&
                 r1.round === r2.round) {
-                return res.json({ status: 'MATCHED' });
+                return res.json({ status: 'MATCHED', deal: { round: r1.round, year: r1.year, amount: r1.amount } });
             } else {
                 return res.json({ status: 'PENDING', mismatch: true });
             }
@@ -132,7 +133,7 @@ router.post('/confirm', async (req, res) => {
         if (reports.length >= 2) {
             const r1 = reports[0];
             const r2 = reports[1];
-            if (String(r1.amount) === String(r2.amount) &&
+            if (normalizeAmount(r1.amount) === normalizeAmount(r2.amount) &&
                 String(r1.year) === String(r2.year) &&
                 r1.round === r2.round) {
                 status = 'MATCHED';
@@ -141,7 +142,7 @@ router.post('/confirm', async (req, res) => {
             }
         }
 
-        res.json({ status, mismatch });
+        res.json({ status, mismatch, deal: status === 'MATCHED' ? { round: reports[0].round, year: reports[0].year, amount: reports[0].amount } : undefined });
 
     } catch (e) {
         console.error("Inv Confirm Error:", e);

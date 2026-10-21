@@ -1,15 +1,11 @@
-version: '3.8'
-
 services:
-  # 1. Database
   db:
     image: postgres:15-alpine
     container_name: startupforge-postgres
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: StrongPassword123
+      POSTGRES_PASSWORD: password
       POSTGRES_DB: startupforge_db
-      POSTGRES_HOST_AUTH_METHOD: trust
     ports:
       - "5432:5432"
     volumes:
@@ -17,24 +13,40 @@ services:
     networks:
       - app-network
 
-  # 2. Backend (Node.js)
+  neo4j:
+    image: neo4j:5-community
+    container_name: startupforge-neo4j
+    environment:
+      NEO4J_AUTH: "neo4j/${NEO4J_PASSWORD:-startupforge-local}"
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    networks:
+      - app-network
+
   backend:
     build: ./backend
     container_name: startupforge-backend
     ports:
       - "3000:3000"
     environment:
-      - DB_USER=postgres
-      - DB_HOST=db
-      - DB_NAME=startupforge_db
-      - DB_PASSWORD=StrongPassword123
-      - DB_PORT=5432
+      DB_USER: postgres
+      DB_HOST: db
+      DB_NAME: startupforge_db
+      DB_PASSWORD: password
+      DB_PORT: 5432
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: "${NEO4J_PASSWORD:-startupforge-local}"
     depends_on:
       - db
+      - neo4j
     networks:
       - app-network
 
-  # 3. Gun Relay (Chat)
   gun_server:
     build: ./gun_server
     container_name: startupforge-gun
@@ -43,19 +55,23 @@ services:
     networks:
       - app-network
 
-  # 4. RAG Backend (AI)
   rag_backend:
     build: ./rag_backend
     container_name: startupforge-rag
     ports:
       - "8000:8000"
     environment:
-      # Pass the API key from host environment or .env file
-      - MISTRAL_API_KEY=${MISTRAL_API_KEY}
+      MISTRAL_API_KEY: "${MISTRAL_API_KEY:-}"
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: password
+      DB_NAME: startupforge_db
+    depends_on:
+      - db
     networks:
       - app-network
 
-  # 5. Prediction Backend
   prediction_backend:
     build: ./growth_predict/models/investor_backend
     container_name: startupforge-prediction
@@ -64,17 +80,21 @@ services:
     networks:
       - app-network
 
-  # 6. Frontend
   frontend:
     build: ./frontend
     container_name: startupforge-frontend
     ports:
       - "5173:5173"
     environment:
-      - VITE_API_URL=http://localhost:3000
+      VITE_API_URL: http://localhost:3000
+      VITE_GUN_URL: http://localhost:8765
+      VITE_RAG_API_URL: http://localhost:8000
+      VITE_PREDICTION_URL: http://localhost:8002
     depends_on:
       - backend
       - gun_server
+      - rag_backend
+      - prediction_backend
     networks:
       - app-network
 
@@ -84,3 +104,5 @@ networks:
 
 volumes:
   postgres_data:
+  neo4j_data:
+  neo4j_logs:
