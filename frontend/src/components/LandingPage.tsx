@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
     ArrowRight,
     CheckCircle2,
@@ -15,6 +15,8 @@ export const LandingPage = ({ onLogin }: LandingPageProps) => {
     const [role, setRole] = useState('investor');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const nameInputRef = useRef<HTMLInputElement>(null);
+    const focusLogin = () => { nameInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); nameInputRef.current?.focus({ preventScroll: true }); };
 
     const handleLogin = async (e?: React.FormEvent) => {
         if (e) e.preventDefault();
@@ -61,8 +63,8 @@ export const LandingPage = ({ onLogin }: LandingPageProps) => {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <button className="text-sm font-bold text-slate-900 hover:opacity-70">Log In</button>
-                    <button className="px-5 py-2.5 bg-slate-900 text-white text-sm font-bold rounded-full hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                    <button type="button" onClick={focusLogin} className="text-sm font-bold text-slate-900 hover:opacity-70">Log In</button>
+                    <button type="button" onClick={focusLogin} className="px-5 py-2.5 bg-slate-900 text-white text-sm font-bold rounded-full hover:shadow-lg hover:-translate-y-0.5 transition-all">
                         Get Started
                     </button>
                 </div>
@@ -115,6 +117,7 @@ export const LandingPage = ({ onLogin }: LandingPageProps) => {
                             <div>
                                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Full Name</label>
                                 <input
+                                    ref={nameInputRef}
                                     type="text"
                                     value={name}
                                     onChange={e => setName(e.target.value)}

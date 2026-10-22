@@ -19,6 +19,8 @@ export function Post({ post, currentUser, onLike, onViewProfile, onAddComment, o
   const [commentText, setCommentText] = useState('');
   const [showMenu, setShowMenu] = useState(false);
   const [showSendModal, setShowSendModal] = useState(false);
+  const [dismissed, setDismissed] = useState(() => { try { return JSON.parse(localStorage.getItem('startupforge:hidden-posts') || '[]').includes(post.id); } catch { return false; } });
+  const [likedComments, setLikedComments] = useState<Set<string>>(new Set());
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -38,19 +40,24 @@ export function Post({ post, currentUser, onLike, onViewProfile, onAddComment, o
     }
   };
 
-  const handleSaveVia = () => {
-    onSave();
-    alert('Post will be saved with a note (feature coming soon)');
+  const handleSaveVia = async () => {
+    const shareText = `${post.userName}: ${post.content}\n${window.location.origin}/#post-${encodeURIComponent(post.id)}`;
+    try { await navigator.clipboard.writeText(shareText); window.alert('Post text and link copied.'); }
+    catch { window.alert('Clipboard access was blocked by the browser.'); }
     setShowMenu(false);
   };
 
   const handleNotInterested = () => {
-    alert('You will see fewer posts like this');
+    try { const hidden = new Set<string>(JSON.parse(localStorage.getItem('startupforge:hidden-posts') || '[]')); hidden.add(post.id); localStorage.setItem('startupforge:hidden-posts', JSON.stringify([...hidden])); } catch { /* keep the dismissal for this render */ }
+    setDismissed(true);
     setShowMenu(false);
   };
 
+  if (dismissed) return null;
+
   const handleReport = () => {
-    alert('Post reported. Thank you for helping keep our community safe.');
+    try { const reports = JSON.parse(localStorage.getItem('startupforge:post-reports') || '[]'); reports.push({ postId: post.id, reportedAt: new Date().toISOString() }); localStorage.setItem('startupforge:post-reports', JSON.stringify(reports)); alert('Report saved on this device. It has not been sent to a moderation team.'); }
+    catch { alert('Could not save this report in browser storage.'); }
     setShowMenu(false);
   };
 
@@ -110,8 +117,8 @@ export function Post({ post, currentUser, onLike, onViewProfile, onAddComment, o
                 >
                   <Bookmark className="w-5 h-5" />
                   <div>
-                    <div className="text-gray-900">Save via</div>
-                    <div className="text-xs text-gray-500">Save with a note</div>
+                    <div className="text-gray-900">Copy post text and link</div>
+                    <div className="text-xs text-gray-500">Share it outside StartupForge</div>
                   </div>
                 </button>
 
@@ -190,6 +197,9 @@ export function Post({ post, currentUser, onLike, onViewProfile, onAddComment, o
             />
           </div>
         )}
+
+        {post.attachment?.type === 'video' && <div className="px-4 pb-3"><video controls preload="metadata" src={post.attachment.data} className="max-h-96 w-full rounded-lg" aria-label={post.attachment.name} /></div>}
+        {post.attachment?.type === 'document' && <div className="px-4 pb-3"><a href={post.attachment.data} download={post.attachment.name} className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-indigo-700 hover:bg-indigo-50">{post.attachment.name} · Download document</a></div>}
 
         {/* Engagement Stats */}
         <div className="px-4 py-2 flex items-center justify-between border-b border-gray-200">
@@ -308,8 +318,8 @@ export function Post({ post, currentUser, onLike, onViewProfile, onAddComment, o
                         <p className="text-sm text-gray-700 mt-1">{comment.content}</p>
                       </div>
                       <div className="flex gap-4 mt-1 px-4 text-xs text-gray-600">
-                        <button className="hover:text-blue-600">Like</button>
-                        <button className="hover:text-blue-600">Reply</button>
+                        <button onClick={() => setLikedComments(previous => { const next = new Set(previous); next.has(comment.id) ? next.delete(comment.id) : next.add(comment.id); return next; })} className={`hover:text-blue-600 ${likedComments.has(comment.id) ? 'font-semibold text-blue-600' : ''}`}>{likedComments.has(comment.id) ? 'Liked' : 'Like'}</button>
+                        <button onClick={() => { setCommentText(`@${comment.userName} `); setShowComments(true); }} className="hover:text-blue-600">Reply</button>
                         <span>{comment.timestamp}</span>
                       </div>
                     </div>

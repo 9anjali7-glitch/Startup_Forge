@@ -684,7 +684,11 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
               </div>
             </div>
             <div className="flex-1 overflow-y-auto px-2 pb-2 space-y-1 custom-scrollbar">
-              {conversations
+              {conversations.length === 0 ? (
+                <div className="p-5 text-center text-sm text-slate-500">No accepted connections yet. Connect with someone from Network to start a conversation.</div>
+              ) : conversations.filter(c => c.userName.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 ? (
+                <div className="p-5 text-center text-sm text-slate-500">No conversations match “{searchQuery}”.</div>
+              ) : conversations
                 .filter(c => c.userName.toLowerCase().includes(searchQuery.toLowerCase()))
                 .map(conversation => (
                   <button

@@ -85,6 +85,7 @@ export type Post = {
   userAvatar: string;
   content: string;
   image?: string;
+  attachment?: { type: 'video' | 'document'; data: string; name: string };
   likes: number;
   comments: Comment[];
   reposts: number;
@@ -457,7 +458,7 @@ function App() {
     setFollowedUsers(newFollowed);
   };
 
-  const handleCreatePost = (content: string, image?: string) => {
+  const handleCreatePost = (content: string, image?: string, attachment?: Post['attachment']) => {
     const newPost: Post = {
       id: `post-${Date.now()}`,
       userId: currentUser.id,
@@ -466,6 +467,7 @@ function App() {
       userAvatar: currentUser.avatar,
       content,
       image,
+      attachment,
       likes: 0,
       comments: [],
       reposts: 0,

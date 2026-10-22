@@ -6,15 +6,18 @@ type CreatePostModalProps = {
   currentUser: User;
   users: User[];
   onClose: () => void;
-  onPost: (content: string, image?: string) => void;
+  onPost: (content: string, image?: string, attachment?: { type: 'video' | 'document'; data: string; name: string }) => void;
 };
 
 export function CreatePostModal({ currentUser, users, onClose, onPost }: CreatePostModalProps) {
   const [content, setContent] = useState('');
   const [image, setImage] = useState<string | undefined>();
+  const [attachment, setAttachment] = useState<{ type: 'video' | 'document'; data: string; name: string } | undefined>();
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showMentions, setShowMentions] = useState(false);
   const [mentionSearch, setMentionSearch] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const mediaInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -25,6 +28,16 @@ export function CreatePostModal({ currentUser, users, onClose, onPost }: CreateP
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleMediaUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 25 * 1024 * 1024) { window.alert('Please choose a file smaller than 25 MB.'); e.target.value = ''; return; }
+    const type = file.type.startsWith('video/') ? 'video' : 'document';
+    const reader = new FileReader();
+    reader.onloadend = () => setAttachment({ type, data: reader.result as string, name: file.name });
+    reader.readAsDataURL(file);
   };
 
   const handleMention = (userName: string) => {
@@ -62,7 +75,7 @@ export function CreatePostModal({ currentUser, users, onClose, onPost }: CreateP
 
   const handlePost = () => {
     if (content.trim()) {
-      onPost(content, image);
+      onPost(content, image, attachment);
       onClose();
     }
   };
@@ -119,6 +132,8 @@ export function CreatePostModal({ currentUser, users, onClose, onPost }: CreateP
             </div>
           )}
 
+          {attachment && <div className="mt-3 flex items-center justify-between rounded-lg bg-slate-50 p-3 text-sm"><span className="truncate">{attachment.type === 'video' ? 'Video' : 'Document'}: {attachment.name}</span><button type="button" onClick={() => setAttachment(undefined)} className="ml-3 text-slate-500 hover:text-red-600">Remove</button></div>}
+
           {/* Image Preview */}
           {image && (
             <div className="relative mt-4">
@@ -145,12 +160,8 @@ export function CreatePostModal({ currentUser, users, onClose, onPost }: CreateP
               >
                 <Image className="w-5 h-5" />
               </button>
-              <button className="p-2 hover:bg-gray-100 rounded text-blue-600" title="Add video">
-                <Video className="w-5 h-5" />
-              </button>
-              <button className="p-2 hover:bg-gray-100 rounded text-orange-600" title="Add document">
-                <FileText className="w-5 h-5" />
-              </button>
+              <button type="button" onClick={() => { if (mediaInputRef.current) { mediaInputRef.current.accept = 'video/*'; mediaInputRef.current.click(); } }} className="p-2 hover:bg-gray-100 rounded text-blue-600" title="Add video"><Video className="w-5 h-5" /></button>
+              <button type="button" onClick={() => { if (mediaInputRef.current) { mediaInputRef.current.accept = 'application/pdf,.doc,.docx,.txt'; mediaInputRef.current.click(); } }} className="p-2 hover:bg-gray-100 rounded text-orange-600" title="Add document"><FileText className="w-5 h-5" /></button>
               <button 
                 onClick={() => {
                   setContent(content + '@');
@@ -161,11 +172,11 @@ export function CreatePostModal({ currentUser, users, onClose, onPost }: CreateP
               >
                 <AtSign className="w-5 h-5" />
               </button>
-              <button className="p-2 hover:bg-gray-100 rounded text-yellow-600" title="Add emoji">
-                <Smile className="w-5 h-5" />
-              </button>
+              <button type="button" onClick={() => setShowEmojiPicker(v => !v)} className="p-2 hover:bg-gray-100 rounded text-yellow-600" title="Add emoji"><Smile className="w-5 h-5" /></button>
             </div>
           </div>
+          {showEmojiPicker && <div className="mt-3 flex gap-2">{['😀', '🎉', '🚀', '💡', '💰'].map(emoji => <button type="button" key={emoji} onClick={() => { setContent(value => `${value}${emoji}`); setShowEmojiPicker(false); }} className="rounded-lg p-2 hover:bg-gray-100 text-xl">{emoji}</button>)}</div>}
+          <input ref={mediaInputRef} type="file" accept="video/*,application/pdf,.doc,.docx,.txt" onChange={handleMediaUpload} className="hidden" />
           <input
             ref={fileInputRef}
             type="file"

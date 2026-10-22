@@ -110,11 +110,11 @@ export function NetworkPage({
 
       if (fRes.ok) {
         const fData = await fRes.json();
-        setRealFounders(fData);
+        setRealFounders(Array.isArray(fData) ? fData.filter((u: any) => u?.id != null && String(u.name || '').trim()).map((u: any) => ({ ...u, id: String(u.id), name: String(u.name).trim(), headline: u.headline || 'Founder' })) : []);
       }
       if (iRes.ok) {
         const iData = await iRes.json();
-        setRealInvestors(iData);
+        setRealInvestors(Array.isArray(iData) ? iData.filter((u: any) => u?.id != null && String(u.name || '').trim()).map((u: any) => ({ ...u, id: String(u.id), name: String(u.name).trim(), headline: u.headline || 'Investor' })) : []);
       }
     } catch (e) {
       console.error("Failed to fetch network data", e);
@@ -165,7 +165,7 @@ export function NetworkPage({
   const renderTopProfiles = (users: User[]) => (
     <div className="flex flex-row gap-4 overflow-x-auto pb-6 pt-2 custom-scrollbar px-1">
       {users.slice(0, 5).map((user) => (
-        <div key={user.id} className="flex flex-col items-center min-w-[100px] p-3 rounded-2xl hover:bg-white hover:shadow-lg transition-all duration-300 cursor-pointer group border border-transparent hover:border-slate-100 relative" onClick={() => onViewProfile(user.id)}>
+        <div key={`${user.role || activeTab}-${user.id}`} className="flex flex-col items-center min-w-[100px] p-3 rounded-2xl hover:bg-white hover:shadow-lg transition-all duration-300 cursor-pointer group border border-transparent hover:border-slate-100 relative" onClick={() => onViewProfile(user.id)}>
           <div className="relative mb-3 transform group-hover:scale-105 transition-transform duration-300">
             <div className="absolute inset-0 bg-indigo-500 rounded-full blur-md opacity-0 group-hover:opacity-20 transition-opacity"></div>
             <img
@@ -187,7 +187,7 @@ export function NetworkPage({
   );
 
   const renderUserCard = (user: User) => (
-    <div key={user.id} className="bg-white border border-slate-200/60 rounded-2xl p-4 hover:shadow-lg hover:shadow-slate-200/50 transition-all duration-300 hover:border-indigo-100 group hover:-translate-y-1">
+    <div key={`${user.role || activeTab}-${user.id}`} className="bg-white border border-slate-200/60 rounded-2xl p-4 hover:shadow-lg hover:shadow-slate-200/50 transition-all duration-300 hover:border-indigo-100 group hover:-translate-y-1">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-4 flex-1 min-w-0" onClick={() => onViewProfile(user.id)}>
           <div className="relative">

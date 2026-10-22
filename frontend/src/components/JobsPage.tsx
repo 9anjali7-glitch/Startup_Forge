@@ -32,7 +32,12 @@ const ActionItem = ({ icon, label, onClick, badge, active }: { icon: any, label:
 );
 
 export function JobsPage({ currentUser, onNavigate, onSearch, onQueryChange, ragResults, isSearching }: JobsPageProps) {
-  const [savedJobs, setSavedJobs] = useState<Set<string>>(new Set());
+  const [savedJobs, setSavedJobs] = useState<Set<string>>(() => { try { return new Set(JSON.parse(localStorage.getItem(`startupforge:saved-jobs:${currentUser?.id || 'guest'}`) || '[]')); } catch { return new Set(); } });
+  const [appliedJobs, setAppliedJobs] = useState<Set<string>>(() => { try { return new Set(JSON.parse(localStorage.getItem(`startupforge:applied-jobs:${currentUser?.id || 'guest'}`) || '[]')); } catch { return new Set(); } });
+  const [jobTypeFilters, setJobTypeFilters] = useState<string[]>([]);
+  const [workTypeFilters, setWorkTypeFilters] = useState<string[]>([]);
+  const [experienceFilters, setExperienceFilters] = useState<string[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [location, setLocation] = useState('');
   const [isSearchExpanded, setIsSearchExpanded] = useState(false); // Mobile search
@@ -61,6 +66,7 @@ export function JobsPage({ currentUser, onNavigate, onSearch, onQueryChange, rag
       workType: 'Remote',
       postedDate: '2 days ago',
       applicants: 45,
+      experience: 'Senior',
       description: 'We are looking for a talented Senior Product Designer to join our team...'
     },
     {
@@ -74,6 +80,7 @@ export function JobsPage({ currentUser, onNavigate, onSearch, onQueryChange, rag
       workType: 'Hybrid',
       postedDate: '5 days ago',
       applicants: 78,
+      experience: 'Mid-level',
       description: 'Join our growing startup as a UX/UI Designer and help shape our product...'
     },
     {
@@ -87,6 +94,7 @@ export function JobsPage({ currentUser, onNavigate, onSearch, onQueryChange, rag
       workType: 'On-site',
       postedDate: '1 week ago',
       applicants: 32,
+      experience: 'Entry level',
       description: 'Creative product designer needed for innovative projects...'
     },
     {
@@ -100,6 +108,7 @@ export function JobsPage({ currentUser, onNavigate, onSearch, onQueryChange, rag
       workType: 'Remote',
       postedDate: '3 days ago',
       applicants: 89,
+      experience: 'Senior',
       description: 'Lead a team of talented designers and create amazing user experiences...'
     }
   ];
@@ -112,6 +121,14 @@ export function JobsPage({ currentUser, onNavigate, onSearch, onQueryChange, rag
       newSaved.add(jobId);
     }
     setSavedJobs(newSaved);
+    localStorage.setItem(`startupforge:saved-jobs:${currentUser?.id || 'guest'}`, JSON.stringify([...newSaved]));
+  };
+  const handleApply = (jobId: string) => {
+    const next = new Set(appliedJobs); next.add(jobId); setAppliedJobs(next);
+    localStorage.setItem(`startupforge:applied-jobs:${currentUser?.id || 'guest'}`, JSON.stringify([...next]));
+  };
+  const toggleFilter = (setter: React.Dispatch<React.SetStateAction<string[]>>, filters: string[], value: string) => {
+    setter(filters.includes(value) ? filters.filter(item => item !== value) : [...filters, value]);
   };
 
   const filteredJobs = jobs.filter(job => {
@@ -120,7 +137,10 @@ export function JobsPage({ currentUser, onNavigate, onSearch, onQueryChange, rag
       job.company.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesLocation = !location ||
       job.location.toLowerCase().includes(location.toLowerCase());
-    return matchesSearch && matchesLocation;
+    const matchesType = jobTypeFilters.length === 0 || jobTypeFilters.includes(job.type);
+    const matchesWorkType = workTypeFilters.length === 0 || workTypeFilters.includes(job.workType);
+    const matchesExperience = experienceFilters.length === 0 || experienceFilters.includes(job.experience);
+    return matchesSearch && matchesLocation && matchesType && matchesWorkType && matchesExperience;
   });
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -243,7 +263,7 @@ export function JobsPage({ currentUser, onNavigate, onSearch, onQueryChange, rag
         <div className="max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-6 p-4">
 
           {/* Left Sidebar - Filters (Hidden on Mobile for now, needs a toggle or dedicated page) */}
-          <div className="hidden lg:block w-72 flex-shrink-0">
+          <div className={`${showFilters ? 'block' : 'hidden'} lg:block w-full lg:w-72 flex-shrink-0`}>
             <div className="bg-white rounded-2xl border border-gray-200 p-5 sticky top-6">
               <h3 className="text-gray-900 mb-4 flex items-center gap-2 font-bold">
                 <Filter className="w-5 h-5 text-slate-500" />
@@ -255,15 +275,15 @@ export function JobsPage({ currentUser, onNavigate, onSearch, onQueryChange, rag
                   <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-3">Job type</label>
                   <div className="space-y-2.5">
                     <label className="flex items-center gap-3 cursor-pointer group">
-                      <input type="checkbox" className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" defaultChecked />
+                      <input type="checkbox" checked={jobTypeFilters.includes('Full-time')} onChange={() => toggleFilter(setJobTypeFilters, jobTypeFilters, 'Full-time')} className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
                       <span className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">Full-time</span>
                     </label>
                     <label className="flex items-center gap-3 cursor-pointer group">
-                      <input type="checkbox" className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                      <input type="checkbox" checked={jobTypeFilters.includes('Part-time')} onChange={() => toggleFilter(setJobTypeFilters, jobTypeFilters, 'Part-time')} className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
                       <span className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">Part-time</span>
                     </label>
                     <label className="flex items-center gap-3 cursor-pointer group">
-                      <input type="checkbox" className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                      <input type="checkbox" checked={jobTypeFilters.includes('Contract')} onChange={() => toggleFilter(setJobTypeFilters, jobTypeFilters, 'Contract')} className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
                       <span className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">Contract</span>
                     </label>
                   </div>
@@ -273,15 +293,15 @@ export function JobsPage({ currentUser, onNavigate, onSearch, onQueryChange, rag
                   <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-3">Work type</label>
                   <div className="space-y-2.5">
                     <label className="flex items-center gap-3 cursor-pointer group">
-                      <input type="checkbox" className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" defaultChecked />
+                      <input type="checkbox" checked={workTypeFilters.includes('Remote')} onChange={() => toggleFilter(setWorkTypeFilters, workTypeFilters, 'Remote')} className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
                       <span className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">Remote</span>
                     </label>
                     <label className="flex items-center gap-3 cursor-pointer group">
-                      <input type="checkbox" className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                      <input type="checkbox" checked={workTypeFilters.includes('Hybrid')} onChange={() => toggleFilter(setWorkTypeFilters, workTypeFilters, 'Hybrid')} className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
                       <span className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">Hybrid</span>
                     </label>
                     <label className="flex items-center gap-3 cursor-pointer group">
-                      <input type="checkbox" className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                      <input type="checkbox" checked={workTypeFilters.includes('On-site')} onChange={() => toggleFilter(setWorkTypeFilters, workTypeFilters, 'On-site')} className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
                       <span className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">On-site</span>
                     </label>
                   </div>
@@ -291,15 +311,15 @@ export function JobsPage({ currentUser, onNavigate, onSearch, onQueryChange, rag
                   <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-3">Experience level</label>
                   <div className="space-y-2.5">
                     <label className="flex items-center gap-3 cursor-pointer group">
-                      <input type="checkbox" className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                      <input type="checkbox" checked={experienceFilters.includes('Entry level')} onChange={() => toggleFilter(setExperienceFilters, experienceFilters, 'Entry level')} className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
                       <span className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">Entry level</span>
                     </label>
                     <label className="flex items-center gap-3 cursor-pointer group">
-                      <input type="checkbox" className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                      <input type="checkbox" checked={experienceFilters.includes('Mid-level')} onChange={() => toggleFilter(setExperienceFilters, experienceFilters, 'Mid-level')} className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
                       <span className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">Mid-level</span>
                     </label>
                     <label className="flex items-center gap-3 cursor-pointer group">
-                      <input type="checkbox" className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" defaultChecked />
+                      <input type="checkbox" checked={experienceFilters.includes('Senior')} onChange={() => toggleFilter(setExperienceFilters, experienceFilters, 'Senior')} className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
                       <span className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">Senior</span>
                     </label>
                   </div>
@@ -310,6 +330,7 @@ export function JobsPage({ currentUser, onNavigate, onSearch, onQueryChange, rag
 
           {/* Main Content */}
           <div className="flex-1 min-w-0">
+            <button type="button" onClick={() => setShowFilters(value => !value)} className="mb-4 inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 lg:hidden"><Filter className="h-4 w-4" />{showFilters ? 'Hide filters' : 'Show filters'}</button>
             {/* Search Bar (Secondary, specific to Jobs) */}
             <div className="bg-white rounded-2xl border border-gray-200 p-4 mb-6 shadow-sm hidden md:block">
               <div className="flex gap-4">
@@ -333,9 +354,7 @@ export function JobsPage({ currentUser, onNavigate, onSearch, onQueryChange, rag
                     className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all text-sm font-medium"
                   />
                 </div>
-                <button className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 font-medium transition-colors shadow-sm shadow-indigo-200">
-                  Search
-                </button>
+                <button type="button" onClick={() => onSearch?.(searchQuery)} className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 font-medium transition-colors shadow-sm shadow-indigo-200">Search</button>
               </div>
             </div>
 
@@ -346,13 +365,11 @@ export function JobsPage({ currentUser, onNavigate, onSearch, onQueryChange, rag
                   <Briefcase className="w-6 h-6" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-slate-900 font-bold text-lg">Set your job preferences</h3>
+                  <h3 className="text-slate-900 font-bold text-lg">Example job listings</h3>
                   <p className="text-sm text-slate-600 mt-1 leading-relaxed">
-                    Tell us what you're looking for and we'll show you jobs that match your preferences
+                    These sample listings demonstrate search and filters. Applications and saved jobs are stored on this device only.
                   </p>
-                  <button className="mt-3 px-5 py-2 bg-white text-indigo-700 border border-indigo-200 rounded-full hover:bg-slate-50 text-sm font-bold shadow-sm transition-all">
-                    Set preferences
-                  </button>
+                  <button type="button" onClick={() => document.querySelector<HTMLInputElement>('input[placeholder="Search by title, skill, or company"]')?.focus()} className="mt-3 px-5 py-2 bg-white text-indigo-700 border border-indigo-200 rounded-full hover:bg-slate-50 text-sm font-bold shadow-sm transition-all">Search jobs</button>
                 </div>
               </div>
             </div>
@@ -363,7 +380,7 @@ export function JobsPage({ currentUser, onNavigate, onSearch, onQueryChange, rag
                 {filteredJobs.length} jobs found
               </h2>
 
-              {filteredJobs.map(job => (
+              {filteredJobs.length === 0 ? <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">No sample jobs match. Clear a filter or try another search.</div> : filteredJobs.map(job => (
                 <div key={job.id} className="bg-white rounded-2xl border border-gray-200 p-5 hover:shadow-md transition-shadow cursor-pointer">
                   <div className="flex gap-4">
                     <img
@@ -421,9 +438,7 @@ export function JobsPage({ currentUser, onNavigate, onSearch, onQueryChange, rag
                         <p className="text-xs font-medium text-slate-400">
                           {job.applicants} applicants • Posted {job.postedDate}
                         </p>
-                        <button className="px-6 py-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 text-sm font-bold shadow-sm shadow-indigo-200 transition-all">
-                          Apply
-                        </button>
+                        <button type="button" onClick={() => handleApply(job.id)} disabled={appliedJobs.has(job.id)} className="px-6 py-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 disabled:bg-emerald-600 disabled:cursor-default text-sm font-bold shadow-sm shadow-indigo-200 transition-all">{appliedJobs.has(job.id) ? 'Applied on this device' : 'Mark as applied'}</button>
                       </div>
                     </div>
                   </div>

@@ -195,7 +195,7 @@ app.get('/api/users/founders', async (req, res) => {
       MATCH (f:Company)
       WITH f.name AS company, collect(f) AS copies
       WITH company, copies[0] AS f
-      RETURN f.id as id, f.founder as name, f.name as headline, 'https://cdn-icons-png.flaticon.com/512/149/149071.png' as avatar
+      RETURN coalesce(toString(f.id), 'neo4j:' + elementId(f)) as id, coalesce(f.founder, f.name, 'Founder') as name, f.name as headline, 'https://cdn-icons-png.flaticon.com/512/149/149071.png' as avatar
       LIMIT 50
     `);
     const mapped = result.records.map(r => ({
@@ -329,7 +329,8 @@ app.get('/api/users/:id', async (req, res) => {
 
     // Check Founder
     const founderResult = await session.run(`
-      MATCH (c:Company {id: $id})
+      MATCH (c:Company)
+      WHERE toString(c.id) = $id OR ('neo4j:' + elementId(c)) = $id
       OPTIONAL MATCH (c)-[:COMPETES_WITH]->(comp:Company)
       OPTIONAL MATCH (p:Company)-[:HAS_SUBSIDIARY]->(c)
       RETURN c.founder AS name, c.name AS company, 'Founder' AS role,

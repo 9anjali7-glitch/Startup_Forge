@@ -85,7 +85,7 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                     type: 'connection',
                     avatar: 'https://randomuser.me/api/portraits/lego/1.jpg',
                     message: `${n.receiver_name} accepted your connection request`,
-                    timestamp: new Date(n.responded_at).toLocaleDateString(),
+                    timestamp: n.responded_at && Number.isFinite(Date.parse(n.responded_at)) ? new Date(n.responded_at).toLocaleDateString() : 'Recently',
                     unread: !readIds().has(`conn-${n.id}`),
                     metadata: { userId: String(n.receiver_id) }
                 }));
@@ -327,7 +327,7 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
 
                                                 <div className="flex-1 min-w-0">
                                                     <p className="text-slate-900 font-medium text-sm md:text-[15px]">Investment successful in {update.company}</p>
-                                                    <p className="text-slate-500 text-xs mt-1">{new Date(update.time || Date.now()).toLocaleDateString()} • {update.round}</p>
+                                                    <p className="text-slate-500 text-xs mt-1">{update.time && Number.isFinite(Date.parse(update.time)) ? new Date(update.time).toLocaleDateString() : 'Date unavailable'} • {update.round}</p>
                                                 </div>
 
                                                 <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full mt-2 self-start ring-4 ring-emerald-50"></div>
@@ -351,11 +351,11 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                             <div className="space-y-4">
                                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
                                     <h4 className="font-bold text-slate-800 text-sm">Portfolio Growth</h4>
-                                    <p className="text-emerald-600 font-bold text-lg mt-1">+12.4% <span className="text-slate-400 text-xs font-normal text-black">this month</span></p>
+                                    <p className="text-slate-600 text-sm mt-1">Portfolio performance data is not connected.</p>
                                 </div>
                                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
                                     <h4 className="font-bold text-slate-800 text-sm">New Opportunities</h4>
-                                    <p className="text-slate-600 text-sm mt-1">3 new matching startups found</p>
+                                    <p className="text-slate-600 text-sm mt-1">{companyUpdates.length} recorded investment update{companyUpdates.length === 1 ? '' : 's'}</p>
                                 </div>
                             </div>
                         </div>
@@ -376,7 +376,7 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                                             />
                                             <div>
                                                 <h4 className="font-bold text-slate-800 text-xs">{update.company}</h4>
-                                                <p className="text-[10px] text-slate-500">{update.round} • {new Date(update.time).toLocaleDateString()}</p>
+                                                <p className="text-[10px] text-slate-500">{update.round} • {update.time && Number.isFinite(Date.parse(update.time)) ? new Date(update.time).toLocaleDateString() : 'Date unavailable'}</p>
                                             </div>
                                         </div>
                                     ))
@@ -388,30 +388,14 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                             </div>
                         </div>
 
-                        {/* Widget 3: Stock Prices */}
+                        {/* Live market prices are not provided by the connected data sources. */}
                         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-                            <div className="flex items-center gap-3 mb-4">
+                            <div className="flex items-center gap-3 mb-3">
                                 <div className="p-2 bg-amber-50 rounded-lg"><DollarSign className="w-5 h-5 text-amber-600" /></div>
                                 <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wide">Market Watch</h3>
                             </div>
-                            <div className="space-y-2">
-                                <div className="flex justify-between items-center py-2 border-b border-slate-50">
-                                    <span className="font-bold text-slate-700 text-sm">NVDA</span>
-                                    <span className="text-emerald-600 font-medium text-sm">+2.4%</span>
-                                </div>
-                                <div className="flex justify-between items-center py-2 border-b border-slate-50">
-                                    <span className="font-bold text-slate-700 text-sm">MSFT</span>
-                                    <span className="text-emerald-600 font-medium text-sm">+0.8%</span>
-                                </div>
-                                <div className="flex justify-between items-center py-2 border-b border-slate-50">
-                                    <span className="font-bold text-slate-700 text-sm">AAPL</span>
-                                    <span className="text-red-500 font-medium text-sm">-0.2%</span>
-                                </div>
-                                <div className="flex justify-between items-center py-2">
-                                    <span className="font-bold text-slate-700 text-sm">GOOGL</span>
-                                    <span className="text-emerald-600 font-medium text-sm">+1.1%</span>
-                                </div>
-                            </div>
+                            <p className="text-sm text-slate-600">Live market prices are not connected. See Market Intelligence on Home for dated, source-linked research.</p>
+                            <button type="button" onClick={() => onNavigate('home')} className="mt-3 text-sm font-semibold text-indigo-600 hover:text-indigo-800">Open market intelligence</button>
                         </div>
 
                     </div>
