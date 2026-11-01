@@ -9,6 +9,7 @@ export interface ConflictExplanationData {
   level: number;
   path: string[];
   reason: string;
+  severity?: "low" | "medium" | "high";
 }
 
 interface ConflictExplanationPanelProps {
@@ -36,7 +37,7 @@ const ConflictExplanationPanel = ({
       const mapped: ConflictPath[] = conflicts.map((c, i) => ({
         id: i.toString(),
         path: c.path,
-        severity: c.level === 2 ? "high" : "medium",
+        severity: c.severity || (c.level === 2 ? "high" : "medium"),
         explanation: c.reason
       }));
       setConflictPaths(mapped);
@@ -175,7 +176,7 @@ const ConflictExplanationPanel = ({
                   <div className="flex items-center gap-3 p-4 rounded-[1.5rem] bg-primary/5 border border-primary/10">
                     <AlertCircle className="h-5 w-5 text-primary shrink-0" />
                     <p className="text-xs text-muted-foreground font-medium leading-normal">
-                      This explanation is audit-ready and suitable for compliance documentation.
+                      Screening output only. Verify each relationship against reliable source documents before making an investment or compliance decision.
                     </p>
                   </div>
                 </div>

@@ -150,34 +150,64 @@ async function setupDatabase(res) {
                             round: row.round, year: row.year, description: row.description });
                     }
 
-                    // Repeatable local examples for direct and indirect COI checks,
-                    // plus an accepted demo connection so the inbox can be exercised.
+                    // Remove only the previous synthetic demo fixtures. Never clear the user's graph.
                     await graphSession.run(`
-                        MERGE (mark:Investor {name: 'Mark Suster'})
+                        MATCH (c:Company)
+                        WHERE c.id IN ['demo-direct-portfolio', 'demo-direct-target', 'demo-indirect-parent', 'demo-indirect-subsidiary', 'demo-indirect-target']
+                        DETACH DELETE c
+                    `);
+
+                    // Synthetic scenarios use a fictional investor; no demo conflict is attributed to a real person.
+                    await graphSession.run(`
+                        MERGE (demoInvestor:Investor {id: 'demo-investor-jordan-lee'})
+                        SET demoInvestor.name = 'Jordan Lee (Demo Investor)',
+                            demoInvestor.firm_name = 'Northstar Capital (Demo)',
+                            demoInvestor.domain = 'Healthcare Technology',
+                            demoInvestor.demo_fixture = true
+
                         MERGE (healthFounder:Company {name: '1upHealth'})
+                        MERGE (mark:Investor {name: 'Mark Suster'})
                         MERGE (mark)-[:CONNECTED_TO]->(healthFounder)
                         MERGE (healthFounder)-[:CONNECTED_TO]->(mark)
 
-                        MERGE (domain:Domain {name: 'Demo HealthTech'})
+                        MERGE (domain:Domain {name: 'Healthcare Technology'})
                         MERGE (directPortfolio:Company {id: 'demo-direct-portfolio'})
-                        SET directPortfolio.name = 'Demo Direct Portfolio Co',
-                            directPortfolio.domain = 'Demo HealthTech'
+                        SET directPortfolio.name = 'Harbor Health Analytics',
+                            directPortfolio.domain = 'Healthcare Technology',
+                            directPortfolio.description = 'Synthetic healthcare data platform used as a direct competitor fixture.',
+                            directPortfolio.demo_fixture = true
                         MERGE (directTarget:Company {id: 'demo-direct-target'})
-                        SET directTarget.name = 'Demo Direct Conflict Co',
-                            directTarget.domain = 'Demo HealthTech'
-                        MERGE (mark)-[:INVESTED_IN]->(directPortfolio)
+                        SET directTarget.name = 'Northstar Care Systems',
+                            directTarget.domain = 'Healthcare Technology',
+                            directTarget.description = 'Synthetic target company for the direct portfolio conflict demo.',
+                            directTarget.demo_fixture = true
+                        MERGE (demoInvestor)-[:INVESTED_IN {evidence_type: 'synthetic demo fixture', notes: 'Seeded only to demonstrate an explicit portfolio relationship.'}]->(directPortfolio)
                         MERGE (directPortfolio)-[:OPERATES_IN]->(domain)
                         MERGE (directTarget)-[:OPERATES_IN]->(domain)
+                        MERGE (directPortfolio)-[directCompetition:COMPETES_WITH]->(directTarget)
+                        SET directCompetition.evidence_type = 'synthetic demo fixture',
+                            directCompetition.notes = 'Illustrative direct competitor relationship; not a real-world diligence finding.'
 
                         MERGE (parent:Company {id: 'demo-indirect-parent'})
-                        SET parent.name = 'Demo Parent Holdings'
+                        SET parent.name = 'Summit Digital Holdings',
+                            parent.description = 'Synthetic holding company used for the indirect conflict demo.',
+                            parent.demo_fixture = true
                         MERGE (subsidiary:Company {id: 'demo-indirect-subsidiary'})
-                        SET subsidiary.name = 'Demo Competitor Labs'
+                        SET subsidiary.name = 'Summit Care Networks',
+                            subsidiary.domain = 'Healthcare Technology',
+                            subsidiary.description = 'Synthetic subsidiary used for the indirect conflict demo.',
+                            subsidiary.demo_fixture = true
                         MERGE (indirectTarget:Company {id: 'demo-indirect-target'})
-                        SET indirectTarget.name = 'Demo Indirect Conflict Co'
-                        MERGE (mark)-[:INVESTED_IN]->(parent)
-                        MERGE (parent)-[:HAS_SUBSIDIARY]->(subsidiary)
-                        MERGE (subsidiary)-[:COMPETES_WITH]->(indirectTarget)
+                        SET indirectTarget.name = 'Cedarline Health',
+                            indirectTarget.domain = 'Healthcare Technology',
+                            indirectTarget.description = 'Synthetic target company for the indirect ownership demo.',
+                            indirectTarget.demo_fixture = true
+                        MERGE (demoInvestor)-[:INVESTED_IN {evidence_type: 'synthetic demo fixture', notes: 'Seeded only to demonstrate parent-company exposure.'}]->(parent)
+                        MERGE (parent)-[ownership:HAS_SUBSIDIARY]->(subsidiary)
+                        SET ownership.evidence_type = 'synthetic demo fixture'
+                        MERGE (subsidiary)-[indirectCompetition:COMPETES_WITH]->(indirectTarget)
+                        SET indirectCompetition.evidence_type = 'synthetic demo fixture',
+                            indirectCompetition.notes = 'Illustrative indirect competitor relationship; not a real-world diligence finding.'
                     `);
                 } finally {
                     await graphSession.close();

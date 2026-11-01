@@ -2,10 +2,13 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY rag_backend/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY rag_backend/ ./
+RUN mkdir -p /app/data
+COPY frontend/src/data/founders.json /app/data/founders.json
+COPY frontend/src/data/investors.json /app/data/investors.json
 
 ENV MALLOC_ARENA_MAX=2
 

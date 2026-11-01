@@ -1,7 +1,15 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Sparkles, Send } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { User } from '../../App';
+import { apiFetch } from '../../apiFetch';
+
+const suggestedQuestions = [
+    'I’m new here. How do I navigate StartupForge?',
+    'How do I find investors for my startup?',
+    'What is the difference between a direct and indirect conflict?',
+    'Explain SAFE, dilution, and runway in simple terms.'
+];
 
 interface ChatPanelProps {
     currentUser: User;
@@ -9,7 +17,7 @@ interface ChatPanelProps {
     setChatInput: (val: string) => void;
     chatMessages: { role: 'user' | 'assistant', content: string }[];
     isChatLoading: boolean;
-    handleChatSubmit: (e?: React.FormEvent) => void;
+    handleChatSubmit: (e?: React.FormEvent | string) => void;
 }
 
 export const ChatPanel = ({
@@ -20,6 +28,38 @@ export const ChatPanel = ({
     isChatLoading,
     handleChatSubmit
 }: ChatPanelProps) => {
+    const [aiProvider, setAiProvider] = useState<'checking' | 'gemini' | 'ollama' | 'mistral' | 'profile_search' | 'offline'>('checking');
+
+    useEffect(() => {
+        let active = true;
+        const checkProvider = async () => {
+            try {
+                const ragUrl = import.meta.env.VITE_RAG_API_URL || 'http://localhost:8000';
+                const response = await apiFetch(`${ragUrl}/health`, { signal: AbortSignal.timeout(4000) });
+                if (!response.ok) throw new Error(`Health check failed (${response.status})`);
+                const health = await response.json();
+                if (active) setAiProvider(health.ai_provider || 'profile_search');
+            } catch {
+                if (active) setAiProvider('offline');
+            }
+        };
+        checkProvider();
+        const timer = window.setInterval(checkProvider, 15000);
+        return () => {
+            active = false;
+            window.clearInterval(timer);
+        };
+    }, []);
+
+    const providerLabel = {
+        checking: 'CHECKING',
+        ollama: 'LOCAL AI ONLINE',
+        mistral: 'AI ONLINE',
+        profile_search: 'GUIDE + SEARCH',
+        gemini: 'GEMINI FREE',
+        offline: 'SERVICE OFFLINE'
+    }[aiProvider];
+
     return (
         <div style={{ flex: 22 }} className="flex flex-col bg-white rounded-2xl shadow-soft border border-slate-300 overflow-hidden flex-shrink-0 min-w-0 h-full">
             <div className="p-4 border-b border-slate-100 bg-white flex items-center gap-2 flex-shrink-0">
@@ -28,7 +68,7 @@ export const ChatPanel = ({
                 </div>
                 <h3 className="font-bold text-slate-900 text-lg">
                     <b>AI Assistant</b> |
-                    <span className="text-[10px] font-medium text-indigo-500 ml-2 bg-indigo-50 px-2 py-0.5 rounded-full"><b>RAG Powered</b> </span>
+                    <span className={`text-[10px] font-medium ml-2 px-2 py-0.5 rounded-full ${aiProvider === 'gemini' || aiProvider === 'ollama' || aiProvider === 'mistral' ? 'text-emerald-700 bg-emerald-50' : aiProvider === 'offline' ? 'text-red-700 bg-red-50' : 'text-amber-700 bg-amber-50'}`}><b>{providerLabel}</b></span>
                 </h3>
             </div>
 
@@ -38,8 +78,16 @@ export const ChatPanel = ({
                         <div className="w-16 h-16 bg-white border border-dashed border-slate-200 rounded-2xl flex items-center justify-center mb-4 shadow-sm">
                             <Sparkles className="w-8 h-8 text-indigo-400" />
                         </div>
-                        <p className="text-sm font-semibold text-slate-600">AI Assistant Ready</p>
-                        <p className="text-xs mt-1 text-slate-400 max-w-[200px]">Ask questions about your portfolio, market trends, or founder details.</p>
+                        <p className="text-sm font-semibold text-slate-600">{aiProvider === 'gemini' || aiProvider === 'ollama' || aiProvider === 'mistral' ? 'AI assistant ready' : aiProvider === 'offline' ? 'Assistant service is offline' : 'Profile search is available'}</p>
+                        <p className="text-xs mt-1 text-slate-400 max-w-[260px]">Ask how to use StartupForge, explore founder and investor profiles, understand conflict checks, or get plain-language explanations of fundraising terms. General education only; verify deal-specific questions with a qualified adviser.</p>
+                        <div className="flex flex-wrap justify-center gap-2 mt-4 max-w-[420px]">
+                            {suggestedQuestions.map((prompt) => (
+                                <button key={prompt} type="button" onClick={() => handleChatSubmit(prompt)} disabled={isChatLoading}
+                                    className="text-[11px] text-indigo-700 bg-white border border-indigo-100 hover:border-indigo-300 hover:bg-indigo-50 rounded-full px-3 py-2 transition-colors disabled:opacity-50">
+                                    {prompt}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 ) : (
                     chatMessages.map((msg, idx) => (
@@ -98,6 +146,20 @@ export const ChatPanel = ({
                         </div>
                     </div>
                 )}
+
+                {chatMessages.length > 0 && !isChatLoading && (
+                    <div className="ml-11 mt-1">
+                        <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 mb-2">Try another question</p>
+                        <div className="flex flex-wrap gap-2">
+                            {suggestedQuestions.map((prompt) => (
+                                <button key={prompt} type="button" onClick={() => handleChatSubmit(prompt)}
+                                    className="text-[11px] text-indigo-700 bg-white border border-indigo-100 hover:border-indigo-300 hover:bg-indigo-50 rounded-full px-3 py-2 transition-colors">
+                                    {prompt}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Input Area */}
@@ -109,7 +171,7 @@ export const ChatPanel = ({
                         </div>
                         <input
                             type="text"
-                            placeholder="Ask about your portfolio..."
+                            placeholder={aiProvider === 'gemini' || aiProvider === 'ollama' || aiProvider === 'mistral' ? 'Ask the AI assistant...' : 'Ask a question or search founders and investors...'}
                             className="w-full pl-14 pr-12 py-3.5 bg-slate-50 border border-slate-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300 transition-all font-medium text-slate-800 placeholder:text-slate-400 shadow-sm group-hover:bg-white group-hover:shadow-md"
                             value={chatInput}
                             onChange={(e) => setChatInput(e.target.value)}

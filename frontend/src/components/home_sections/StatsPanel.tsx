@@ -102,7 +102,7 @@ export const StatsPanel = ({
 
                     <div className="flex-1 flex flex-col justify-center items-center text-center">
                         <p className="text-sm text-gray-500 mb-6 leading-relaxed">
-                            Match with the perfect investors for your startup's stage and industry.
+                            Browse investor profiles. Personalized fit requires verified sector and stage mandates.
                         </p>
 
                         <button
@@ -117,7 +117,7 @@ export const StatsPanel = ({
                                 </>
                             ) : (
                                 <>
-                                    Find Investors <ArrowUpRight className="w-4 h-4" />
+                                    Browse Investors <ArrowUpRight className="w-4 h-4" />
                                 </>
                             )}
                         </button>

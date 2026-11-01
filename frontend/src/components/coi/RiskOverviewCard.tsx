@@ -7,6 +7,7 @@ interface RiskOverviewCardProps {
   riskScore: number;
   relationships: string[];
   description: string;
+  conflictType?: string;
   className?: string;
 }
 
@@ -16,6 +17,7 @@ const RiskOverviewCard = ({
   riskScore,
   relationships,
   description,
+  conflictType,
   className,
 }: RiskOverviewCardProps) => {
   // Level-specific theming - using standard Tailwind classes
@@ -26,8 +28,8 @@ const RiskOverviewCard = ({
         accentColor: "bg-blue-500",
         iconBg: "bg-white/10",
         icon: <Link2 className="h-5 w-5 text-white" />,
-        title: "Level 1: Direct Conflict",
-        subtitle: "Immediate relationships",
+        title: conflictType?.includes("sector") ? "Level 1: Sector Overlap" : "Level 1: Direct Competitor Path",
+        subtitle: conflictType?.includes("sector") ? "Screening signal · shared operating sector" : "Potential portfolio exposure · verify evidence",
         tagBg: "bg-blue-50",
         tagText: "text-blue-700",
         tagBorder: "border-blue-200"
@@ -38,8 +40,8 @@ const RiskOverviewCard = ({
       accentColor: "bg-purple-500",
       iconBg: "bg-white/10",
       icon: <Users className="h-5 w-5 text-white" />,
-      title: "Level 2: Indirect Conflict",
-      subtitle: "Multi-hop connections",
+      title: "Level 2: Indirect Competitor Path",
+      subtitle: "Potential multi-hop exposure · verify evidence",
       tagBg: "bg-purple-50",
       tagText: "text-purple-700",
       tagBorder: "border-purple-200"
@@ -116,12 +118,13 @@ const RiskOverviewCard = ({
           <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${finalRisk.statusBg} border-2 ${finalRisk.statusBorder} ${finalRisk.statusText} flex-1`}>
             {finalRisk.statusIcon}
             <span className="text-xs font-bold">
-              {hasConflict ? "Conflict Detected" : "No Conflict"}
+              {hasConflict ? "Potential Conflict Path" : "No Path Found"}
             </span>
           </div>
           <div className="text-right bg-white px-3 py-2 rounded-lg border border-slate-200">
-            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Risk Score</div>
+            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Screening Priority</div>
             <div className="text-lg font-black text-slate-900">{riskScore}<span className="text-xs text-slate-500">/100</span></div>
+            <div className="mt-1 text-[9px] text-slate-400">Heuristic, not probability</div>
           </div>
         </div>
 

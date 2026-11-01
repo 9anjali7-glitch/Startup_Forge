@@ -1,6 +1,7 @@
 // Enhanced UI - v2.0 - Vibrant Colors Applied - 00:46
 import React, { useState, useEffect } from "react";
 import { User } from '../App';
+import { apiFetch } from '../apiFetch';
 import { SearchResultsDropdown } from './SearchResultsDropdown';
 // New Components
 import EntitySelectionPanel from "@/components/coi/EntitySelectionPanel";
@@ -78,7 +79,7 @@ const ConflictReportPage = ({
 
         try {
             const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-            const res = await fetch(`${apiUrl}/api/coi/check`, {
+            const res = await apiFetch(`${apiUrl}/api/coi/check`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -132,14 +133,18 @@ const ConflictReportPage = ({
     if (isLevel2) {
         explanationConflicts = level2Details.map((c: any) => ({
             level: 2,
+            severity: "high",
             path: [selectedInvestor, c.investedParent, c.competingSubsidiary, selectedTarget],
             reason: `Parent entity '${c.investedParent}' owns subsidiary '${c.competingSubsidiary}' which competes with the target.`
         }));
     } else if (isLevel1) {
         explanationConflicts = level1Companies.map((name: string) => ({
             level: 1,
+            severity: conflictData?.conflictType?.includes("sector") ? "medium" : "high",
             path: [selectedInvestor, name, selectedTarget],
-            reason: `Portfolio company '${name}' operates in the same domain as the target.`
+            reason: conflictData?.conflictType?.includes("sector")
+                ? `Portfolio company '${name}' and the target share the ${conflictData?.sector || "same"} sector. This is a screening signal, not proof that the companies compete.`
+                : `The graph records an investment in '${name}' and a COMPETES_WITH relationship from that portfolio company to the target. Verify the source and current status independently.`
         }));
     }
 
@@ -270,7 +275,7 @@ const ConflictReportPage = ({
                             </h2>
                             <p className="text-xs md:text-sm text-slate-600 font-semibold mt-1 ml-12 md:ml-14 flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
-                                <b>Real-time adversarial relationship analysis</b>
+                                <b>Graph-based screening of recorded relationships</b>
                             </p>
                         </div>
                         <div className="hidden md:flex items-center gap-3">
@@ -302,8 +307,8 @@ const ConflictReportPage = ({
                                     <EntitySelectionPanel
                                         onRunCheck={handleRunCheck}
                                         isLoading={isAnalyzing}
-                                        preselectedInvestor={currentInvestorName}
-                                        preselectedTarget={targetCompanyName}
+                                        preselectedInvestor={selectedInvestor}
+                                        preselectedTarget={selectedTarget}
                                         compact={true}
                                     />
                                 </div>
@@ -350,6 +355,21 @@ const ConflictReportPage = ({
                                             </div>
                                         </div>
                                     </div>
+
+                                    {conflictData?.dataClassification === "synthetic demo fixture" && (
+                                        <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+                                            <strong>Synthetic demo data.</strong> This relationship path is seeded for demonstration and is not a real-world investment or diligence finding.
+                                        </div>
+                                    )}
+                                    {conflictData?.dataClassification === "public-source demo example" && (
+                                        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-950">
+                                            <strong>Public-source screening example.</strong> This is a potential screening path, not a finding of an actual legal or investment conflict. Source dates and scope matter; verify current status before relying on it.
+                                            <ul className="mt-2 list-disc space-y-1 pl-4">
+                                                <li><a className="underline" href="https://www.sec.gov/Archives/edgar/data/1067983/000119312526352200/0001193125-26-352200-index.htm" target="_blank" rel="noreferrer">Berkshire Q2 2026 Form 13F-HR (filed Aug 14, 2026)</a></li>
+                                                {selectedTarget === 'Samsung Electronics Co., Ltd.' ? <li><a className="underline" href="https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0312/2026031200834.pdf" target="_blank" rel="noreferrer">Samsung filing on phone competitors (2026)</a></li> : <><li><a className="underline" href="https://www.apple.com/gr/newsroom/2014/05/28Apple-to-Acquire-Beats-Music-Beats-Electronics/" target="_blank" rel="noreferrer">Apple acquisition announcement (2014)</a></li><li><a className="underline" href="https://ec.europa.eu/competition/mergers/cases/decisions/m7290_20140725_20310_3804651_EN.pdf" target="_blank" rel="noreferrer">European Commission headphone market decision (2014)</a></li></>}
+                                            </ul>
+                                        </div>
+                                    )}
 
                                     <div>
                                         {hasResults ? (
@@ -400,6 +420,7 @@ const ConflictReportPage = ({
                                         conflictLevel={currentLevel}
                                         conflicts={level2Details}
                                         level1Companies={level1Companies}
+                                        conflictType={conflictData?.conflictType}
                                     />
                                 </div>
                             ) : (
@@ -433,6 +454,7 @@ const ConflictReportPage = ({
                                             riskScore={isLevel1 ? (conflictData?.score ?? 45) : 0}
                                             relationships={level1Tags}
                                             description={isLevel1 ? (conflictData?.reason || "Direct portfolio overlap.") : "No direct conflict."}
+                                            conflictType={conflictData?.conflictType}
                                             className="h-full shadow-sm hover:shadow-md transition-shadow"
                                         />
                                     ) : (

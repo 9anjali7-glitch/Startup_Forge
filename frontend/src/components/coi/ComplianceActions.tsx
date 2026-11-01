@@ -37,11 +37,16 @@ const ComplianceActions = ({
         `Target company: ${reportData.targetCompany || "Not supplied"}`,
         `Outcome: ${reportData.hasConflict ? "Potential conflict identified" : "No conflict identified in available records"}`,
         `Screening level: ${reportData.conflictLevel ?? 0}`,
+        `Conflict type: ${reportData.conflictType || "No matching conflict path"}`,
+        `Confidence: ${reportData.confidence || "Graph records only"}`,
+        `Data classification: ${reportData.dataClassification || "StartupForge relationship graph"}`,
         "",
         "Findings",
         ...(reportData.conflictLevel === 2
-          ? (reportData.conflicts || []).map((c: any) => `Direct investment in ${c.investedParent}; related entity ${c.competingSubsidiary} may compete with target.`)
-          : (reportData.conflictingCompanies || []).map((company: string) => `Portfolio company ${company} has a reported sector overlap with target.`)),
+          ? (reportData.conflicts || []).map((c: any) => `Investor exposure to ${c.investedParent} -> subsidiary ${c.competingSubsidiary} -> target competitor. Evidence: ${c.evidenceType || "graph relationship"}. ${c.notes || ""}`)
+          : reportData.conflictType?.includes("sector")
+            ? (reportData.conflictingCompanies || []).map((company: string) => `Portfolio company ${company} shares sector ${reportData.sector || "overlap"} with target. Screening signal only; this does not establish direct competition.`)
+            : (reportData.conflictingCompanies || []).map((company: string) => `Portfolio company ${company} has a recorded COMPETES_WITH relationship to target. Verify the relationship source and current status.`)),
         ...(reportData.hasConflict ? ["", "Recommended next step: verify the relationship and obtain independent legal/compliance review before relying on this screening."] : ["", "This result covers relationships present in the connected StartupForge records at the time of screening."]),
         "This screening record is informational and is not legal advice or a legal determination.",
       ];
@@ -77,11 +82,32 @@ const ComplianceActions = ({
   const handleExportGraph = () => {
     if (!reportData) return;
 
-    // Construct a JSON representation of the graph
-    const graphData = {
+    // Prefer the exact paths and relationship evidence returned by the graph API.
+    // Keep a fallback for older backend responses while they are being upgraded.
+    const graphData = reportData.graph?.nodes && reportData.graph?.edges
+      ? {
+        schemaVersion: "1.0",
+        meta: {
+          investor: reportData.investor || reportData.investorName,
+          target: reportData.targetCompany,
+          conflictType: reportData.conflictType,
+          conflictLevel: reportData.conflictLevel,
+          confidence: reportData.confidence,
+          dataClassification: reportData.dataClassification,
+          generatedAt: new Date().toISOString(),
+          evidenceNote: "Edge properties are copied from the graph database; verify sources and current status."
+        },
+        nodes: reportData.graph.nodes,
+        edges: reportData.graph.edges
+      }
+      : {
+      schemaVersion: "1.0",
       meta: {
-        investor: reportData.investorName,
+        investor: reportData.investor || reportData.investorName,
         target: reportData.targetCompany,
+        conflictType: reportData.conflictType,
+        confidence: reportData.confidence,
+        dataClassification: reportData.dataClassification,
         generatedAt: new Date().toISOString()
       },
       nodes: [
@@ -96,7 +122,7 @@ const ComplianceActions = ({
         const id = `l1-${i}`;
         graphData.nodes.push({ id, label: comp, type: "company" });
         graphData.edges.push({ from: "inv", to: id, relation: "invested_in" });
-        graphData.edges.push({ from: id, to: "tgt", relation: "competes_with_sector" });
+        graphData.edges.push({ from: id, to: "tgt", relation: reportData.conflictType?.includes("sector") ? "same_sector_as" : "competes_with" });
       });
     } else if (reportData.conflictLevel === 2 && reportData.conflicts) {
       reportData.conflicts.forEach((c: any, i: number) => {

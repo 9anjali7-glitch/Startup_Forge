@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { MobileChatOverlay } from './common/MobileChatOverlay';
 import { SearchResultsDropdown } from './SearchResultsDropdown';
+import { apiFetch } from '../apiFetch';
 
 type NotificationsPageProps = {
     currentUser: any;
@@ -52,6 +53,13 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
     const [searchQuery, setSearchQuery] = useState('');
     const [notifications, setNotifications] = useState<any[]>([]);
     const [companyUpdates, setCompanyUpdates] = useState<any[]>([]);
+    const [publicFilings, setPublicFilings] = useState<any[]>([]);
+    const [filingsUpdatedAt, setFilingsUpdatedAt] = useState<string | null>(null);
+    const [filingsError, setFilingsError] = useState<string | null>(null);
+    const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+    const [feedError, setFeedError] = useState<string | null>(null);
+    const [refreshing, setRefreshing] = useState(false);
+    const [refreshToken, setRefreshToken] = useState(0);
     const [isSearchExpanded, setIsSearchExpanded] = useState(false); // Mobile search
     const [activeTab, setActiveTab] = useState<'notifications' | 'updates'>('notifications');
     const readKey = `startupforge:read:${currentUser?.id || 'guest'}`;
@@ -71,14 +79,22 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
     }, [isSearchExpanded]);
 
     useEffect(() => {
+        if (!currentUser?.id) return;
+        const controller = new AbortController();
+        let active = true;
+        let inFlight = false;
         const fetchNotifications = async () => {
+            if (inFlight || document.visibilityState === 'hidden') return;
+            inFlight = true;
+            setRefreshing(true);
             try {
-                if (!currentUser?.id) return;
                 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-                const res = await fetch(`${apiUrl}/connections/notifications`, {
-                    headers: { 'x-user-id': currentUser.id }
+                const res = await apiFetch(`${apiUrl}/connections/notifications`, {
+                    headers: { 'x-user-id': currentUser.id }, signal: controller.signal
                 });
+                if (!res.ok) throw new Error(`Alerts returned HTTP ${res.status}`);
                 const data = await res.json();
+                if (!Array.isArray(data)) throw new Error('Alerts response was invalid');
 
                 const realNotifs = data.map((n: any) => ({
                     id: `conn-${n.id}`,
@@ -90,28 +106,52 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                     metadata: { userId: String(n.receiver_id) }
                 }));
 
-                setNotifications(realNotifs);
-
-                // Fetch Company Updates
-                const resUpdates = await fetch(`${apiUrl}/api/investments/updates`, {
-                    headers: { 'x-user-id': currentUser.id }
+                const resUpdates = await apiFetch(`${apiUrl}/api/investments/updates`, {
+                    headers: { 'x-user-id': currentUser.id }, signal: controller.signal
                 });
+                if (!resUpdates.ok) throw new Error(`Investment updates returned HTTP ${resUpdates.status}`);
                 const updateData = await resUpdates.json();
-                if (Array.isArray(updateData)) {
-                    setCompanyUpdates(updateData);
-                }
-
-            } catch (e) { console.error(e); }
+                if (!Array.isArray(updateData)) throw new Error('Investment updates response was invalid');
+                if (!active) return;
+                setNotifications(realNotifs);
+                setCompanyUpdates(updateData);
+                setLastUpdated(new Date());
+                setFeedError(null);
+            } catch (e) {
+                if (!controller.signal.aborted && active) setFeedError(e instanceof Error ? e.message : 'Unable to refresh alerts.');
+            } finally {
+                inFlight = false;
+                if (active) setRefreshing(false);
+            }
         };
-
-        // Initial fetch
         fetchNotifications();
+        const intervalId = window.setInterval(fetchNotifications, 15000);
+        const onVisibilityChange = () => { if (document.visibilityState === 'visible') fetchNotifications(); };
+        document.addEventListener('visibilitychange', onVisibilityChange);
+        return () => { active = false; controller.abort(); window.clearInterval(intervalId); document.removeEventListener('visibilitychange', onVisibilityChange); };
+    }, [currentUser?.id, refreshToken]);
 
-        // Poll every 3 seconds for near-instant updates
-        const intervalId = setInterval(fetchNotifications, 3000);
-
-        return () => clearInterval(intervalId);
-    }, [currentUser]);
+    useEffect(() => {
+        const controller = new AbortController();
+        let active = true;
+        const loadFilings = async () => {
+            try {
+                const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+                const response = await apiFetch(`${apiUrl}/api/market/updates`, { signal: controller.signal });
+                const data = await response.json();
+                if (!response.ok && !data.entries?.length) throw new Error(data.error || 'SEC filing feed is unavailable.');
+                if (!active) return;
+                setPublicFilings(Array.isArray(data.entries) ? data.entries : []);
+                setFilingsUpdatedAt(data.fetchedAt || null);
+                setFilingsError(data.error || null);
+            } catch (error) {
+                if (active && !controller.signal.aborted) setFilingsError(error instanceof Error ? error.message : 'SEC filing feed is unavailable.');
+            }
+        };
+        loadFilings();
+        const timer = window.setInterval(() => { if (document.visibilityState === 'visible') loadFilings(); }, 5 * 60 * 1000);
+        return () => { active = false; controller.abort(); window.clearInterval(timer); };
+    }, []);
 
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -227,7 +267,7 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                     <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
                         <ActionItem icon={<Home />} label="Home" onClick={() => onNavigate('home')} />
                         <ActionItem icon={<Users />} label="Network" onClick={() => onNavigate('network')} />
-                        <ActionItem icon={<Bell />} label="Alerts" badge={false} onClick={() => onNavigate('notifications')} active={true} />
+                        <ActionItem icon={<Bell />} label="Alerts" badge={notifications.some(item => item.unread)} onClick={() => onNavigate('notifications')} active={true} />
                         <ActionItem icon={<MessageSquare />} label="Inbox" onClick={() => onNavigate('messages')} />
                         <ActionItem icon={<BrainCircuit />} label="Deep Analysis" onClick={() => onNavigate('conflict-report')} />
                     </div>
@@ -259,8 +299,10 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 md:p-6 min-h-[500px]">
                             <div className="flex items-center justify-between mb-8 border-b border-slate-100 pb-4">
                                 <h2 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Notifications</h2>
-                                <button onClick={() => markRead(notifications.map(n => n.id))} className="text-sm font-semibold text-slate-500 hover:text-slate-900">Mark all as read</button>
+                                <div className="flex items-center gap-3"><span className="text-[10px] text-slate-400">{refreshing ? 'Updating…' : lastUpdated ? `Updated ${lastUpdated.toLocaleTimeString()}` : ''}</span><button type="button" onClick={() => setRefreshToken(value => value + 1)} disabled={refreshing} className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 disabled:opacity-40">Refresh</button><button type="button" onClick={() => markRead(notifications.map(n => n.id))} disabled={!notifications.some(n => n.unread)} className="text-sm font-semibold text-slate-500 hover:text-slate-900 disabled:opacity-40">Mark all as read</button></div>
                             </div>
+
+                            {feedError && <div role="status" className="mb-4 flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900"><span>Could not refresh live alerts: {feedError}</span><button type="button" onClick={() => { setFeedError(null); setRefreshToken(value => value + 1); }} className="font-bold underline">Retry</button></div>}
 
                             <div className="space-y-4">
 
@@ -311,8 +353,8 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                                     <div className="space-y-2">
                                         {companyUpdates.slice(0, 4).map((update, i) => (
                                             <div
-                                                key={`inv-${i}`} onClick={() => onNavigate('messages')}
-                                                className="group p-3 md:p-4 rounded-xl border border-transparent hover:border-slate-200 hover:bg-slate-50 transition-all cursor-pointer flex items-start gap-4 bg-emerald-50/30"
+                                                key={`inv-${i}`} onClick={() => update.founder_id && onNavigateToChat(String(update.founder_id))}
+                                                className={`group p-3 md:p-4 rounded-xl border border-transparent hover:border-slate-200 hover:bg-slate-50 transition-all flex items-start gap-4 bg-emerald-50/30 ${update.founder_id ? 'cursor-pointer' : ''}`}
                                             >
                                                 <div className="relative">
                                                     <img
@@ -369,7 +411,7 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                             <div className="space-y-3">
                                 {companyUpdates.slice(0, 4).length > 0 ? (
                                     companyUpdates.slice(0, 4).map((update, i) => (
-                                        <div key={i} className="flex gap-3 items-center p-2 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer">
+                                        <div key={i} className="flex gap-3 items-center p-2 hover:bg-slate-50 rounded-lg transition-colors">
                                             <img
                                                 src={`https://i.pravatar.cc/150?u=${update.founder_id || (i % 5) + 5}`}
                                                 className="w-10 h-10 rounded-lg bg-slate-200 object-cover"
@@ -394,7 +436,9 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                                 <div className="p-2 bg-amber-50 rounded-lg"><DollarSign className="w-5 h-5 text-amber-600" /></div>
                                 <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wide">Market Watch</h3>
                             </div>
-                            <p className="text-sm text-slate-600">Live market prices are not connected. See Market Intelligence on Home for dated, source-linked research.</p>
+                            <p className="text-sm text-slate-600">Live stock and private-market prices are not connected. These are current SEC Form D notices, not verified deal announcements.</p>
+                            <p className="mt-2 text-[10px] text-slate-400">{filingsUpdatedAt ? `EDGAR feed updated ${new Date(filingsUpdatedAt).toLocaleString()}` : filingsError || 'Loading public filings…'}</p>
+                            {publicFilings.slice(0, 3).map((filing: any, index: number) => <a key={`${filing.url}-${index}`} href={filing.url} target="_blank" rel="noreferrer" className="mt-2 block rounded-lg border border-slate-100 p-2 text-xs font-semibold text-slate-700 hover:border-indigo-200 hover:text-indigo-700">{filing.title}<span className="mt-1 block text-[10px] font-normal text-slate-400">{filing.filedAt && Number.isFinite(Date.parse(filing.filedAt)) ? new Date(filing.filedAt).toLocaleDateString() : 'SEC EDGAR'}</span></a>)}
                             <button type="button" onClick={() => onNavigate('home')} className="mt-3 text-sm font-semibold text-indigo-600 hover:text-indigo-800">Open market intelligence</button>
                         </div>
 
@@ -407,7 +451,7 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                 <ActionItem icon={<Home />} label="Home" onClick={() => onNavigate('home')} />
                 <ActionItem icon={<Users className="w-6 h-6" />} label="Network" onClick={() => onNavigate('network')} />
                 <ActionItem icon={<BrainCircuit className="w-6 h-6" />} label="Analyze" onClick={() => onNavigate('conflict-report')} />
-                <ActionItem icon={<Bell className="w-6 h-6" />} label="Alerts" badge={true} onClick={() => onNavigate('notifications')} active={true} />
+                <ActionItem icon={<Bell className="w-6 h-6" />} label="Alerts" badge={notifications.some(item => item.unread)} onClick={() => onNavigate('notifications')} active={true} />
                 <ActionItem icon={<MessageSquare className="w-6 h-6" />} label="Inbox" onClick={() => onNavigate('messages')} />
             </div>
 

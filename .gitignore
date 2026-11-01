@@ -48,3 +48,6 @@ coverage/
 # Temporary files
 tmp/
 temp/
+
+# Local database snapshots/backups must not be committed or published.
+/backupdb/backups/

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Bell, MessageSquare, BrainCircuit, Sparkles, UserPlus, UserCheck, X, Check, TrendingUp, Home } from 'lucide-react';
 import { User } from '../App';
+import { apiFetch } from '../apiFetch';
 import { MobileChatOverlay } from './common/MobileChatOverlay';
 import { SearchResultsDropdown } from './SearchResultsDropdown';
 
@@ -33,10 +34,9 @@ interface NetworkPageProps {
   investors: User[];
   followedUsers: Set<string>;
   connectedUsers: Set<string>;
-  onRejectRequest: (id: string) => void;
+  onRejectRequest: (id: string) => Promise<void>;
   onFollowUser: (userId: string, role?: string) => void;
   onViewProfile: (userId: string) => void;
-  onAcceptRequest: (id: string) => void;
   onNavigate: (page: string) => void;
 
   onSearch?: (query: string) => void;
@@ -47,12 +47,11 @@ interface NetworkPageProps {
 
 export function NetworkPage({
   currentUser,
-  // founders - unused
-  // investors - unused
+  founders,
+  investors,
   followedUsers,
   connectedUsers,
   onRejectRequest,
-  onAcceptRequest,
   onFollowUser,
   onViewProfile,
   onNavigate,
@@ -69,16 +68,12 @@ export function NetworkPage({
   const [isSearchExpanded, setIsSearchExpanded] = useState(false); // Mobile search toggle
   const [activeTab, setActiveTab] = useState<'founders' | 'investors'>('founders');
 
-  // Local state for Real Data
-  const [realFounders, setRealFounders] = useState<User[]>([]);
-  const [realInvestors, setRealInvestors] = useState<User[]>([]);
-
   // Fetch Connection Requests (Invitations)
   const fetchRequests = async () => {
     try {
       if (!currentUser.id) return;
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const res = await fetch(`${apiUrl}/connections/requests/incoming`, {
+      const res = await apiFetch(`${apiUrl}/connections/requests/incoming`, {
         headers: { 'x-user-id': currentUser.id }
       });
       const data = await res.json();
@@ -98,33 +93,9 @@ export function NetworkPage({
     }
   };
 
-  // Fetch All Users for Network (Founders & Investors)
-  const fetchNetwork = async () => {
-    if (!currentUser.id) return;
-    try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const [fRes, iRes] = await Promise.all([
-        fetch(`${apiUrl}/api/users/founders`, { headers: { 'x-user-id': currentUser.id } }),
-        fetch(`${apiUrl}/api/users/investors`, { headers: { 'x-user-id': currentUser.id } })
-      ]);
-
-      if (fRes.ok) {
-        const fData = await fRes.json();
-        setRealFounders(Array.isArray(fData) ? fData.filter((u: any) => u?.id != null && String(u.name || '').trim()).map((u: any) => ({ ...u, id: String(u.id), name: String(u.name).trim(), headline: u.headline || 'Founder' })) : []);
-      }
-      if (iRes.ok) {
-        const iData = await iRes.json();
-        setRealInvestors(Array.isArray(iData) ? iData.filter((u: any) => u?.id != null && String(u.name || '').trim()).map((u: any) => ({ ...u, id: String(u.id), name: String(u.name).trim(), headline: u.headline || 'Investor' })) : []);
-      }
-    } catch (e) {
-      console.error("Failed to fetch network data", e);
-    }
-  };
-
   useEffect(() => {
     if (currentUser.id) {
       fetchRequests();
-      fetchNetwork();
     }
   }, [currentUser.id]);
 
@@ -149,14 +120,27 @@ export function NetworkPage({
   const handleAcceptInternal = async (reqId: string) => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      await fetch(`${apiUrl}/connections/accept/${reqId}`, {
+      const response = await apiFetch(`${apiUrl}/connections/accept/${reqId}`, {
         method: 'POST',
         headers: { 'x-user-id': currentUser.id }
       });
-      onAcceptRequest(reqId);
-      fetchRequests();
-      fetchNetwork();
-    } catch (e) { console.error(e); }
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.error || `Accept request failed (${response.status})`);
+      }
+      await fetchRequests();
+    } catch (e) {
+      window.alert(e instanceof Error ? e.message : 'Could not accept the connection request.');
+    }
+  };
+
+  const handleRejectInternal = async (reqId: string) => {
+    try {
+      await onRejectRequest(reqId);
+      await fetchRequests();
+    } catch (e) {
+      window.alert(e instanceof Error ? e.message : 'Could not reject the connection request.');
+    }
   };
 
 
@@ -361,7 +345,7 @@ export function NetworkPage({
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={() => onRejectRequest(request.id)} className="w-9 h-9 flex items-center justify-center bg-white border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-100 hover:bg-red-50 rounded-xl transition-colors shadow-sm"><X className="w-4 h-4" /></button>
+                    <button onClick={() => handleRejectInternal(request.id)} className="w-9 h-9 flex items-center justify-center bg-white border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-100 hover:bg-red-50 rounded-xl transition-colors shadow-sm"><X className="w-4 h-4" /></button>
                     <button onClick={() => handleAcceptInternal(request.id)} className="w-9 h-9 flex items-center justify-center bg-slate-900 text-white hover:bg-indigo-600 rounded-xl transition-all shadow-md hover:scale-105"><Check className="w-4 h-4" /></button>
                   </div>
                 </div>
@@ -407,7 +391,7 @@ export function NetworkPage({
                 <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{activeTab === 'founders' ? 'Recently Active' : 'Top VCs & Angels'}</h4>
                 <span className="h-px flex-1 bg-slate-200 ml-4"></span>
               </div>
-              {renderTopProfiles(activeTab === 'founders' ? realFounders : realInvestors)}
+              {renderTopProfiles(activeTab === 'founders' ? founders : investors)}
             </div>
 
             {/* Grid Grid */}
@@ -417,7 +401,7 @@ export function NetworkPage({
                 <span className="h-px flex-1 bg-slate-200 ml-4"></span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {(activeTab === 'founders' ? realFounders : realInvestors).map(renderUserCard)}
+                {(activeTab === 'founders' ? founders : investors).map(renderUserCard)}
               </div>
             </div>
           </div>

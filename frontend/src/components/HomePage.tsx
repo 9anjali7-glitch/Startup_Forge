@@ -4,6 +4,7 @@ import investorsData from '../data/investors.json';
 import { SearchResultsDropdown } from './SearchResultsDropdown';
 import { Bell, MessageSquare, BrainCircuit, Sparkles, Home, X, ArrowUpRight, Users } from 'lucide-react';
 import { Drawer } from 'vaul';
+import { apiFetch } from '../apiFetch';
 
 // Import newly extracted components
 import { ChatPanel } from './home_sections/ChatPanel';
@@ -28,6 +29,9 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
   const [searchQuery, setSearchQuery] = useState('');
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [topFounders, setTopFounders] = useState<any[]>([]);
+  const [topFoundersLoading, setTopFoundersLoading] = useState(true);
+  const [topFoundersError, setTopFoundersError] = useState<string | null>(null);
+  const [founderRetry, setFounderRetry] = useState(0);
   const [investedCompanies, setInvestedCompanies] = useState<any[]>([]);
 
   // COI State
@@ -41,30 +45,12 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
   const [showFindInvestorsModal, setShowFindInvestorsModal] = useState(false);
   const [isFindingInvestors, setIsFindingInvestors] = useState(false);
   const [investorMatchError, setInvestorMatchError] = useState<string | null>(null);
-  const [userGrowthRate, setUserGrowthRate] = useState<number>(0.24);
 
   // Mobile Drawer State
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isStatsOpen, setIsStatsOpen] = useState(false);
 
-  // Fetch match data prerequisites
-  useEffect(() => {
-    if (currentUser.id && currentUser.role === 'founder') {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      fetch(`${apiUrl}/api/founders/growth/${currentUser.id}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.success && data.growth_rate) {
-            setUserGrowthRate(data.growth_rate);
-          }
-        })
-        .catch(err => console.error("Growth fetch error:", err));
-    }
-  }, [currentUser.id]);
-
-  const handleFindInvestors = async () => {
-    setIsFindingInvestors(true);
-    setInvestorMatchError(null);
+  const handleFindInvestors = () => {
     const directory = investorsData as { id: number; name: string; firm_name: string; headline?: string }[];
     const fallbackMatches = [
       directory.find((investor) => investor.firm_name.toLowerCase().includes('sequoia')),
@@ -81,54 +67,8 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
       activity_volatility: null,
     }));
     setInvestorMatches(fallbackMatches);
+    setInvestorMatchError('Directory profiles only: this dataset has no verified sector mandates, so fit scores are not shown.');
     setShowFindInvestorsModal(true);
-
-    const controller = new AbortController();
-    const timeoutId = window.setTimeout(() => controller.abort(), 8000);
-    try {
-      // Use User data if available, or sensible defaults
-      const payload = {
-        sector: currentUser.primaryDomain ? [currentUser.primaryDomain] : ["AI", "Healthcare"],
-        stage: currentUser.investmentStage || "Seed",
-        growth_rate: userGrowthRate
-      };
-
-      const predictionUrl = import.meta.env.VITE_PREDICTION_URL || 'http://localhost:8002';
-      const res = await fetch(`${predictionUrl}/match`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        signal: controller.signal,
-      });
-      if (!res.ok) throw new Error(`Match service returned ${res.status}`);
-      const data = await res.json();
-      if (Array.isArray(data.matches) && data.matches.length) {
-        const matchesWithProfiles = data.matches.map((match: any) => {
-          const name = String(match.name || '').toLowerCase();
-          const investor = directory.find((candidate) => {
-            const firm = candidate.firm_name.toLowerCase();
-            return (name.includes('sequoia') && firm.includes('sequoia')) ||
-              (name.includes('andreessen') && firm.includes('andreessen')) ||
-              (name.includes('y combinator') && firm.includes('y combinator'));
-          });
-          return {
-            ...match,
-            profileId: investor ? `investor-${investor.id}` : undefined,
-            profileName: investor?.name,
-            profileHeadline: investor?.headline || investor?.firm_name,
-          };
-        });
-        setInvestorMatches(matchesWithProfiles);
-      } else {
-        setInvestorMatchError('Personalized scores are unavailable. Browse these investor profiles while matching reconnects.');
-      }
-    } catch (err) {
-      console.error("Failed to find investors:", err);
-      setInvestorMatchError('Personalized scores are unavailable. Browse these investor profiles while matching reconnects.');
-    } finally {
-      window.clearTimeout(timeoutId);
-      setIsFindingInvestors(false);
-    }
   };
 
   // Auto-search for COI companies
@@ -140,7 +80,7 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
       }
       try {
         const ragUrl = import.meta.env.VITE_RAG_API_URL || 'http://localhost:8000';
-        const res = await fetch(`${ragUrl}/search/founders`, {
+        const res = await apiFetch(`${ragUrl}/search/founders`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query: coiCompanyName, top_k: 3 })
@@ -165,19 +105,23 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
   useEffect(() => {
     // Fetch Dynamic Founder Data based on User Domain
     const fetchFounders = async () => {
+      setTopFoundersLoading(true);
+      setTopFoundersError(null);
       try {
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-        const res = await fetch(`${apiUrl}/api/founders/rising`, {
+        const res = await apiFetch(`${apiUrl}/api/founders/rising`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId: currentUser.id, role: currentUser.role })
         });
         const data = await res.json();
-        if (data.success) {
-          setTopFounders(data.founders);
-        }
+        if (!res.ok || !data.success || !Array.isArray(data.founders)) throw new Error(data.error || 'Founder profiles could not be loaded.');
+        setTopFounders(data.founders);
       } catch (err) {
-        console.error("Error loading top founders:", err);
+        console.error('Error loading founder profiles:', err);
+        setTopFoundersError(err instanceof Error ? err.message : 'Founder profiles could not be loaded.');
+      } finally {
+        setTopFoundersLoading(false);
       }
     };
 
@@ -185,7 +129,7 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
     const fetchInvestments = async () => {
       try {
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-        const res = await fetch(`${apiUrl}/api/investments/updates`, {
+        const res = await apiFetch(`${apiUrl}/api/investments/updates`, {
           headers: { 'x-user-id': currentUser.id }
         });
         const data = await res.json();
@@ -197,34 +141,36 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
       fetchFounders();
       fetchInvestments();
     }
-  }, [currentUser]);
+  }, [currentUser.id, currentUser.role, founderRetry]);
 
   // Chat State
   const [chatInput, setChatInput] = useState('');
   const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'assistant', content: string }[]>([]);
   const [isChatLoading, setIsChatLoading] = useState(false);
 
-  const handleChatSubmit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!chatInput.trim() || isChatLoading) return;
+  const handleChatSubmit = async (e?: React.FormEvent | string) => {
+    if (typeof e !== 'string') e?.preventDefault();
+    const userMsg = typeof e === 'string' ? e : chatInput;
+    if (!userMsg.trim() || isChatLoading) return;
 
-    const userMsg = chatInput;
     setChatMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setChatInput('');
     setIsChatLoading(true);
 
     try {
       const ragUrl = import.meta.env.VITE_RAG_API_URL || 'http://localhost:8000';
-      const res = await fetch(`${ragUrl}/chat`, {
+      const res = await apiFetch(`${ragUrl}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: userMsg, top_k: 5 })
+        body: JSON.stringify({ query: userMsg, history: chatMessages.slice(-8) })
       });
-      const data = await res.json();
-      setChatMessages(prev => [...prev, { role: 'assistant', content: data.response || "Sorry, I couldn't understand that." }]);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.detail || data.error || `Assistant request failed (${res.status})`);
+      setChatMessages(prev => [...prev, { role: 'assistant', content: data.response || "I couldn't generate a reply. Please try again." }]);
     } catch (err) {
       console.error("Chat Error:", err);
-      setChatMessages(prev => [...prev, { role: 'assistant', content: "Error connecting to AI Assistant." }]);
+      const message = err instanceof Error ? err.message : "Could not connect to the AI assistant.";
+      setChatMessages(prev => [...prev, { role: 'assistant', content: `${message} Check that the RAG service is running.` }]);
     } finally {
       setIsChatLoading(false);
     }
@@ -388,7 +334,7 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
 
               {/* 1. Founders Section (Top on Mobile) */}
               <div className="flex-shrink-0 min-h-0 lg:flex-1 h-[420px] lg:h-auto pt-2 lg:pt-0">
-                <FoundersPanel topFounders={topFounders} onNavigate={onNavigate} />
+                <FoundersPanel topFounders={topFounders} onNavigate={onNavigate} loading={topFoundersLoading} error={topFoundersError} onRetry={() => setFounderRetry(value => value + 1)} />
               </div>
 
               {/* 2. Stats Section (Middle on Mobile, Right Column on Desktop) */}
@@ -518,16 +464,7 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-1.5 mt-0.5">
-                      <div className="p-1.5 bg-slate-50 rounded border border-slate-100">
-                        <span className="block text-[8px] text-slate-400 font-medium uppercase leading-none mb-0.5">Conf.</span>
-                        <span className="block text-[10px] font-bold text-slate-700 leading-none">{Number.isFinite(match.confidence_score) ? `${(match.confidence_score * 100).toFixed(0)}%` : '—'}</span>
-                      </div>
-                      <div className="p-1.5 bg-slate-50 rounded border border-slate-100">
-                        <span className="block text-[8px] text-slate-400 font-medium uppercase leading-none mb-0.5">Vol.</span>
-                        <span className="block text-[10px] font-bold text-slate-700 leading-none">{Number.isFinite(match.activity_volatility) ? match.activity_volatility.toFixed(2) : '—'}</span>
-                      </div>
-                    </div>
+                    <p className="text-[9px] text-slate-500">Public directory profile · fit not scored</p>
 
                     <button
                       onClick={() => {
@@ -579,7 +516,7 @@ function ProfileModal({ currentUser, onClose, onNavigate }: { currentUser: User,
     // Fetch Growth Prediction
     const fetchGrowth = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/api/founders/growth/${currentUser.id}`);
+        const res = await apiFetch(`http://localhost:3000/api/founders/growth/${currentUser.id}`);
         const data = await res.json();
         if (data.success) {
           setGrowthData({ rate: data.growth_rate });

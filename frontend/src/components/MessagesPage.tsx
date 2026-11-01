@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { User } from '../App';
+import { apiFetch } from '../apiFetch';
 import {
   Search,
   Send as SendIcon,
@@ -134,7 +135,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
   const fetchConnections = async () => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const res = await fetch(`${apiUrl}/inbox`, {
+      const res = await apiFetch(`${apiUrl}/inbox`, {
         headers: { 'x-user-id': currentUser.id }
       });
       const data = await res.json();
@@ -172,7 +173,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
       try {
         // Get Room Key from Backend
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-        const res = await fetch(`${apiUrl}/chat`, {
+        const res = await apiFetch(`${apiUrl}/chat`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -217,7 +218,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
     const checkStatus = async () => {
       try {
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-        const res = await fetch(`${apiUrl}/api/investments/status/${currentConnectionId}`, {
+        const res = await apiFetch(`${apiUrl}/api/investments/status/${currentConnectionId}`, {
           headers: { 'x-user-id': currentUser.id }
         });
         const data = await res.json();
@@ -347,7 +348,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
     if (!currentConnectionId) return;
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      await fetch(`${apiUrl}/api/investments/report`, {
+      await apiFetch(`${apiUrl}/api/investments/report`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -363,7 +364,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
     if (!currentConnectionId) return;
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const res = await fetch(`${apiUrl}/api/investments/confirm`, {
+      const res = await apiFetch(`${apiUrl}/api/investments/confirm`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -548,7 +549,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
       }));
 
       const ragUrl = import.meta.env.VITE_RAG_API_URL || 'http://localhost:8000';
-      const res = await fetch(`${ragUrl}/chat/autocomplete`, {
+      const res = await apiFetch(`${ragUrl}/chat/autocomplete`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { ArrowUpRight, BarChart3, ExternalLink, Newspaper, X } from 'lucide-react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ArrowUpRight, BarChart3, ExternalLink, Newspaper, X, RefreshCw } from 'lucide-react';
+import { apiFetch } from '../../apiFetch';
 
 type Insight = {
   category: string;
@@ -42,13 +43,38 @@ const insights: Insight[] = [
 
 export function MarketIntelligence({ compact = false }: { compact?: boolean }) {
   const [selected, setSelected] = useState<Insight | null>(null);
+  const [live, setLive] = useState<{ entries: { title: string; url: string; filedAt: string | null; summary: string }[]; fetchedAt: string | null; stale: boolean; error?: string } | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const refreshFilings = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const response = await apiFetch(`${apiUrl}/api/market/updates`);
+      const data = await response.json();
+      if (!response.ok && !data.entries?.length) throw new Error(data.error || 'Live SEC filings are temporarily unavailable.');
+      setLive(data);
+    } catch (error) {
+      setLive(previous => previous ? { ...previous, stale: true, error: error instanceof Error ? error.message : 'Feed unavailable.' } : { entries: [], fetchedAt: null, stale: true, error: error instanceof Error ? error.message : 'Feed unavailable.' });
+    } finally { setRefreshing(false); }
+  }, []);
+  useEffect(() => {
+    refreshFilings();
+    const interval = window.setInterval(refreshFilings, 5 * 60 * 1000);
+    return () => window.clearInterval(interval);
+  }, [refreshFilings]);
   return (
     <section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col min-h-0 h-full">
       <div className="px-5 py-3 border-b border-slate-100 flex items-center justify-between gap-3 bg-slate-50/70 shrink-0">
-        <div className="flex items-center gap-2"><Newspaper className="w-5 h-5 text-slate-700"/><div><h3 className="font-bold text-slate-900">Market Intelligence</h3><p className="text-[10px] text-slate-500">Curated venture signals · updated Oct 21, 2026</p></div></div>
-        <span className="shrink-0 px-2 py-1 rounded-full bg-indigo-50 text-[9px] font-bold text-indigo-700 border border-indigo-100">3 BRIEFS</span>
+        <div className="flex items-center gap-2"><Newspaper className="w-5 h-5 text-slate-700"/><div><h3 className="font-bold text-slate-900">Market Intelligence</h3><p className="text-[10px] text-slate-500">SEC public filing feed + dated research briefs</p></div></div>
+        <button type="button" onClick={refreshFilings} disabled={refreshing} className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-60" aria-label="Refresh SEC filings"><RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />{refreshing ? 'Refreshing' : 'Refresh'}</button>
       </div>
       <div className={`flex-1 overflow-y-auto p-3 custom-scrollbar ${compact ? 'space-y-2' : 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 content-start'}`}>
+        <div className={`rounded-xl border border-indigo-100 bg-indigo-50/70 p-3 ${compact ? '' : 'md:col-span-2 xl:col-span-3'}`}>
+          <div className="flex flex-wrap items-center justify-between gap-2"><div><p className="text-[10px] font-bold uppercase tracking-wide text-indigo-800">Live SEC Form D notices</p><p className="mt-0.5 text-[9px] text-slate-600">Public exempt-offering filings · {live?.fetchedAt ? `${live.stale ? 'Last successful refresh' : 'Updated'} ${new Date(live.fetchedAt).toLocaleString()}` : 'Connecting to EDGAR…'}</p></div><a href="https://www.sec.gov/search-filings" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[10px] font-bold text-indigo-700 hover:underline">SEC EDGAR <ExternalLink className="h-3 w-3" /></a></div>
+          {live?.error && <p role="status" className="mt-2 text-[10px] text-amber-800">{live.error}{live.stale ? ' Showing the last cached feed.' : ''}</p>}
+          <p className="mt-2 text-[9px] leading-relaxed text-slate-500">Form D is an issuer-filed notice, not an SEC endorsement or confirmation of deal terms. It does not cover every venture round; verify details in the original filing.</p>
+          {live?.entries?.length ? <div className="mt-2 grid gap-1.5 md:grid-cols-2">{live.entries.slice(0, compact ? 3 : 6).map((entry, index) => <a key={`${entry.url}-${index}`} href={entry.url} target="_blank" rel="noreferrer" className="flex min-w-0 items-center justify-between gap-3 rounded-lg border border-white bg-white/80 px-2.5 py-2 hover:border-indigo-300"><span className="truncate text-[10px] font-semibold text-slate-800">{entry.title}</span><span className="shrink-0 text-[9px] text-slate-500">{entry.filedAt && Number.isFinite(Date.parse(entry.filedAt)) ? new Date(entry.filedAt).toLocaleDateString() : 'EDGAR'} <ExternalLink className="inline h-3 w-3" /></span></a>)}</div> : !live?.error ? <p className="mt-2 text-[10px] text-slate-500">Loading current public filings…</p> : null}
+        </div>
         {insights.map((item) => (
           <button key={item.title} type="button" onClick={() => setSelected(item)} className="w-full text-left p-3 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400 group">
             <div className="flex items-center justify-between gap-2"><span className="text-[9px] font-bold uppercase tracking-wide text-indigo-700">{item.category}</span><ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-600"/></div>

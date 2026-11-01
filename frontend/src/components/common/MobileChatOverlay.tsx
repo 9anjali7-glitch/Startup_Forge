@@ -3,6 +3,7 @@ import { Sparkles } from 'lucide-react';
 import { Drawer } from 'vaul';
 import { ChatPanel } from '../home_sections/ChatPanel';
 import { User } from '../../App';
+import { apiFetch } from '../../apiFetch';
 
 interface MobileChatOverlayProps {
     currentUser: User;
@@ -14,27 +15,29 @@ export const MobileChatOverlay = ({ currentUser }: MobileChatOverlayProps) => {
     const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'assistant', content: string }[]>([]);
     const [isChatLoading, setIsChatLoading] = useState(false);
 
-    const handleChatSubmit = async (e?: React.FormEvent) => {
-        if (e) e.preventDefault();
-        if (!chatInput.trim() || isChatLoading) return;
+    const handleChatSubmit = async (e?: React.FormEvent | string) => {
+        if (typeof e !== 'string') e?.preventDefault();
+        const userMsg = typeof e === 'string' ? e : chatInput;
+        if (!userMsg.trim() || isChatLoading) return;
 
-        const userMsg = chatInput;
         setChatMessages(prev => [...prev, { role: 'user', content: userMsg }]);
         setChatInput('');
         setIsChatLoading(true);
 
         try {
             const ragUrl = import.meta.env.VITE_RAG_API_URL || 'http://localhost:8000';
-            const res = await fetch(`${ragUrl}/chat`, {
+            const res = await apiFetch(`${ragUrl}/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ query: userMsg, top_k: 5 })
+                body: JSON.stringify({ query: userMsg, history: chatMessages.slice(-8) })
             });
-            const data = await res.json();
-            setChatMessages(prev => [...prev, { role: 'assistant', content: data.response || "Sorry, I couldn't understand that." }]);
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(data.detail || data.error || `Assistant request failed (${res.status})`);
+            setChatMessages(prev => [...prev, { role: 'assistant', content: data.response || "I couldn't generate a reply. Please try again." }]);
         } catch (err) {
             console.error("Chat Error:", err);
-            setChatMessages(prev => [...prev, { role: 'assistant', content: "Error connecting to AI Assistant." }]);
+            const message = err instanceof Error ? err.message : "Could not connect to the AI assistant.";
+            setChatMessages(prev => [...prev, { role: 'assistant', content: `${message} Check that the RAG service is running.` }]);
         } finally {
             setIsChatLoading(false);
         }

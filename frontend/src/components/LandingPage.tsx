@@ -1,4 +1,5 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { apiFetch, setAuthToken, getAuthToken } from '../apiFetch';
 import {
     ArrowRight,
     CheckCircle2,
@@ -7,38 +8,56 @@ import {
 } from 'lucide-react';
 
 interface LandingPageProps {
-    onLogin: (id: string, role: string, name: string) => void;
+    onLogin: (id: string, role: string, name: string, token?: string, organization?: string) => void;
 }
 
 export const LandingPage = ({ onLogin }: LandingPageProps) => {
+    const productionAuth = import.meta.env.PROD;
     const [name, setName] = useState('');
     const [role, setRole] = useState('investor');
+    const [mode, setMode] = useState<'login' | 'register'>('login');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [organization, setOrganization] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const nameInputRef = useRef<HTMLInputElement>(null);
     const focusLogin = () => { nameInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); nameInputRef.current?.focus({ preventScroll: true }); };
 
+    useEffect(() => {
+        if (!import.meta.env.PROD || !getAuthToken()) return;
+        let cancelled = false;
+        apiFetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/auth/me`)
+            .then(response => response.ok ? response.json() : Promise.reject(new Error('Session expired')))
+            .then(data => { if (!cancelled && data.user) onLogin(data.user.id, data.user.role, data.user.name, getAuthToken(), data.user.organization); })
+            .catch(() => setAuthToken(''));
+        return () => { cancelled = true; };
+    }, [onLogin]);
+
     const handleLogin = async (e?: React.FormEvent) => {
         if (e) e.preventDefault();
-        if (!name) {
-            setError("Please enter your name");
-            return;
-        }
+        if (!import.meta.env.PROD && !name.trim()) return setError('Please enter your name');
+        if (import.meta.env.PROD && (!email.trim() || !password)) return setError('Enter your email and password.');
+        if (mode === 'register' && (!name.trim() || !organization.trim())) return setError('Enter your name and company or fund.');
         setLoading(true);
         setError('');
 
         try {
             const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:3000';
-            const res = await fetch(`${apiUrl}/api/login`, {
+            const productionAuth = import.meta.env.PROD;
+            const authPath = productionAuth ? `/api/auth/${mode}` : '/api/login';
+            const res = await apiFetch(`${apiUrl}${authPath}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, role })
+                body: JSON.stringify(productionAuth ? (mode === 'register' ? { name, email, password, role, organization } : { email, password }) : { name, role })
             });
 
             const data = await res.json();
 
-            if (res.ok && data.success && data.userId != null) {
-                onLogin(data.userId.toString(), role, data.name);
+            if (res.ok && data.success && (data.userId != null || data.user?.id != null)) {
+                const account = data.user || { id: data.userId, name: data.name, role };
+                if (data.token) setAuthToken(data.token);
+                onLogin(String(account.id), account.role, account.name, data.token, account.organization);
             } else {
                 setError(data.error || "Login failed. Please check your spelling.");
             }
@@ -109,24 +128,40 @@ export const LandingPage = ({ onLogin }: LandingPageProps) => {
                         </div>
 
                         <div className="mb-8">
-                            <h2 className="text-2xl font-bold text-slate-900">Welcome Back</h2>
-                            <p className="text-slate-500 mt-1">Access your deal flow dashboard.</p>
+                            <h2 className="text-2xl font-bold text-slate-900">{productionAuth && mode === 'register' ? 'Create your account' : 'Welcome Back'}</h2>
+                            <p className="text-slate-500 mt-1">{productionAuth ? 'Sign in to your secure StartupForge account.' : 'Access your deal flow dashboard.'}</p>
                         </div>
 
                         <form onSubmit={handleLogin} className="space-y-5">
                             <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Full Name</label>
-                                <input
-                                    ref={nameInputRef}
-                                    type="text"
-                                    value={name}
-                                    onChange={e => setName(e.target.value)}
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:bg-white transition-all shadow-sm"
-                                    placeholder="e.g. Mark Suster"
-                                />
+                                {!productionAuth && <>
+                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Full Name</label>
+                                    <input ref={nameInputRef} type="text" value={name} onChange={e => setName(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:bg-white transition-all shadow-sm" placeholder="e.g. Mark Suster" />
+                                </>}
+                                {productionAuth && <div className="space-y-4">
+                                    {mode === 'register' && <>
+                                        <p className="rounded-xl bg-amber-50 px-4 py-3 text-xs leading-relaxed text-amber-800">Your founder or investor profile is self-reported until independently verified.</p>
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Full name</label>
+                                            <input autoComplete="name" value={name} onChange={e => setName(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:bg-white" placeholder="Your name" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Company or fund</label>
+                                            <input autoComplete="organization" value={organization} onChange={e => setOrganization(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:bg-white" placeholder="Organization name" />
+                                        </div>
+                                    </>}
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Email</label>
+                                        <input ref={nameInputRef} type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:bg-white" placeholder="you@company.com" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Password</label>
+                                        <input type="password" autoComplete={mode === 'register' ? 'new-password' : 'current-password'} minLength={mode === 'register' ? 12 : undefined} value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:bg-white" placeholder={mode === 'register' ? 'At least 12 characters' : 'Your password'} />
+                                    </div>
+                                </div>}
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3">
+                            {(!productionAuth || mode === 'register') && <div className="grid grid-cols-2 gap-3">
                                 <button
                                     type="button"
                                     onClick={() => setRole('investor')}
@@ -147,7 +182,7 @@ export const LandingPage = ({ onLogin }: LandingPageProps) => {
                                 >
                                     Founder
                                 </button>
-                            </div>
+                            </div>}
 
                             {error && (
                                 <div className="p-3 bg-red-50 text-red-600 rounded-xl text-sm font-medium flex items-center gap-2">
@@ -160,14 +195,16 @@ export const LandingPage = ({ onLogin }: LandingPageProps) => {
                                 disabled={loading}
                                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-xl shadow-indigo-200 transition-all flex items-center justify-center gap-2"
                             >
-                                {loading ? 'Authenticating...' : 'Enter Dashboard'}
+                                {loading ? 'Please wait...' : productionAuth && mode === 'register' ? 'Create account' : 'Enter Dashboard'}
                                 {!loading && <ArrowRight className="w-5 h-5" />}
                             </button>
                         </form>
 
-                        <div className="mt-6 text-center text-xs text-slate-400">
-                            Try: <span className="text-indigo-600 font-bold cursor-pointer hover:underline" onClick={() => { setName('Mark Suster'); setRole('investor'); }}>Mark Suster</span> or <span className="text-emerald-600 font-bold cursor-pointer hover:underline" onClick={() => { setName('1upHealth'); setRole('founder'); }}>1upHealth</span>
-                        </div>
+                        {productionAuth ? <div className="mt-6 text-center text-sm text-slate-500">
+                            {mode === 'login' ? <>New to StartupForge? <button type="button" className="font-bold text-indigo-600 hover:underline" onClick={() => { setMode('register'); setError(''); }}>Create an account</button></> : <>Already registered? <button type="button" className="font-bold text-indigo-600 hover:underline" onClick={() => { setMode('login'); setError(''); }}>Sign in</button></>}
+                        </div> : <div className="mt-6 text-center text-xs text-slate-400">
+                            Demo profiles: <span className="text-indigo-600 font-bold cursor-pointer hover:underline" onClick={() => { setName('Mark Suster'); setRole('investor'); }}>Mark Suster</span> or <span className="text-emerald-600 font-bold cursor-pointer hover:underline" onClick={() => { setName('1upHealth'); setRole('founder'); }}>1upHealth</span>
+                        </div>}
                     </div>
                 </div>
             </header>

@@ -15,6 +15,8 @@ import { CreatePostModal } from './components/CreatePostModal';
 import ConflictReportPage from './components/ConflictReportPage';
 import { LandingPage } from './components/LandingPage';
 import { Toaster } from './components/ui/sonner';
+import { LogOut } from 'lucide-react';
+import { apiFetch, setAuthToken } from './apiFetch';
 
 // Import Data
 import foundersData from './data/founders.json';
@@ -32,6 +34,7 @@ export type User = {
   role?: string;
   // Enhanced Profile Data
   pastInvestments?: string;
+  companyFunding?: string;
   investmentStage?: string;
   primaryDomain?: string;
   secondaryDomain?: string;
@@ -40,12 +43,41 @@ export type User = {
   isActive?: boolean;
   company?: string;
   location?: string;
+  profileSource?: string;
+  avatarSource?: string;
+  dataStatus?: string;
   // Prediction Data
   valuation?: number;
   fundingYear?: number;
   fundingRound?: string;
   competitors?: string[];
   umbrella?: string[];
+};
+
+const getFounderProfile = (userId: string): User | undefined => {
+  if (!userId.startsWith('founder-')) return undefined;
+  const founder = (foundersData as any[])[Number(userId.slice('founder-'.length))];
+  if (!founder) return undefined;
+  return {
+    id: userId,
+    name: founder.name,
+    headline: founder.headline || founder.company,
+    avatar: founder.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(founder.name)}&background=e2e8f0&color=334155&size=256`,
+    coverImage: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=1200&h=400',
+    connections: 0,
+    about: founder.about || `${founder.name} is listed as a founder associated with ${founder.company}. Verify current role and company details at the linked source.`,
+    experience: founder.experience || `${founder.company} — role details not provided.`,
+    education: founder.education || 'Not provided in this directory.',
+    role: 'founder',
+    company: founder.company,
+    pastInvestments: founder.pastInvestments,
+    companyFunding: founder.companyFunding,
+    primaryDomain: founder.primaryDomain || founder.domain,
+    website: founder.website,
+    profileSource: founder.profileSource,
+    avatarSource: founder.avatarSource,
+    dataStatus: founder.dataStatus,
+  };
 };
 
 const getInvestorProfile = (userId: string): User | undefined => {
@@ -57,14 +89,22 @@ const getInvestorProfile = (userId: string): User | undefined => {
     id: userId,
     name: investor.name,
     headline: investor.headline || investor.firm_name,
-    avatar: investor.avatar,
+    avatar: investor.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(investor.name)}&background=e2e8f0&color=334155&size=256`,
     coverImage: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=1200&h=400',
     connections: 0,
-    about: `${investor.name} is listed in the StartupForge investor directory.`,
-    experience: investor.firm_name,
-    education: 'Not provided',
+    about: investor.about || `${investor.name} is a directory profile for ${investor.firm_name}. Treat this as a discovery lead; verify role, thesis, stage, check size, and current availability with the investor or fund before outreach.`,
+    experience: investor.experience || investor.firm_name,
+    education: investor.education || 'Not provided in this directory.',
     role: 'investor',
     company: investor.firm_name,
+    pastInvestments: investor.pastInvestments,
+    investmentStage: investor.investmentStage,
+    primaryDomain: investor.primaryDomain,
+    website: investor.website,
+    location: investor.location,
+    profileSource: investor.profileSource,
+    avatarSource: investor.avatarSource,
+    dataStatus: investor.dataStatus,
   };
 };
 
@@ -113,21 +153,6 @@ export type Conversation = {
   unread: boolean;
 };
 
-export type ConnectionRequest = {
-  id: string;
-  userId: string;
-  userName: string;
-  userHeadline: string;
-  userAvatar: string;
-  mutualConnections: number;
-  // Backend fields
-  sender_id?: string;
-  sender_role?: string;
-  message?: string;
-};
-
-
-
 // --- Main App ---
 function App() {
   // Gun State
@@ -158,7 +183,6 @@ function App() {
   // Domain State
   const [connectedUsers, setConnectedUsers] = useState<Set<string>>(new Set());
   const [followedUsers, setFollowedUsers] = useState<Set<string>>(new Set());
-  const [connectionRequests, setConnectionRequests] = useState<ConnectionRequest[]>([]);
 
   const [currentUser, setCurrentUser] = useState<User>({
     id: '',
@@ -382,7 +406,7 @@ function App() {
     console.log("targetUserId =", targetUserId);
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const res = await fetch(`${apiUrl}/connections/request`, {
+      const res = await apiFetch(`${apiUrl}/connections/request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -478,19 +502,20 @@ function App() {
     setPosts([newPost, ...posts]);
   };
 
-  const handleAcceptRequest = (requestId: string) => {
-    setConnectionRequests(connectionRequests.filter(req => req.id !== requestId));
-  };
-
   const handleRejectRequest = async (requestId: string) => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const res = await fetch(`${apiUrl}/connections/reject/${requestId}`, {
+      const res = await apiFetch(`${apiUrl}/connections/reject/${requestId}`, {
         method: 'POST', headers: { 'x-user-id': currentUser.id }
       });
-      if (res.ok) setConnectionRequests(connectionRequests.filter(req => req.id !== requestId));
-      else console.error('Failed to reject connection request:', await res.text());
-    } catch (err) { console.error('Failed to reject connection request', err); }
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || `Reject request failed (${res.status})`);
+      }
+    } catch (err) {
+      console.error('Failed to reject connection request', err);
+      throw err;
+    }
   };
 
   const handleSendMessage = (userId: string, content: string, type: 'text' | 'voice' | 'image' | 'file' = 'text', fileName?: string) => {
@@ -530,12 +555,12 @@ function App() {
       // For now, let's keep localhost:8000 if not defined, but ideally this should be env var.
       const ragUrl = import.meta.env.VITE_RAG_API_URL || 'http://127.0.0.1:8000';
       const [foundersRes, investorsRes] = await Promise.all([
-        fetch(`${ragUrl}/search/founders`, {
+        apiFetch(`${ragUrl}/search/founders`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query, top_k: 5 })
         }).catch(err => { console.error("Founders Fetch Err:", err); return null; }),
-        fetch(`${ragUrl}/search/investors`, {
+        apiFetch(`${ragUrl}/search/investors`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query, top_k: 5 })
@@ -602,12 +627,12 @@ function App() {
       return;
     }
 
-    const localUser = users.find(u => u.id === viewingUserId) || extraSearchResults.find(u => u.id === viewingUserId) || getInvestorProfile(viewingUserId);
+    const localUser = users.find(u => u.id === viewingUserId) || extraSearchResults.find(u => u.id === viewingUserId) || getInvestorProfile(viewingUserId) || getFounderProfile(viewingUserId);
     if (!localUser) {
       // Fetch from API
       console.log(`Fetching profile for: ${viewingUserId}`);
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      fetch(`${apiUrl}/api/users/${viewingUserId}`)
+      apiFetch(`${apiUrl}/api/users/${viewingUserId}`)
         .then(res => res.json())
         .then(data => {
           if (data.success) {
@@ -622,7 +647,7 @@ function App() {
 
   const viewingUser = viewingUserId === 'current-user'
     ? currentUser
-    : (users.find(u => u.id === viewingUserId) || extraSearchResults.find(u => u.id === viewingUserId) || getInvestorProfile(viewingUserId) || fetchedUser || currentUser);
+    : (users.find(u => u.id === viewingUserId) || extraSearchResults.find(u => u.id === viewingUserId) || getInvestorProfile(viewingUserId) || getFounderProfile(viewingUserId) || fetchedUser || currentUser);
 
   const isOwnProfile = viewingUserId === 'current-user';
 
@@ -632,7 +657,8 @@ function App() {
     // For this flow, let's init in login handler to keep it simple.
   }, []);
 
-  const handleAppLogin = (id: string, role: string, name: string) => {
+  const handleAppLogin = (id: string, role: string, name: string, token?: string, organization?: string) => {
+    setAuthToken(token || '');
     // 1. Init Gun
     // 1. Init Gun with backend URL
     // 1. Init Gun with backend URL
@@ -675,13 +701,52 @@ function App() {
         ...prev,
         id,
         name: name,
-        headline: `${role === 'investor' ? 'Investor' : 'Founder'} at Startup Forge`,
+        headline: `${role === 'investor' ? 'Investor' : 'Founder'} at ${organization || 'Startup Forge'}`,
+        company: organization,
         role
       }));
 
       // Load Inbox logic here potentially
       // loadInbox(id, role);
     }
+  };
+
+  const handleAppLogout = () => {
+    void apiFetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/auth/logout`, { method: 'POST' });
+    setAuthToken('');
+    try {
+      if (typeof gunUser?.leave === 'function') gunUser.leave();
+    } catch (error) {
+      console.warn('Gun session could not be cleanly closed:', error);
+    }
+    setIsLoggedIn(false);
+    setGun(null);
+    setGunUser(null);
+    setUserPair(null);
+    setCurrentUser({
+      id: '',
+      name: '',
+      headline: 'Startup Founder',
+      avatar: 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+      coverImage: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=1200&h=400&fit=crop',
+      connections: 0,
+      about: 'Waiting for bio...',
+      experience: '-',
+      education: '-',
+    });
+    setCurrentPage('home');
+    setViewingUserId('current-user');
+    setHistory(['home']);
+    setHistoryIndex(0);
+    setTargetChatUserId(null);
+    setShowCreatePost(false);
+    setSearchQuery('');
+    setExtraSearchResults([]);
+    setFetchedUser(null);
+    setRagResults({ founders: [], investors: [] });
+    setConnectedUsers(new Set());
+    setFollowedUsers(new Set());
+    setCoiTarget(null);
   };
 
   if (!isLoggedIn) {
@@ -691,6 +756,16 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Toaster />
+      <button
+        type="button"
+        onClick={handleAppLogout}
+        title="Log out of StartupForge"
+        aria-label="Log out of StartupForge"
+        className="fixed bottom-20 left-4 lg:bottom-4 z-[90] inline-flex items-center gap-2 rounded-full border border-rose-200 bg-white px-4 py-2.5 text-sm font-semibold text-rose-700 shadow-lg transition-colors hover:border-rose-300 hover:bg-rose-50 focus:outline-none focus:ring-2 focus:ring-rose-300"
+      >
+        <LogOut className="h-4 w-4" />
+        Log out
+      </button>
       {currentPage !== 'home' && currentPage !== 'network' && currentPage !== 'notifications' && currentPage !== 'messages' && currentPage !== 'conflict-report' && currentPage !== 'profile' && (
         <NavigationBar
           canGoBack={historyIndex > 0}
@@ -819,23 +894,10 @@ function App() {
         <NetworkPage
           currentUser={currentUser}
           suggestedUsers={users}
-          founders={foundersData.map((f: any, i: number) => ({
-            id: `founder-${i}`,
-            name: f.name,
-            headline: f.headline || f.company,
-            avatar: f.avatar,
-            connections: Math.floor(Math.random() * 500) + 50
-          }))}
-          investors={investorsData.map((i: any) => ({
-            id: `investor-${i.id}`,
-            name: i.name,
-            headline: i.headline || i.firm_name,
-            avatar: i.avatar,
-            connections: Math.floor(Math.random() * 500) + 50
-          }))}
+          founders={foundersData.map((_f: any, i: number) => ({ ...getFounderProfile(`founder-${i}`)!, connections: 0 }))}
+          investors={investorsData.map((i: any) => ({ ...getInvestorProfile(`investor-${i.id}`)!, connections: 0 }))}
           followedUsers={followedUsers}
           connectedUsers={connectedUsers}
-          onAcceptRequest={handleAcceptRequest}
           onRejectRequest={handleRejectRequest}
           onFollowUser={handleSendConnectionRequest}
           onViewProfile={(userId) => navigateTo('profile', userId)}
@@ -917,3 +979,5 @@ function App() {
 }
 
 export default App;
+
+

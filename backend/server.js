@@ -1,33 +1,87 @@
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 const express = require('express');
 const cors = require('cors');
+const { timingSafeEqual } = require('crypto');
 const pool = require('./db');
 const chatRoutes = require('./chat.routes');
 const inboxRoutes = require('./inbox.routes');
 const connectionRoutes = require('./connections.routes');
 const investmentRoutes = require('./investments.routes');
+const marketRoutes = require('./market.routes');
+const { router: authRoutes, authenticateToken } = require('./auth.routes');
 
 
 const app = express();
-const PORT = 3000;
+// Cloud hosts inject PORT at runtime; Compose maps this to 3000.
+const PORT = Number.parseInt(process.env.PORT || '3000', 10);
+app.set('trust proxy', 1);
 
 /* ---------------- MIDDLEWARE ---------------- */
-app.use(cors());
-app.use(express.json());
+const allowedOrigins = (process.env.CORS_ORIGINS || (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5173,http://127.0.0.1:5173'))
+  .split(',').map(origin => origin.trim()).filter(Boolean);
+app.use(cors({
+  origin: (origin, callback) => callback(null, !origin || allowedOrigins.includes(origin)),
+  credentials: false,
+}));
+app.use(express.json({ limit: '1mb' }));
 
 app.get('/', (req, res) => res.send('StartupForge Backend Running'));
 
-// DB Setup Route
+// Administrative data mutation routes require a secret and POST to avoid
+// accidental execution by crawlers, previews, or cross-site navigation.
 const setupDatabase = require('./db_setup');
-app.get('/setup-db', (req, res) => {
+const adminKey = process.env.ADMIN_API_KEY || '';
+function requireAdmin(req, res, next) {
+  const supplied = req.get('x-admin-api-key') || '';
+  const expected = Buffer.from(adminKey);
+  const actual = Buffer.from(supplied);
+  if (!adminKey) return res.status(503).json({ error: 'Administrative routes are disabled until ADMIN_API_KEY is configured.' });
+  if (actual.length !== expected.length || !timingSafeEqual(actual, expected)) {
+    return res.status(401).json({ error: 'Invalid administrative credentials.' });
+  }
+  next();
+}
+
+async function requireAuthenticatedSessions(req, res, next) {
+  const token = req.get('authorization')?.replace(/^Bearer\s+/i, '');
+  if (!token) {
+    if (process.env.NODE_ENV !== 'production') return next();
+    return res.status(401).json({ error: 'Sign in to use this feature.' });
+  }
+  try {
+    const account = await authenticateToken(token);
+    if (!account) return res.status(401).json({ error: 'Your session expired. Sign in again.' });
+    const claimedUserId = req.get('x-user-id');
+    if (claimedUserId && claimedUserId !== String(account.user_id)) {
+      return res.status(403).json({ error: 'This session cannot act as another user.' });
+    }
+    req.auth = { id: String(account.user_id), name: account.name, role: account.role };
+    req.headers['x-user-id'] = req.auth.id;
+    req.headers['x-user-role'] = req.auth.role;
+    if (req.body && typeof req.body === 'object') {
+      if ('userId' in req.body) req.body.userId = req.auth.id;
+      if ('sender_id' in req.body) req.body.sender_id = req.auth.id;
+      if ('sender_role' in req.body) req.body.sender_role = req.auth.role;
+      if ('role' in req.body) req.body.role = req.auth.role;
+    }
+    next();
+  } catch (error) {
+    console.error('Session verification failed:', error.message);
+    res.status(503).json({ error: 'Authentication is temporarily unavailable.' });
+  }
+}
+
+app.post('/setup-db', requireAdmin, (req, res) => {
   setupDatabase(res);
 });
 
 // Full CSV Seed Route
 const seedFullDatabase = require('./seed_full');
-app.get('/seed-full', (req, res) => {
+app.post('/seed-full', requireAdmin, (req, res) => {
   seedFullDatabase(res);
 });
+
+app.use('/api/auth', authRoutes);
 
 /* ---------------- HEALTH CHECK ---------------- */
 /**
@@ -36,32 +90,37 @@ app.get('/seed-full', (req, res) => {
  * 2. Database is reachable
  */
 app.get('/health', async (req, res) => {
+  const dependencies = { db: 'unknown', graph: 'unknown' };
   try {
     await pool.query('SELECT 1');
-    res.status(200).json({
-      status: 'ok',
-      db: 'connected',
-      timestamp: new Date().toISOString()
-    });
-
-    // DEBUG: Check for investment_reports table
-    const tableCheck = await pool.query("SELECT to_regclass('public.investment_reports')");
-    console.log("DEBUG: investment_reports table check:", tableCheck.rows[0]);
-
+    dependencies.db = 'connected';
   } catch (err) {
-    console.error('DB health check failed:', err.message);
-    res.status(500).json({
-      status: 'error',
-      db: 'disconnected'
-    });
+    dependencies.db = 'disconnected';
+    console.error('Database health check failed:', err.message);
   }
+  try {
+    if (!driver) throw new Error('Neo4j driver is not configured');
+    await driver.verifyConnectivity();
+    dependencies.graph = 'connected';
+  } catch (err) {
+    dependencies.graph = 'disconnected';
+    console.error('Neo4j health check failed:', err.message);
+  }
+  const healthy = dependencies.db === 'connected' && dependencies.graph === 'connected';
+  res.status(healthy ? 200 : 503).json({
+    status: healthy ? 'ok' : 'degraded',
+    ...dependencies,
+    timestamp: new Date().toISOString(),
+  });
 });
 
 /* ---------------- ROUTES ---------------- */
+app.use(['/chat', '/inbox', '/connections', '/api/investments', '/api/coi'], requireAuthenticatedSessions);
 app.use('/chat', chatRoutes);
 app.use('/inbox', inboxRoutes);
 app.use('/connections', connectionRoutes);
 app.use('/api/investments', investmentRoutes);
+app.use('/api/market', marketRoutes);
 
 const coiRouter = require('./coiService');
 app.use('/api/coi', coiRouter);
@@ -90,24 +149,55 @@ try {
 
 // LOGIN ENDPOINT (Neo4j Source)
 app.post('/api/login', async (req, res) => {
-  const { name, role } = req.body;
-  if (!name || !role) return res.status(400).json({ error: 'Name and Role required' });
+  if (process.env.NODE_ENV === 'production' && process.env.ALLOW_INSECURE_DEMO_LOGIN !== 'true') {
+    return res.status(503).json({ error: 'Name-only demo login is disabled in production. Configure a real authentication provider first.' });
+  }
+  const name = typeof req.body?.name === 'string' ? req.body.name.trim() : '';
+  const role = typeof req.body?.role === 'string' ? req.body.role.trim().toLowerCase() : '';
+  if (!name || name.length > 120 || !['founder', 'investor'].includes(role)) {
+    return res.status(400).json({ error: 'Enter a valid name (up to 120 characters) and choose Founder or Investor.' });
+  }
 
   const session = driver.session();
   try {
     let result;
-    if (role.toLowerCase() === 'investor') {
+    if (role === 'investor') {
       result = await session.run(
-        `MATCH (u:Investor) WHERE toLower(u.name) CONTAINS toLower($name) 
-         RETURN u.id AS id, u.name AS name, u.firm_name AS headline, 'investor' AS role LIMIT 1`,
+        `MATCH (u:Investor) WHERE toLower(trim(u.name)) = toLower($name)
+         RETURN u.id AS id, u.name AS name, u.firm_name AS headline, 'investor' AS role
+         ORDER BY u.id LIMIT 1`,
         { name }
       );
+      // If the supplied name is a fund name, choose a deterministic matching
+      // investor profile instead of treating a shared fund as an ambiguous person.
+      if (result.records.length === 0) {
+        result = await session.run(
+          `MATCH (u:Investor) WHERE toLower(trim(coalesce(u.firm_name, ''))) = toLower($name)
+           RETURN u.id AS id, u.name AS name, u.firm_name AS headline, 'investor' AS role
+           ORDER BY u.id LIMIT 1`,
+          { name }
+        );
+      }
     } else {
       result = await session.run(
-        `MATCH (u:Company) WHERE toLower(u.founder) CONTAINS toLower($name) OR toLower(u.name) CONTAINS toLower($name)
-         RETURN u.id AS id, u.founder AS name, u.name AS headline, 'founder' AS role LIMIT 1`,
+        `MATCH (u:Company) WHERE toLower(trim(u.name)) = toLower($name)
+         RETURN u.id AS id, coalesce(u.founder, u.name) AS name, u.name AS headline, 'founder' AS role
+         ORDER BY u.id LIMIT 1`,
         { name }
       );
+      // The demo helper uses the company name. Resolve that exact company first;
+      // only ask for a person's full name when no company matches.
+      if (result.records.length === 0) {
+        result = await session.run(
+          `MATCH (u:Company) WHERE toLower(trim(coalesce(u.founder, ''))) = toLower($name)
+           RETURN u.id AS id, u.founder AS name, u.name AS headline, 'founder' AS role LIMIT 2`,
+          { name }
+        );
+      }
+    }
+
+    if (result.records.length > 1) {
+      return res.status(409).json({ error: 'That name matches multiple profiles. Enter the person’s full name or an exact company/fund name.' });
     }
 
     if (result.records.length > 0) {
@@ -140,6 +230,8 @@ app.post('/api/founders/rising', async (req, res) => {
     const query = `
       MATCH (c:Company)
       WHERE c.valuation IS NOT NULL AND c.founder IS NOT NULL
+        AND trim(toString(c.founder)) <> ''
+        AND toLower(trim(toString(c.founder))) <> toLower(trim(toString(c.name)))
       WITH c.name AS company, collect(c) AS copies
       WITH company, copies[0] AS c
       RETURN c.id as id, c.founder as name, c.name as company, c.valuation as valuation, 
@@ -149,11 +241,6 @@ app.post('/api/founders/rising', async (req, res) => {
     `;
 
     const result = await session.run(query);
-
-    if (result.records.length === 0) {
-      // Fallback mock if graph empty
-      throw new Error("No founders in graph");
-    }
 
     const founders = result.records.map(r => ({
       id: r.get('id'),
@@ -169,13 +256,7 @@ app.post('/api/founders/rising', async (req, res) => {
 
   } catch (err) {
     console.error("Error fetching founders from Neo4j:", err.message);
-    // Fallback Mock Data
-    const mockFounders = [
-      { id: 'm1', company: "Nebula AI", name: "Alex Rivera", round: "Series A", year: "2024", valuation: 45000000, umbrella: "AI & ML" },
-      { id: 'm2', company: "Zephyr Energy", name: "Sarah Chen", round: "Seed", year: "2023", valuation: 12000000, umbrella: "CleanTech" },
-      { id: 'm3', company: "Flux Systems", name: "James Wilson", round: "Series B", year: "2022", valuation: 150000000, umbrella: "Robotics" }
-    ];
-    res.json({ success: true, founders: mockFounders });
+    res.status(503).json({ success: false, error: 'Founder profiles are temporarily unavailable. Please retry in a moment.' });
   } finally {
     session.close();
   }

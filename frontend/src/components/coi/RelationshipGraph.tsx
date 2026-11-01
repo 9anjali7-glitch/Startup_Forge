@@ -25,9 +25,10 @@ interface RelationshipGraphProps {
   conflictLevel?: number;
   conflicts?: any[];
   level1Companies?: string[];
+  conflictType?: string;
 }
 
-const RelationshipGraph = ({ investorName, targetCompany, conflictLevel = 0, conflicts = [], level1Companies = [] }: RelationshipGraphProps) => {
+const RelationshipGraph = ({ investorName, targetCompany, conflictLevel = 0, conflicts = [], level1Companies = [], conflictType = "" }: RelationshipGraphProps) => {
   const [zoom, setZoom] = useState(1);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
 
@@ -46,17 +47,19 @@ const RelationshipGraph = ({ investorName, targetCompany, conflictLevel = 0, con
     }
 
     // Base Nodes
-    newNodes.push({ id: "inv", label: investorName || "Investor", type: "investor", x: 100, y: 150 });
-    newNodes.push({ id: "tgt", label: targetCompany || "Target", type: "target", x: 700, y: 150 });
+    // Keep long entity labels inside the SVG viewport at both desktop and mobile widths.
+    newNodes.push({ id: "inv", label: investorName || "Investor", type: "investor", x: 160, y: 150 });
+    newNodes.push({ id: "tgt", label: targetCompany || "Target", type: "target", x: 640, y: 150 });
 
     if (conflictLevel === 1) {
-      // Level 1: Investor -> Company -> (Sector) -> Target
-      // We draw Company in middle.
+      // Level 1: Investor -> portfolio company -> target. A same-sector match
+      // is drawn as a dashed screening signal; explicit competition is solid.
+      const sectorOnly = conflictType.includes("sector");
       level1Companies.slice(0, 3).forEach((comp, i) => {
         const id = `l1-${i}`;
         newNodes.push({ id, label: comp, type: "company", x: 400, y: 100 + (i * 80) });
         newEdges.push({ from: "inv", to: id, type: "direct", label: "Invested In" });
-        newEdges.push({ from: id, to: "tgt", type: "indirect", label: "Direct Competitor" });
+        newEdges.push({ from: id, to: "tgt", type: sectorOnly ? "indirect" : "direct", label: sectorOnly ? "Shared Sector" : "Competes With" });
       });
     } else if (conflictLevel === 2) {
       // Level 2: Investor -> Parent -> Subsidiary -> Target
@@ -70,14 +73,16 @@ const RelationshipGraph = ({ investorName, targetCompany, conflictLevel = 0, con
 
         newEdges.push({ from: "inv", to: pid, type: "direct", label: "Invested In" });
         newEdges.push({ from: pid, to: sid, type: "direct", label: "Subsidiary" });
-        newEdges.push({ from: sid, to: "tgt", type: "indirect", label: "Competes With" });
+        // The conflict is indirect across the ownership path, but this individual
+        // COMPETES_WITH edge is still a recorded relationship and stays solid.
+        newEdges.push({ from: sid, to: "tgt", type: "direct", label: "Competes With" });
       });
     }
 
     setNodes(newNodes);
     setEdges(newEdges);
 
-  }, [investorName, targetCompany, conflictLevel, conflicts, level1Companies]);
+  }, [investorName, targetCompany, conflictLevel, conflicts, level1Companies, conflictType]);
 
 
   const getNodeColor = (type: string) => {

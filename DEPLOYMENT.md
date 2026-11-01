@@ -19,10 +19,7 @@ The entire system is containerized using Docker. This allows you to run all serv
 ## How to Run
 
 1.  **Environment Variables**:
-    Ensure you have a `.env` file in the root directory (or set in your shell) with your AI API key:
-    ```
-    MISTRAL_API_KEY=your_actual_key_here
-    ```
+    Copy `.env.example` to `.env`. Mistral is optional and disabled by default; configure Gemini or the local Ollama model for generated answers. Keep database backups local and do not commit `.env` or credentials.
 
 2.  **Build and Start**:
     ```bash
@@ -34,4 +31,7 @@ The entire system is containerized using Docker. This allows you to run all serv
 
 ## Notes
 - The database volume `postgres_data` persists data even if containers are stopped.
-- The `rag_backend` container expects `MISTRAL_API_KEY` to be available. You can create a `.env` in the same folder as `docker-compose.yml` to set it automatically.
+- Browser API origins are restricted by `CORS_ORIGINS`; use exact origins without a trailing slash.
+- `/setup-db` and `/seed-full` accept POST only and require `x-admin-api-key` matching `ADMIN_API_KEY`.
+- Production account routes require a server-issued bearer session and reject mismatched client-supplied user IDs. Name-only demo login is disabled in production. Accounts use passwords but email ownership and professional details are not verified; do not present profile claims as verified diligence evidence.
+- A deployable cloud backend also needs an externally reachable Neo4j service; the Render blueprint only provisions PostgreSQL.
