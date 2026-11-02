@@ -1,0 +1,14 @@
+**/node_modules
+**/dist
+**/build
+**/__pycache__
+.git
+.env
+.env.*
+!.env.example
+backupdb
+**/*.log
+**/*.err.log
+venv
+tmp
+temp

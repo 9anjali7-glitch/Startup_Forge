@@ -18,7 +18,7 @@ router.get('/growth/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
-        const query = `SELECT * FROM founders WHERE id = $1`;
+        const query = `SELECT * FROM founders WHERE id::text = $1 OR lower(trim(company)) = lower(trim($1)) ORDER BY CASE WHEN lower(trim(company)) = lower(trim($1)) THEN 0 ELSE 1 END, id DESC LIMIT 1`;
         const result = await pool.query(query, [id]);
 
         if (result.rows.length === 0) {
@@ -34,6 +34,10 @@ router.get('/growth/:id', async (req, res) => {
             year: Number(round.year),
             amount: parseFundingAmount(round.amount),
         })).filter((round) => Number.isFinite(round.year) && round.year > 1900 && Number.isFinite(round.amount) && round.amount > 0)
+          // Guard against corrupted imports (for example, a $1.7B seed round
+          // paired with a $10M company valuation). The UI will show a clearly
+          // labeled illustrative scenario if no credible recorded round remains.
+          .filter((round) => !Number(founder.valuation) || round.amount <= Number(founder.valuation) * 10)
           .sort((a, b) => a.year - b.year);
         if (!observations.length) {
             return res.status(422).json({ error: 'No dated funding round with a numeric amount is recorded for this founder.' });

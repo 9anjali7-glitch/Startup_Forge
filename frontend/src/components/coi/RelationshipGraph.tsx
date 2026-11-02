@@ -1,13 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Network, ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
+import { Network, ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Node {
   id: string;
   label: string;
-  type: "investor" | "founder" | "company" | "target";
+  type: "investor" | "founder" | "company" | "target" | "sector";
   x: number;
   y: number;
 }
@@ -26,9 +25,10 @@ interface RelationshipGraphProps {
   conflicts?: any[];
   level1Companies?: string[];
   conflictType?: string;
+  graph?: { nodes?: Array<{ id: string; label: string; type: string }>; edges?: Array<{ from: string; to: string; relation?: string; evidence_type?: string }> };
 }
 
-const RelationshipGraph = ({ investorName, targetCompany, conflictLevel = 0, conflicts = [], level1Companies = [], conflictType = "" }: RelationshipGraphProps) => {
+const RelationshipGraph = ({ investorName, targetCompany, conflictLevel = 0, conflicts = [], level1Companies = [], conflictType = "", graph }: RelationshipGraphProps) => {
   const [zoom, setZoom] = useState(1);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
 
@@ -46,10 +46,31 @@ const RelationshipGraph = ({ investorName, targetCompany, conflictLevel = 0, con
       return;
     }
 
-    // Base Nodes
-    // Keep long entity labels inside the SVG viewport at both desktop and mobile widths.
-    newNodes.push({ id: "inv", label: investorName || "Investor", type: "investor", x: 160, y: 150 });
-    newNodes.push({ id: "tgt", label: targetCompany || "Target", type: "target", x: 640, y: 150 });
+    if (graph?.nodes?.length) {
+      const apiNodes = graph.nodes;
+      const apiEdges = graph.edges || [];
+      const layerFor = (type: string) => type === "investor" ? 0 : type === "target" ? 3 : type === "sector" ? 2 : conflictLevel === 2 ? 1 + Math.max(0, apiNodes.filter(n => n.type === "company").findIndex(n => n.type === type)) : 1;
+      // Place nodes by path order and spread branches vertically.
+      const companyNodes = apiNodes.filter(n => n.type === "company");
+      const positioned = apiNodes.map((node) => {
+        const layer = node.type === "investor" ? 0 : node.type === "target" ? 3 : node.type === "sector" ? 2 : (conflictLevel === 2 ? Math.max(1, companyNodes.findIndex(n => n.id === node.id) + 1) : 1);
+        const x = 90 + layer * 205;
+        const siblings = apiNodes.filter(n => n.type === node.type && (n.type === "company" || n.type === "sector"));
+        const index = siblings.findIndex(n => n.id === node.id);
+        const y = siblings.length > 1 ? 120 + index * (220 / (siblings.length - 1)) : 200;
+        return { id: node.id, label: node.label, type: (node.type === "investor" || node.type === "target" || node.type === "sector" ? node.type : "company") as Node["type"], x, y };
+      });
+      newNodes.push(...positioned);
+      newEdges.push(...apiEdges.map(edge => ({
+        from: edge.from,
+        to: edge.to,
+        type: edge.relation === "OPERATES_IN" ? "indirect" as const : "direct" as const,
+        label: (edge.relation || "Relationship").replaceAll("_", " ").toLowerCase(),
+      })));
+    } else {
+    // Fallback for older API responses without an explicit graph.
+    newNodes.push({ id: "inv", label: investorName || "Investor", type: "investor", x: 90, y: 200 });
+    newNodes.push({ id: "tgt", label: targetCompany || "Target", type: "target", x: 705, y: 200 });
 
     if (conflictLevel === 1) {
       // Level 1: Investor -> portfolio company -> target. A same-sector match
@@ -78,11 +99,12 @@ const RelationshipGraph = ({ investorName, targetCompany, conflictLevel = 0, con
         newEdges.push({ from: sid, to: "tgt", type: "direct", label: "Competes With" });
       });
     }
+    }
 
     setNodes(newNodes);
     setEdges(newEdges);
 
-  }, [investorName, targetCompany, conflictLevel, conflicts, level1Companies, conflictType]);
+  }, [investorName, targetCompany, conflictLevel, conflicts, level1Companies, conflictType, graph]);
 
 
   const getNodeColor = (type: string) => {
@@ -91,6 +113,7 @@ const RelationshipGraph = ({ investorName, targetCompany, conflictLevel = 0, con
       founder: "#9333EA",
       company: "#0EA5E9",
       target: "#EF4444",
+      sector: "#F59E0B",
     };
     return colors[type] || "#6B7280";
   };
@@ -101,6 +124,7 @@ const RelationshipGraph = ({ investorName, targetCompany, conflictLevel = 0, con
       founder: "#FAF5FF",
       company: "#F0F9FF",
       target: "#FEF2F2",
+      sector: "#FFFBEB",
     };
     return colors[type] || "#F9FAFB";
   };
@@ -152,6 +176,10 @@ const RelationshipGraph = ({ investorName, targetCompany, conflictLevel = 0, con
       </CardHeader>
 
       <CardContent className="p-0">
+        <div className="border-t border-slate-100 bg-white px-5 py-3 text-sm normal-case tracking-normal">
+          {conflictLevel === 2 ? <span className="font-semibold text-amber-700">Indirect conflict path detected through recorded ownership.</span> : conflictLevel === 1 ? <span className="font-semibold text-rose-700">Direct portfolio conflict path detected.</span> : <span className="font-medium text-slate-600">No direct or indirect conflict path found in the recorded graph.</span>}
+          <span className="ml-2 text-slate-500">Each arrow shows a recorded relationship; demo fixtures are synthetic.</span>
+        </div>
         <div className="relative border-t border-border/50 bg-[#F8FAFC] overflow-hidden" style={{ height: 400 }}>
           <svg
             id="coi-relationship-graph-svg"

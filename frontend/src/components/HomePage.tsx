@@ -5,6 +5,7 @@ import { SearchResultsDropdown } from './SearchResultsDropdown';
 import { Bell, MessageSquare, BrainCircuit, Sparkles, Home, X, ArrowUpRight, Users } from 'lucide-react';
 import { Drawer } from 'vaul';
 import { apiFetch } from '../apiFetch';
+import { useUnreadBadges } from '../useUnreadBadges';
 
 // Import newly extracted components
 import { ChatPanel } from './home_sections/ChatPanel';
@@ -26,6 +27,7 @@ type HomePageProps = {
 };
 
 export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, ragResults, isSearching, onCheckConflict }: HomePageProps) {
+  const { unreadAlerts, unreadInbox } = useUnreadBadges(String(currentUser?.id || ''));
   const [searchQuery, setSearchQuery] = useState('');
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [topFounders, setTopFounders] = useState<any[]>([]);
@@ -198,7 +200,7 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
   };
 
   return (
-    <div className="h-screen bg-slate-50 flex flex-col font-sans overflow-hidden">
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans overflow-x-hidden">
       {/* --- Fixed Header --- */}
       <div className="bg-white px-4 md:px-8 py-3 md:py-6 shadow-sm border-b border-slate-100 z-50 flex-shrink-0 relative">
         <div className="flex items-center justify-between gap-4 w-full h-14 md:h-24">
@@ -284,19 +286,19 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
           <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
             <ActionItem icon={<Home />} label="Home" onClick={() => onNavigate('home')} active={true} />
             <ActionItem icon={<Users />} label="Network" onClick={() => onNavigate('network')} />
-            <ActionItem icon={<Bell />} label="Alerts" badge={true} onClick={() => onNavigate('notifications')} />
-            <ActionItem icon={<MessageSquare />} label="Inbox" onClick={() => onNavigate('messages')} />
+            <ActionItem icon={<Bell />} label="Alerts" badge={unreadAlerts > 0} onClick={() => onNavigate('notifications')} />
+            <ActionItem icon={<MessageSquare />} label="Inbox" badge={unreadInbox > 0} onClick={() => onNavigate('messages')} />
             <ActionItem icon={<BrainCircuit />} label="Deep Analysis" onClick={() => onNavigate('conflict-report')} />
           </div>
         </div>
       </div>
 
       {/* --- Main Dashboard Content --- */}
-      <div className="w-full px-0 md:px-6 pt-0 md:pt-6 pb-20 md:pb-2 overflow-hidden flex-1 relative">
-        <div className="relative flex flex-row w-full h-full gap-6 px-4 md:px-0 pt-4 md:pt-0">
+      <div className="w-full px-0 md:px-6 pt-0 md:pt-6 pb-20 md:pb-8 flex-1 relative">
+        <div className="relative flex flex-row w-full gap-6 px-4 md:px-0 pt-4 md:pt-0 items-start">
 
           {/* COLUMN 1: RAG Chatbot (Desktop Only) */}
-          <div className="hidden lg:flex lg:flex-[22] h-full min-w-0">
+          <div className="hidden lg:flex lg:flex-[22] min-w-0 sticky top-4 h-[calc(100vh-2rem)]">
             <ChatPanel
               currentUser={currentUser}
               chatInput={chatInput}
@@ -329,11 +331,11 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
 
 
           {/* COLUMN 2: Feed + Stats (Mobile: Reordered) */}
-          <div className="flex-[100] lg:flex-[54] h-full min-w-0 overflow-y-auto lg:overflow-hidden pb-24 md:pb-0 scroll-smooth">
-            <div className="flex flex-col h-full gap-2 lg:gap-6">
+          <div className="flex-[100] lg:flex-[54] min-w-0 pb-24 md:pb-0 scroll-smooth">
+            <div className="flex flex-col gap-2 lg:gap-6">
 
               {/* 1. Founders Section (Top on Mobile) */}
-              <div className="flex-shrink-0 min-h-0 lg:flex-1 h-[420px] lg:h-auto pt-2 lg:pt-0">
+              <div className="flex-shrink-0 min-h-[420px] lg:min-h-[400px] pt-2 lg:pt-0">
                 <FoundersPanel topFounders={topFounders} onNavigate={onNavigate} loading={topFoundersLoading} error={topFoundersError} onRetry={() => setFounderRetry(value => value + 1)} />
               </div>
 
@@ -356,7 +358,7 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
               </div>
 
               {/* 3. News Section (Bottom on Mobile) */}
-              <div className="flex-shrink-0 min-h-0 lg:flex-1 h-auto lg:h-auto border-t-[3px] border-slate-100 lg:border-none pt-2 lg:pt-0">
+              <div className="flex-shrink-0 min-h-[620px] border-t-[3px] border-slate-100 lg:border-none pt-4 lg:pt-0">
                 <NewsPanel />
               </div>
             </div>
@@ -364,7 +366,7 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
 
 
           {/* COLUMN 3: Stats (Desktop Only) */}
-          <div className="hidden lg:flex lg:flex-[20] h-full min-w-0">
+          <div className="hidden lg:flex lg:flex-[20] min-w-0">
             <StatsPanel
               currentUser={currentUser}
               coiCompanyName={coiCompanyName}
@@ -399,8 +401,8 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
         <ActionItem icon={<Home />} label="Home" onClick={() => onNavigate('home')} active={true} />
         <ActionItem icon={<Users className="w-6 h-6" />} label="Network" onClick={() => onNavigate('network')} />
         <ActionItem icon={<BrainCircuit className="w-6 h-6" />} label="Analyze" onClick={() => onNavigate('conflict-report')} />
-        <ActionItem icon={<Bell className="w-6 h-6" />} label="Alerts" badge={true} onClick={() => onNavigate('notifications')} />
-        <ActionItem icon={<MessageSquare className="w-6 h-6" />} label="Inbox" onClick={() => onNavigate('messages')} />
+        <ActionItem icon={<Bell className="w-6 h-6" />} label="Alerts" badge={unreadAlerts > 0} onClick={() => onNavigate('notifications')} />
+        <ActionItem icon={<MessageSquare className="w-6 h-6" />} label="Inbox" badge={unreadInbox > 0} onClick={() => onNavigate('messages')} />
       </div>
 
       {/* --- Profile Modal --- */}

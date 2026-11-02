@@ -3,7 +3,7 @@ services:
   - type: web
     name: startupforge-backend
     env: docker
-    dockerContext: ./backend
+    dockerContext: .
     dockerfilePath: ./backend/Dockerfile
     plan: free
     numInstances: 1
@@ -36,6 +36,8 @@ services:
     numInstances: 1
     healthCheckPath: /health
     envVars:
+      - key: AI_PROVIDER
+        value: gemini
       - key: DATABASE_URL
         sync: false
       - key: MISTRAL_API_KEY
@@ -43,7 +45,13 @@ services:
       - key: GEMINI_API_KEY
         sync: false
       - key: GEMINI_MODEL
+        value: gemini-3.6-flash
+      - key: GEMINI_FALLBACK_MODEL
         value: gemini-3.8-flash
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: chat-latest
       - key: CORS_ORIGINS
         sync: false
 

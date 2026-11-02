@@ -59,6 +59,8 @@ router.get('/', async (req, res) => {
         other_user_role: role,
         other_user_name: name,
         other_user_headline: headline,
+        other_user_company: isInvestor ? null : r.get('other_company'),
+        other_user_firm: isInvestor ? r.get('other_firm') : null,
         other_user_avatar: isInvestor
           ? 'https://cdn-icons-png.flaticon.com/512/147/147144.png'
           : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'

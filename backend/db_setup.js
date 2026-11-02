@@ -1,5 +1,24 @@
 const pool = require('./db');
 const neo4j = require('neo4j-driver');
+const fs = require('fs');
+const path = require('path');
+
+function loadDirectoryProfiles() {
+    const candidates = [
+        process.env.DIRECTORY_DATA_DIR,
+        path.resolve(__dirname, 'data'),
+        path.resolve(__dirname, '../frontend/src/data')
+    ].filter(Boolean);
+    for (const directory of candidates) {
+        try {
+            return {
+                investors: JSON.parse(fs.readFileSync(path.join(directory, 'investors.json'), 'utf8')),
+                founders: JSON.parse(fs.readFileSync(path.join(directory, 'founders.json'), 'utf8'))
+            };
+        } catch { /* Try the next location; source files are included in cloud images. */ }
+    }
+    return { investors: [], founders: [] };
+}
 
 async function setupDatabase(res) {
     try {
@@ -97,6 +116,9 @@ async function setupDatabase(res) {
 
             const investors = (await client.query('SELECT * FROM investors ORDER BY id')).rows;
             const founders = (await client.query('SELECT * FROM founders ORDER BY id')).rows;
+            const directoryProfiles = loadDirectoryProfiles();
+            let addedDirectoryInvestors = 0;
+            let addedDirectoryFounders = 0;
             const neo4jUri = process.env.NEO4J_URI || 'bolt://host.docker.internal:7687';
             const graphDriver = neo4j.driver(
                 neo4jUri,
@@ -148,6 +170,73 @@ async function setupDatabase(res) {
                             name: row.name, domain: row.domain, location: row.location,
                             valuation: row.valuation == null ? null : Number(row.valuation),
                             round: row.round, year: row.year, description: row.description });
+                    }
+
+                    // Ensure the curated Network directory points at graph-backed
+                    // profiles so connection requests do not fail for local IDs.
+                    for (const [index, profile] of directoryProfiles.investors.entries()) {
+                        const name = String(profile.name || '').trim();
+                        if (!name) continue;
+                        const existing = await graphSession.run(`
+                            MATCH (i:Investor)
+                            WHERE toLower(trim(coalesce(i.name, ''))) = toLower($name)
+                            RETURN count(i) AS count
+                        `, { name });
+                        if (existing.records[0].get('count').toNumber() > 0) continue;
+                        await graphSession.run(`
+                            MERGE (i:Investor {id: $id})
+                            SET i.name = $name, i.firm_name = $firm,
+                                i.short_bio = $about, i.domain = $domain,
+                                i.location = $location, i.profile_url = $source,
+                                i.website = $website, i.education = $education,
+                                i.experience = $experience, i.directory_profile = true,
+                                i.verification_status = 'unverified'
+                        `, {
+                            id: `directory-investor-${profile.id ?? index}`,
+                            name,
+                            firm: profile.firm_name || profile.company || '',
+                            about: profile.about || '',
+                            domain: profile.primaryDomain || profile.primary_domain || '',
+                            location: profile.location || '',
+                            source: profile.profileSource || '',
+                            website: profile.website || '',
+                            education: profile.education || '',
+                            experience: profile.experience || ''
+                        });
+                        addedDirectoryInvestors++;
+                    }
+
+                    for (const [index, profile] of directoryProfiles.founders.entries()) {
+                        const name = String(profile.name || '').trim();
+                        const company = String(profile.company || profile.name || '').trim();
+                        if (!name || !company) continue;
+                        const existing = await graphSession.run(`
+                            MATCH (c:Company)
+                            WHERE toLower(trim(coalesce(c.founder, ''))) = toLower($name)
+                            RETURN count(c) AS count
+                        `, { name, company });
+                        if (existing.records[0].get('count').toNumber() > 0) continue;
+                        await graphSession.run(`
+                            MERGE (c:Company {id: $id})
+                            SET c.name = $company, c.founder = $name,
+                                c.domain = $domain, c.location = $location,
+                                c.description = $about, c.profile_url = $source,
+                                c.website = $website, c.education = $education,
+                                c.experience = $experience, c.directory_profile = true,
+                                c.verification_status = 'unverified'
+                        `, {
+                            id: `directory-founder-${profile.id ?? index}`,
+                            name,
+                            company,
+                            domain: profile.primaryDomain || profile.domain || '',
+                            location: profile.location || '',
+                            about: profile.about || '',
+                            source: profile.profileSource || '',
+                            website: profile.website || '',
+                            education: profile.education || '',
+                            experience: profile.experience || ''
+                        });
+                        addedDirectoryFounders++;
                     }
 
                     // Remove only the previous synthetic demo fixtures. Never clear the user's graph.
@@ -218,7 +307,8 @@ async function setupDatabase(res) {
             await client.query('COMMIT');
             res.send(`
         <h1>Database Setup Complete ✅</h1>
-        <p>Schema is ready. Synchronized ${investors.length} investors and ${founders.length} founders into Neo4j.</p>
+        <p>Schema is ready. Synchronized ${investors.length} Postgres investors and ${founders.length} founders into Neo4j.</p>
+        <p>Added ${addedDirectoryInvestors} directory investors and ${addedDirectoryFounders} directory founders missing from the graph.</p>
         <p>You can now return to the frontend and log in with a restored profile.</p>
       `);
 

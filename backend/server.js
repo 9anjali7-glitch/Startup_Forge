@@ -130,6 +130,7 @@ app.use('/api/founders', foundersRoutes);
 
 // LOGIN ENDPOINT (Name -> ID Resolution)
 const neo4j = require('neo4j-driver');
+const { ensureCoiDemoFixtures } = require('./coiDemoFixtures');
 let driver;
 try {
   const uri = process.env.NEO4J_URI || "bolt://host.docker.internal:7687";
@@ -162,8 +163,14 @@ app.post('/api/login', async (req, res) => {
   try {
     let result;
     if (role === 'investor') {
+      // Provide a valid sign-in for the explicitly synthetic screening demo.
+      // Seeding is repeatable and isolated to this one named demo account.
+      if (/^jordan lee(?: \(demo investor\))?$/i.test(name)) {
+        await ensureCoiDemoFixtures(session);
+      }
       result = await session.run(
         `MATCH (u:Investor) WHERE toLower(trim(u.name)) = toLower($name)
+           OR (toLower($name) = 'jordan lee' AND u.id = 'demo-investor-jordan-lee')
          RETURN u.id AS id, u.name AS name, u.firm_name AS headline, 'investor' AS role
          ORDER BY u.id LIMIT 1`,
         { name }
@@ -190,7 +197,8 @@ app.post('/api/login', async (req, res) => {
       if (result.records.length === 0) {
         result = await session.run(
           `MATCH (u:Company) WHERE toLower(trim(coalesce(u.founder, ''))) = toLower($name)
-           RETURN u.id AS id, u.founder AS name, u.name AS headline, 'founder' AS role LIMIT 2`,
+           RETURN u.id AS id, u.founder AS name, u.name AS headline, 'founder' AS role
+           ORDER BY u.id LIMIT 1`,
           { name }
         );
       }

@@ -1,6 +1,6 @@
 # Cloud Deployment Guide
 
-To get a link that anyone can open, you need to host your application on the cloud. We will use **Render** for the backends/database and **Vercel** for the frontend.
+To get a link that anyone can open, host the frontend on **Vercel** and the API services on **Render**. The current blueprint expects PostgreSQL and Neo4j credentials from external providers (Supabase and Neo4j Aura); it does not create those databases. This cloud setup is separate from the local Docker app.
 
 ## Prerequisites
 1.  **GitHub Account**: Your code must be pushed to a GitHub repository.
@@ -20,7 +20,7 @@ We have created a `render.yaml` file that automates this.
 4.  Connect your GitHub repository.
 5.  Render will detect the `render.yaml` file.
 6.  Click **"Apply"**. Set the exact production frontend origin in `CORS_ORIGINS` for the API and RAG services.
-7.  Set `DATABASE_URL` on both the backend and RAG service to your Supabase Postgres **Session pooler** connection string. Set `NEO4J_URI`, `NEO4J_USER`, and `NEO4J_PASSWORD` for your AuraDB instance. Add `GEMINI_API_KEY` to the RAG service for generated assistant answers.
+7.  Set `DATABASE_URL` on both the backend and RAG service to your Supabase Postgres **Session pooler** connection string. Set `NEO4J_URI`, `NEO4J_USER`, and `NEO4J_PASSWORD` for your AuraDB instance. For hosted AI, set `AI_PROVIDER=gemini` and add `GEMINI_API_KEY` to the RAG service. Alternatively, set `AI_PROVIDER=openai` and add `OPENAI_API_KEY`; the API key belongs only on the RAG backend, never in Vercel's frontend variables.
 8.  Set a strong `ADMIN_API_KEY` and leave `ALLOW_INSECURE_DEMO_LOGIN=false`. The API health check remains degraded until Postgres and Neo4j are reachable.
 
 Render will now deploy:
@@ -50,6 +50,8 @@ Once finished, copy the URL for the **Node.js Backend** (e.g., `https://startupf
     *   **Value**: Your Render Gun relay URL.
     *   **Name**: `VITE_PREDICTION_URL`
     *   **Value**: Your Render prediction service URL.
+
+   Do not put `GEMINI_API_KEY` or `OPENAI_API_KEY` in Vercel. The frontend calls the RAG service; provider keys stay on that server.
 
 7.  Set all four deployed service URLs, then click **"Deploy"**. The frontend build embeds these URLs, so redeploy after changing them. The `frontend/vercel.json` file supports client-side SPA routes.
 

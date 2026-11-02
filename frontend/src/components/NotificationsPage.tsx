@@ -18,6 +18,7 @@ import {
 import { MobileChatOverlay } from './common/MobileChatOverlay';
 import { SearchResultsDropdown } from './SearchResultsDropdown';
 import { apiFetch } from '../apiFetch';
+import { alertReadKey, investmentAlertId, saveReadIds, useUnreadBadges } from '../useUnreadBadges';
 
 type NotificationsPageProps = {
     currentUser: any;
@@ -53,6 +54,7 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
     const [searchQuery, setSearchQuery] = useState('');
     const [notifications, setNotifications] = useState<any[]>([]);
     const [companyUpdates, setCompanyUpdates] = useState<any[]>([]);
+    const [portfolioModel, setPortfolioModel] = useState<{ growthRate: number; projectedValue: number; baseValue: number; basis: string } | null>(null);
     const [publicFilings, setPublicFilings] = useState<any[]>([]);
     const [filingsUpdatedAt, setFilingsUpdatedAt] = useState<string | null>(null);
     const [filingsError, setFilingsError] = useState<string | null>(null);
@@ -62,9 +64,42 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
     const [refreshToken, setRefreshToken] = useState(0);
     const [isSearchExpanded, setIsSearchExpanded] = useState(false); // Mobile search
     const [activeTab, setActiveTab] = useState<'notifications' | 'updates'>('notifications');
-    const readKey = `startupforge:read:${currentUser?.id || 'guest'}`;
+    const readKey = alertReadKey(String(currentUser?.id || 'guest'));
     const readIds = () => { try { return new Set<string>(JSON.parse(localStorage.getItem(readKey) || '[]')); } catch { return new Set<string>(); } };
-    const markRead = (ids: string[]) => { const saved = readIds(); ids.forEach(id => saved.add(id)); localStorage.setItem(readKey, JSON.stringify([...saved])); setNotifications(items => items.map(item => ids.includes(item.id) ? { ...item, unread: false } : item)); };
+    const { unreadAlerts, unreadInbox } = useUnreadBadges(String(currentUser?.id || ''));
+    const markRead = (ids: string[]) => { saveReadIds(readKey, ids); setNotifications(items => items.map(item => ids.includes(item.id) ? { ...item, unread: false } : item)); setCompanyUpdates(items => items.map((item, index) => ids.includes(investmentAlertId(item, index)) ? { ...item, unread: false } : item)); };
+    const formatMoney = (value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: value >= 1_000_000 ? 'compact' : 'standard', maximumFractionDigits: 1 }).format(value);
+    const updateDate = (update: any) => update.time && Number.isFinite(Date.parse(update.time)) ? new Date(update.time).toLocaleDateString() : Number(update.year) > 2000 ? String(update.year) : 'Date not recorded';
+
+    useEffect(() => {
+        if (!companyUpdates.length) { setPortfolioModel(null); return; }
+        const totalValue = companyUpdates.reduce((sum, item) => sum + (Number(item.valuation) > 0 ? Number(item.valuation) : 0), 0);
+        if (!(totalValue > 0)) { setPortfolioModel(null); return; }
+        const years = companyUpdates.map(item => Number(item.year)).filter(year => Number.isFinite(year) && year > 2000);
+        const totalRaised = companyUpdates.reduce((sum, item) => sum + (Number(item.amount) > 0 ? Number(item.amount) : 0), 0);
+        const oldestYear = years.length ? Math.min(...years) : new Date().getFullYear();
+        const multiple = totalRaised > 0 ? totalValue / totalRaised : Infinity;
+        const recordedInputs = years.length > 0 && new Date().getFullYear() - oldestYear >= 1 && multiple >= 0.5 && multiple <= 20;
+        const fundingYear = recordedInputs ? oldestYear : new Date().getFullYear() - 2;
+        const fundingAmount = recordedInputs ? totalRaised : totalValue / 2.4;
+        const controller = new AbortController();
+        const predictionUrl = import.meta.env.VITE_PREDICTION_URL || 'http://localhost:8002';
+        const loadForecast = async () => {
+            try {
+                const response = await apiFetch(`${predictionUrl}/predict`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal, body: JSON.stringify({ company: 'Tracked company portfolio', domain: 'diversified startup portfolio', funding_amount: fundingAmount, valuation: totalValue, funding_year: fundingYear, competitors: [], umbrella_companies: [] }) });
+                if (!response.ok) throw new Error(`Growth model returned HTTP ${response.status}`);
+                const result = await response.json();
+                const projectedValue = Number(result?.valuation_projection?.['1_year']);
+                const growthRate = Number(result?.growth_rate);
+                if (!Number.isFinite(projectedValue) || !Number.isFinite(growthRate)) throw new Error('Growth model response was incomplete');
+                setPortfolioModel({ growthRate, projectedValue, baseValue: totalValue, basis: recordedInputs ? 'Model estimate from dated investment records.' : 'Illustrative model scenario: the recorded funding and valuation history is incomplete or inconsistent, so this is not a reported return.' });
+            } catch {
+                if (!controller.signal.aborted) setPortfolioModel({ growthRate: 0, projectedValue: totalValue, baseValue: totalValue, basis: 'Tracked company valuations are shown. The growth service is unavailable, so no forecast has been invented.' });
+            }
+        };
+        loadForecast();
+        return () => controller.abort();
+    }, [companyUpdates]);
 
     // Close search when clicking outside
     useEffect(() => {
@@ -96,7 +131,12 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                 const data = await res.json();
                 if (!Array.isArray(data)) throw new Error('Alerts response was invalid');
 
-                const realNotifs = data.map((n: any) => ({
+                const requestsRes = await apiFetch(`${apiUrl}/connections/requests/incoming`, {
+                    headers: { 'x-user-id': currentUser.id }, signal: controller.signal
+                });
+                const requests = requestsRes.ok ? await requestsRes.json() : [];
+                if (!Array.isArray(requests)) throw new Error('Connection request feed was invalid');
+                const acceptedNotifs = data.map((n: any) => ({
                     id: `conn-${n.id}`,
                     type: 'connection',
                     avatar: 'https://randomuser.me/api/portraits/lego/1.jpg',
@@ -105,18 +145,33 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                     unread: !readIds().has(`conn-${n.id}`),
                     metadata: { userId: String(n.receiver_id) }
                 }));
+                const requestNotifs = requests.map((n: any) => ({
+                    id: `req-${n.id}`, type: 'request',
+                    avatar: n.sender_avatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+                    message: `${n.sender_name || 'Someone'} sent you a connection request${n.sender_headline ? ` · ${n.sender_headline}` : ''}`,
+                    timestamp: n.created_at && Number.isFinite(Date.parse(n.created_at)) ? new Date(n.created_at).toLocaleDateString() : 'Recently',
+                    unread: !readIds().has(`req-${n.id}`), metadata: { page: 'network' }
+                }));
 
-                const resUpdates = await apiFetch(`${apiUrl}/api/investments/updates`, {
-                    headers: { 'x-user-id': currentUser.id }, signal: controller.signal
-                });
-                if (!resUpdates.ok) throw new Error(`Investment updates returned HTTP ${resUpdates.status}`);
-                const updateData = await resUpdates.json();
-                if (!Array.isArray(updateData)) throw new Error('Investment updates response was invalid');
+                let updateData: any[] = [];
+                let updateFeedWarning: string | null = null;
+                try {
+                    const resUpdates = await apiFetch(`${apiUrl}/api/investments/updates`, {
+                        headers: { 'x-user-id': currentUser.id }, signal: controller.signal
+                    });
+                    if (!resUpdates.ok) throw new Error(`Investment updates returned HTTP ${resUpdates.status}`);
+                    const parsedUpdates = await resUpdates.json();
+                    if (!Array.isArray(parsedUpdates)) throw new Error('Investment updates response was invalid');
+                    updateData = parsedUpdates;
+                } catch (error) {
+                    if (controller.signal.aborted) return;
+                    updateFeedWarning = error instanceof Error ? error.message : 'Investment updates are unavailable.';
+                }
                 if (!active) return;
-                setNotifications(realNotifs);
-                setCompanyUpdates(updateData);
+                setNotifications([...requestNotifs, ...acceptedNotifs]);
+                setCompanyUpdates(updateData.map((update: any, index: number) => ({ ...update, unread: !readIds().has(investmentAlertId(update, index)) })));
                 setLastUpdated(new Date());
-                setFeedError(null);
+                setFeedError(updateFeedWarning);
             } catch (e) {
                 if (!controller.signal.aborted && active) setFeedError(e instanceof Error ? e.message : 'Unable to refresh alerts.');
             } finally {
@@ -267,8 +322,8 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                     <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
                         <ActionItem icon={<Home />} label="Home" onClick={() => onNavigate('home')} />
                         <ActionItem icon={<Users />} label="Network" onClick={() => onNavigate('network')} />
-                        <ActionItem icon={<Bell />} label="Alerts" badge={notifications.some(item => item.unread)} onClick={() => onNavigate('notifications')} active={true} />
-                        <ActionItem icon={<MessageSquare />} label="Inbox" onClick={() => onNavigate('messages')} />
+                        <ActionItem icon={<Bell />} label="Alerts" badge={unreadAlerts > 0} onClick={() => onNavigate('notifications')} active={true} />
+                        <ActionItem icon={<MessageSquare />} label="Inbox" badge={unreadInbox > 0} onClick={() => onNavigate('messages')} />
                         <ActionItem icon={<BrainCircuit />} label="Deep Analysis" onClick={() => onNavigate('conflict-report')} />
                     </div>
                 </div>
@@ -299,7 +354,7 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 md:p-6 min-h-[500px]">
                             <div className="flex items-center justify-between mb-8 border-b border-slate-100 pb-4">
                                 <h2 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Notifications</h2>
-                                <div className="flex items-center gap-3"><span className="text-[10px] text-slate-400">{refreshing ? 'Updating…' : lastUpdated ? `Updated ${lastUpdated.toLocaleTimeString()}` : ''}</span><button type="button" onClick={() => setRefreshToken(value => value + 1)} disabled={refreshing} className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 disabled:opacity-40">Refresh</button><button type="button" onClick={() => markRead(notifications.map(n => n.id))} disabled={!notifications.some(n => n.unread)} className="text-sm font-semibold text-slate-500 hover:text-slate-900 disabled:opacity-40">Mark all as read</button></div>
+                                <div className="flex items-center gap-3"><span className="text-[10px] text-slate-400">{refreshing ? 'Updating…' : lastUpdated ? `Updated ${lastUpdated.toLocaleTimeString()}` : ''}</span><button type="button" onClick={() => setRefreshToken(value => value + 1)} disabled={refreshing} className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 disabled:opacity-40">Refresh</button><button type="button" onClick={() => markRead([...notifications.map(n => n.id), ...companyUpdates.map((item, index) => investmentAlertId(item, index))])} disabled={!notifications.some(n => n.unread) && !companyUpdates.some((item: any) => item.unread)} className="text-sm font-semibold text-slate-500 hover:text-slate-900 disabled:opacity-40">Mark all as read</button></div>
                             </div>
 
                             {feedError && <div role="status" className="mb-4 flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900"><span>Could not refresh live alerts: {feedError}</span><button type="button" onClick={() => { setFeedError(null); setRefreshToken(value => value + 1); }} className="font-bold underline">Retry</button></div>}
@@ -317,11 +372,13 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                                                     if (notification.unread) markRead([notification.id]);
                                                     if (notification.type === 'connection' && notification.metadata?.userId) {
                                                         onNavigateToChat(notification.metadata.userId);
+                                                    } else if (notification.metadata?.page) {
+                                                        onNavigate(notification.metadata.page);
                                                     } else if (notification.isJob) {
                                                         onViewJob(notification.id);
                                                     }
                                                 }}
-                                                className={`group p-3 md:p-4 rounded-xl border border-transparent hover:border-slate-200 hover:bg-slate-50 transition-all cursor-pointer flex items-start gap-4 ${notification.unread ? 'bg-indigo-50/50' : ''}`}
+                                                className={`group p-3 md:p-4 rounded-xl border transition-all cursor-pointer flex items-start gap-4 ${notification.unread ? 'border-rose-200 bg-rose-50/70 hover:bg-rose-50' : 'border-transparent hover:border-slate-200 hover:bg-slate-50'}`}
                                             >
                                                 <div className="relative">
                                                     <img
@@ -340,10 +397,11 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                                                 </div>
 
                                                 {notification.unread && (
-                                                    <div className="w-2.5 h-2.5 bg-blue-600 rounded-full mt-2 self-start ring-4 ring-blue-50"></div>
+                                                    <div className="w-2.5 h-2.5 bg-rose-600 rounded-full mt-2 self-start ring-4 ring-rose-100"></div>
                                                 )}
                                             </div>
                                         ))}
+                                        {notifications.length === 0 && !refreshing && <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-5 text-sm text-slate-600"><p className="font-semibold text-slate-800">You’re all caught up</p><p className="mt-1">New connection requests and accepted connections will appear here. Find people in Network to get started.</p><button onClick={() => onNavigate('network')} className="mt-3 font-bold text-indigo-600 hover:text-indigo-800">Explore Network →</button></div>}
                                     </div>
                                 </div>
 
@@ -353,8 +411,8 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                                     <div className="space-y-2">
                                         {companyUpdates.slice(0, 4).map((update, i) => (
                                             <div
-                                                key={`inv-${i}`} onClick={() => update.founder_id && onNavigateToChat(String(update.founder_id))}
-                                                className={`group p-3 md:p-4 rounded-xl border border-transparent hover:border-slate-200 hover:bg-slate-50 transition-all flex items-start gap-4 bg-emerald-50/30 ${update.founder_id ? 'cursor-pointer' : ''}`}
+                                                key={investmentAlertId(update, i)} onClick={() => { if (update.unread) markRead([investmentAlertId(update, i)]); if (update.founder_id) onNavigateToChat(String(update.founder_id)); }}
+                                                className={`group p-3 md:p-4 rounded-xl border transition-all flex items-start gap-4 ${update.unread ? 'border-rose-200 bg-rose-50/70' : 'border-transparent bg-emerald-50/30'} ${update.founder_id ? 'cursor-pointer hover:border-slate-200' : ''}`}
                                             >
                                                 <div className="relative">
                                                     <img
@@ -369,12 +427,13 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
 
                                                 <div className="flex-1 min-w-0">
                                                     <p className="text-slate-900 font-medium text-sm md:text-[15px]">Investment successful in {update.company}</p>
-                                                    <p className="text-slate-500 text-xs mt-1">{update.time && Number.isFinite(Date.parse(update.time)) ? new Date(update.time).toLocaleDateString() : 'Date unavailable'} • {update.round}</p>
+                                                    <p className="text-slate-500 text-xs mt-1">{update.time && Number.isFinite(Date.parse(update.time)) ? new Date(update.time).toLocaleDateString() : (Number(update.year) > 2000 ? String(update.year) : 'Date not recorded')} • {update.round}</p>
                                                 </div>
 
-                                                <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full mt-2 self-start ring-4 ring-emerald-50"></div>
+                                                {update.unread && <div className="w-2.5 h-2.5 bg-rose-600 rounded-full mt-2 self-start ring-4 ring-rose-100"></div>}
                                             </div>
                                         ))}
+                                        {companyUpdates.length === 0 && <p className="rounded-xl bg-slate-50 px-4 py-5 text-sm text-slate-500">No confirmed investment activity yet. Matched founder and investor submissions will appear here.</p>}
                                     </div>
                                 </div>
                             </div>
@@ -392,8 +451,8 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                             </div>
                             <div className="space-y-4">
                                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                    <h4 className="font-bold text-slate-800 text-sm">Portfolio Growth</h4>
-                                    <p className="text-slate-600 text-sm mt-1">Portfolio performance data is not connected.</p>
+                                    <h4 className="font-bold text-slate-800 text-sm">Tracked Company Growth</h4>
+                                    {portfolioModel ? <><p className="mt-1 text-sm text-slate-700">Current tracked valuation: <strong>{formatMoney(portfolioModel.baseValue)}</strong></p><p className="mt-1 text-sm text-slate-700">1-year model scenario: <strong>{formatMoney(portfolioModel.projectedValue)}</strong> ({portfolioModel.growthRate >= 0 ? '+' : ''}{(portfolioModel.growthRate * 100).toFixed(1)}%)</p><p className="mt-2 text-[10px] leading-relaxed text-slate-500">{portfolioModel.basis} Aggregate company valuations are not your ownership stake or realized return.</p></> : <p className="text-slate-600 text-sm mt-1">No company valuations are recorded yet. Confirm investment details to populate the growth model.</p>}
                                 </div>
                                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
                                     <h4 className="font-bold text-slate-800 text-sm">New Opportunities</h4>
@@ -418,7 +477,7 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                                             />
                                             <div>
                                                 <h4 className="font-bold text-slate-800 text-xs">{update.company}</h4>
-                                                <p className="text-[10px] text-slate-500">{update.round} • {update.time && Number.isFinite(Date.parse(update.time)) ? new Date(update.time).toLocaleDateString() : 'Date unavailable'}</p>
+                                                <p className="text-[10px] text-slate-500">{update.round} • {update.time && Number.isFinite(Date.parse(update.time)) ? new Date(update.time).toLocaleDateString() : (Number(update.year) > 2000 ? String(update.year) : 'Date not recorded')}</p>
                                             </div>
                                         </div>
                                     ))
@@ -451,8 +510,8 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
                 <ActionItem icon={<Home />} label="Home" onClick={() => onNavigate('home')} />
                 <ActionItem icon={<Users className="w-6 h-6" />} label="Network" onClick={() => onNavigate('network')} />
                 <ActionItem icon={<BrainCircuit className="w-6 h-6" />} label="Analyze" onClick={() => onNavigate('conflict-report')} />
-                <ActionItem icon={<Bell className="w-6 h-6" />} label="Alerts" badge={notifications.some(item => item.unread)} onClick={() => onNavigate('notifications')} active={true} />
-                <ActionItem icon={<MessageSquare className="w-6 h-6" />} label="Inbox" onClick={() => onNavigate('messages')} />
+                <ActionItem icon={<Bell className="w-6 h-6" />} label="Alerts" badge={unreadAlerts > 0} onClick={() => onNavigate('notifications')} active={true} />
+                <ActionItem icon={<MessageSquare className="w-6 h-6" />} label="Inbox" badge={unreadInbox > 0} onClick={() => onNavigate('messages')} />
             </div>
 
             <MobileChatOverlay currentUser={currentUser} />

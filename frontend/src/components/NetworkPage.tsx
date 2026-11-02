@@ -4,6 +4,7 @@ import { User } from '../App';
 import { apiFetch } from '../apiFetch';
 import { MobileChatOverlay } from './common/MobileChatOverlay';
 import { SearchResultsDropdown } from './SearchResultsDropdown';
+import { useUnreadBadges } from '../useUnreadBadges';
 
 // --- Types ---
 /*
@@ -35,7 +36,7 @@ interface NetworkPageProps {
   followedUsers: Set<string>;
   connectedUsers: Set<string>;
   onRejectRequest: (id: string) => Promise<void>;
-  onFollowUser: (userId: string, role?: string) => void;
+  onFollowUser: (userId: string, role?: string, name?: string, headline?: string, company?: string) => Promise<boolean>;
   onViewProfile: (userId: string) => void;
   onNavigate: (page: string) => void;
 
@@ -61,6 +62,7 @@ export function NetworkPage({
   ragResults,
   isSearching
 }: NetworkPageProps) {
+  const { unreadAlerts, unreadInbox } = useUnreadBadges(String(currentUser?.id || ''));
   // State
   const [searchQuery, setSearchQuery] = useState('');
   const [requests, setRequests] = useState<ConnectionRequest[]>([]);
@@ -193,14 +195,20 @@ export function NetworkPage({
         </div>
         <button
           onClick={() => {
-            if (user.id === currentUser.id) return;
+            if (user.id === currentUser.id || (user.role === currentUser.role && user.name.trim().toLowerCase() === currentUser.name.trim().toLowerCase())) return;
             if (!connectedUsers.has(user.id) && !(user as any).isConnected) {
-              onFollowUser(user.id, user.role || (activeTab === 'investors' ? 'investor' : 'founder'));
-              // Optimistic update
-              (user as any).isConnected = true;
+              void onFollowUser(
+                user.id,
+                user.role || (activeTab === 'investors' ? 'investor' : 'founder'),
+                user.name,
+                user.headline,
+                user.company || ''
+              ).then(sent => {
+                if (sent) (user as any).isConnected = true;
+              });
             }
           }}
-          disabled={connectedUsers.has(user.id) || (user as any).isConnected}
+          disabled={user.id === currentUser.id || (user.role === currentUser.role && user.name.trim().toLowerCase() === currentUser.name.trim().toLowerCase()) || connectedUsers.has(user.id) || (user as any).isConnected}
           className={`h-10 w-10 flex items-center justify-center rounded-xl transition-all shadow-sm flex-shrink-0 ${connectedUsers.has(user.id) || (user as any).isConnected
             ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
             : followedUsers.has(user.id)
@@ -313,8 +321,8 @@ export function NetworkPage({
           <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
             <ActionItem icon={<Home />} label="Home" onClick={() => onNavigate('home')} />
             <ActionItem icon={<Users />} label="Network" onClick={() => onNavigate('network')} active={true} />
-            <ActionItem icon={<Bell />} label="Alerts" badge={true} onClick={() => onNavigate('notifications')} />
-            <ActionItem icon={<MessageSquare />} label="Inbox" onClick={() => onNavigate('messages')} />
+            <ActionItem icon={<Bell />} label="Alerts" badge={unreadAlerts > 0} onClick={() => onNavigate('notifications')} />
+            <ActionItem icon={<MessageSquare />} label="Inbox" badge={unreadInbox > 0} onClick={() => onNavigate('messages')} />
             <ActionItem icon={<BrainCircuit />} label="Deep Analysis" onClick={() => onNavigate('conflict-report')} />
           </div>
         </div>
@@ -413,8 +421,8 @@ export function NetworkPage({
         <ActionItem icon={<Home />} label="Home" onClick={() => onNavigate('home')} />
         <ActionItem icon={<Users className="w-6 h-6" />} label="Network" onClick={() => onNavigate('network')} active={true} />
         <ActionItem icon={<BrainCircuit className="w-6 h-6" />} label="Analyze" onClick={() => onNavigate('conflict-report')} />
-        <ActionItem icon={<Bell className="w-6 h-6" />} label="Alerts" badge={true} onClick={() => onNavigate('notifications')} />
-        <ActionItem icon={<MessageSquare className="w-6 h-6" />} label="Inbox" onClick={() => onNavigate('messages')} />
+        <ActionItem icon={<Bell className="w-6 h-6" />} label="Alerts" badge={unreadAlerts > 0} onClick={() => onNavigate('notifications')} />
+        <ActionItem icon={<MessageSquare className="w-6 h-6" />} label="Inbox" badge={unreadInbox > 0} onClick={() => onNavigate('messages')} />
       </div>
 
       {/* --- Profile Modal --- */}

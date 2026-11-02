@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { User } from '../App';
 import { apiFetch } from '../apiFetch';
+import { inboxSeenKey, inboxUnreadKey, saveSeenConversation, useUnreadBadges } from '../useUnreadBadges';
 import {
   Search,
   Send as SendIcon,
@@ -24,6 +25,7 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { SearchResultsDropdown } from './SearchResultsDropdown';
+import { AiChatComposer } from './AiChatComposer';
 
 type MessagesPageProps = {
   gun: any;
@@ -51,6 +53,10 @@ interface Conversation {
   userId: string;
   userName: string;
   userAvatar: string;
+  role?: 'INVESTOR' | 'FOUNDER';
+  company?: string | null;
+  firm?: string | null;
+  headline?: string | null;
   lastMessage: string;
   timestamp: string;
   unread: boolean;
@@ -85,6 +91,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
   const [headerSearchQuery, setHeaderSearchQuery] = useState('');
   const [isSearchExpanded, setIsSearchExpanded] = useState(false); // Mobile search
   const [clearRequestPending, setClearRequestPending] = useState(false);
+  const { unreadAlerts, unreadInbox } = useUnreadBadges(String(currentUser?.id || ''));
 
   // Close search when clicking outside
   useEffect(() => {
@@ -108,7 +115,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
   const [invStatus, setInvStatus] = useState<'NONE' | 'PENDING' | 'MATCHED' | 'MISMATCH'>('NONE');
   const [invFormData, setInvFormData] = useState({ round: 'Seed', year: new Date().getFullYear().toString(), amount: '' });
   const [submissionFeedback, setSubmissionFeedback] = useState<string | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isAiComposerOpen, setIsAiComposerOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // File Inputs
@@ -129,8 +136,9 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
   useEffect(() => {
     if (targetUserId) {
       setSelectedConversation(targetUserId);
+      saveSeenConversation(String(currentUser.id), String(targetUserId));
     }
-  }, [targetUserId]);
+  }, [targetUserId, currentUser.id]);
 
   const fetchConnections = async () => {
     try {
@@ -140,13 +148,21 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
       });
       const data = await res.json();
       if (data && data.connections) {
+        let seenIds: string[] = [];
+        let unreadIds: string[] = [];
+        try { seenIds = JSON.parse(localStorage.getItem(inboxSeenKey(String(currentUser.id))) || '[]'); } catch { /* use empty seen list */ }
+        try { unreadIds = JSON.parse(localStorage.getItem(inboxUnreadKey(String(currentUser.id))) || '[]'); } catch { /* use empty unread list */ }
         const mapped = data.connections.map((c: any) => ({
           userId: String(c.other_user_id),
           userName: c.other_user_name || `User ${c.other_user_id}`,
           userAvatar: c.other_user_avatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+          role: c.other_user_role as 'INVESTOR' | 'FOUNDER' | undefined,
+          company: c.other_user_company || null,
+          firm: c.other_user_firm || null,
+          headline: c.other_user_headline || null,
           lastMessage: c.other_user_headline || 'Tap to chat',
           timestamp: '',
-          unread: false
+          unread: !seenIds.includes(String(c.other_user_id)) || unreadIds.includes(String(c.other_user_id))
         }));
         // Deduplicate by userId to prevent key warnings
         const unique = mapped.reduce((acc: any[], current: any) => {
@@ -243,6 +259,16 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
     if (invStatus !== 'MATCHED') return;
     const founder = currentUser.role === 'founder' ? currentUser : selectedUser;
     const investor = currentUser.role === 'investor' ? currentUser : selectedUser;
+    const organizationOf = (person: User | Conversation | undefined) => {
+      if (!person) return '';
+      if ('company' in person && person.company?.trim()) return person.company.trim();
+      if ('firm' in person && person.firm?.trim()) return person.firm.trim();
+      if ('headline' in person && person.headline?.trim()) {
+        return person.headline.trim().replace(/^(founder|investor)\s+(at|of)\s+/i, '');
+      }
+      if ('lastMessage' in person && person.lastMessage && person.lastMessage !== 'Tap to chat') return person.lastMessage;
+      return '';
+    };
     const ascii = (value: unknown) => String(value || 'To be agreed')
       .replace(/[\u2018\u2019]/g, "'").replace(/[\u201c\u201d]/g, '"')
       .replace(/[\u2013\u2014]/g, '-').replace(/\u20ac/g, 'EUR').replace(/[^\x20-\x7e]/g, '?');
@@ -271,11 +297,11 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
     wrap('This record summarizes the investment details submitted by the founder and investor and matched on StartupForge. It records the fields below as entered; it does not add terms that were not submitted.', 10);
     add('FOUNDER', 12, true, true);
     add(`Name: ${founder?.name || founder?.userName || 'Not provided'}`);
-    add(`Company: ${founder?.company || 'Not provided'}`);
+    add(`Company: ${organizationOf(founder) || 'Organization not listed in profile'}`);
     add(`Profile: ${founder?.headline || 'Founder'}`);
     add('INVESTOR', 12, true, true);
     add(`Name: ${investor?.name || investor?.userName || 'Not provided'}`);
-    add(`Company / firm: ${investor?.company || 'Not provided'}`);
+    add(`Company / firm: ${organizationOf(investor) || 'Organization not listed in profile'}`);
     add(`Profile: ${investor?.headline || 'Investor'}`);
     add('MATCHED INVESTMENT DETAILS', 12, true, true);
     add(`Funding round: ${invFormData.round}`);
@@ -409,12 +435,16 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
 
     // 2. Handle Clear Confirmation (Actual Delete)
     if (node.type === 'accept_clear') {
-      setMessages([]);
+          setMessages([]);
       setClearRequestPending(false);
       return;
     }
 
     // Check if message already exists
+    if (String(node.sender) !== String(currentUser.id) && selectedConversation) {
+      saveSeenConversation(String(currentUser.id), String(selectedConversation));
+    }
+
     setMessages(prev => {
       if (prev.find(m => m.id === id)) return prev;
 
@@ -539,38 +569,6 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
     if (onSearch) onSearch(headerSearchQuery);
   };
 
-  const handleAutocomplete = async () => {
-    if (messages.length === 0) return;
-    setIsGenerating(true);
-    try {
-      const history = messages.map(m => ({
-        isMe: m.senderId === currentUser.id,
-        content: m.content
-      }));
-
-      const ragUrl = import.meta.env.VITE_RAG_API_URL || 'http://localhost:8000';
-      const res = await apiFetch(`${ragUrl}/chat/autocomplete`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          history,
-          userContext: `Role: ${currentUser.headline || 'User'}. Name: ${currentUser.name}`
-        })
-      });
-
-      const data = await res.json();
-      if (data.reply) {
-        setMessageText(data.reply);
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
   const selectedUser = conversations.find(c => c.userId === selectedConversation);
 
   return (
@@ -652,8 +650,8 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
           <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
             <ActionItem icon={<Home />} label="Home" onClick={() => onNavigate('home')} />
             <ActionItem icon={<Users />} label="Network" onClick={() => onNavigate('network')} />
-            <ActionItem icon={<Bell />} label="Alerts" badge={true} onClick={() => onNavigate('notifications')} />
-            <ActionItem icon={<MessageSquare />} label="Inbox" onClick={() => onNavigate('messages')} active={true} />
+            <ActionItem icon={<Bell />} label="Alerts" badge={unreadAlerts > 0} onClick={() => onNavigate('notifications')} />
+            <ActionItem icon={<MessageSquare />} label="Inbox" badge={unreadInbox > 0} onClick={() => onNavigate('messages')} active={true} />
             <ActionItem icon={<BrainCircuit />} label="Deep Analysis" onClick={() => onNavigate('conflict-report')} />
           </div>
         </div>
@@ -686,7 +684,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
             </div>
             <div className="flex-1 overflow-y-auto px-2 pb-2 space-y-1 custom-scrollbar">
               {conversations.length === 0 ? (
-                <div className="p-5 text-center text-sm text-slate-500">No accepted connections yet. Connect with someone from Network to start a conversation.</div>
+                <div className="p-5 text-center text-sm text-slate-500"><p>No accepted connections yet.</p><p className="mt-1">When someone accepts your connection request, you can message them here.</p><button onClick={() => onNavigate('network')} className="mt-3 font-bold text-indigo-600 hover:text-indigo-800">Explore Network →</button></div>
               ) : conversations.filter(c => c.userName.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 ? (
                 <div className="p-5 text-center text-sm text-slate-500">No conversations match “{searchQuery}”.</div>
               ) : conversations
@@ -694,7 +692,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
                 .map(conversation => (
                   <button
                     key={conversation.userId}
-                    onClick={() => setSelectedConversation(conversation.userId)}
+                    onClick={() => { setSelectedConversation(conversation.userId); saveSeenConversation(String(currentUser.id), conversation.userId); setConversations(items => items.map(item => item.userId === conversation.userId ? { ...item, unread: false } : item)); }}
                     className={`w-full flex items-center gap-3 p-3 rounded-2xl text-left transition-all duration-200 border border-transparent ${selectedConversation === conversation.userId
                       ? 'bg-white shadow-md border-slate-100 ring-1 ring-slate-50 scale-[1.02]'
                       : 'hover:bg-white hover:shadow-sm hover:border-slate-100 text-slate-600'
@@ -704,7 +702,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
                         <h3 className={`text-sm font-bold truncate ${selectedConversation === conversation.userId ? 'text-slate-900' : 'text-slate-700'}`}>{conversation.userName}</h3>
-                        {conversation.unread && <span className="w-2 h-2 bg-blue-500 rounded-full ring-2 ring-white"></span>}
+                        {conversation.unread && <span className="w-2.5 h-2.5 bg-rose-600 rounded-full ring-2 ring-rose-100"></span>}
                       </div>
                       <p className={`text-xs truncate mt-0.5 ${selectedConversation === conversation.userId ? 'text-slate-500 font-medium' : 'text-slate-400 opacity-80'}`}>{conversation.lastMessage}</p>
                     </div>
@@ -911,10 +909,11 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
                     </button>
                     <div className="w-px h-6 bg-slate-200 mx-1 hidden sm:block"></div>
                     <button
-                      onClick={handleAutocomplete}
-                      className={`p-2.5 rounded-full transition-all duration-200 ${isGenerating ? 'animate-pulse text-purple-500 bg-purple-50' : 'text-slate-400 hover:bg-purple-50 hover:text-purple-600 hover:scale-105 active:scale-95'}`}
-                      disabled={isGenerating || !!previewAttachment}
-                      title="AI Autocomplete"
+                      onClick={() => setIsAiComposerOpen(true)}
+                      className="p-2.5 rounded-full transition-all duration-200 text-slate-400 hover:bg-purple-50 hover:text-purple-600 hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+                      disabled={!!previewAttachment || !selectedConversation}
+                      title="Talk to AI and draft a message"
+                      aria-label="Talk to AI and draft a message"
                     >
                       <Sparkles className="w-5 h-5" />
                     </button>
@@ -971,8 +970,8 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
         <ActionItem icon={<Home />} label="Home" onClick={() => onNavigate('home')} />
         <ActionItem icon={<Users className="w-6 h-6" />} label="Network" onClick={() => onNavigate('network')} />
         <ActionItem icon={<BrainCircuit className="w-6 h-6" />} label="Analyze" onClick={() => onNavigate('conflict-report')} />
-        <ActionItem icon={<Bell className="w-6 h-6" />} label="Alerts" badge={true} onClick={() => onNavigate('notifications')} />
-        <ActionItem icon={<MessageSquare className="w-6 h-6" />} label="Inbox" onClick={() => onNavigate('messages')} active={true} />
+        <ActionItem icon={<Bell className="w-6 h-6" />} label="Alerts" badge={unreadAlerts > 0} onClick={() => onNavigate('notifications')} />
+        <ActionItem icon={<MessageSquare className="w-6 h-6" />} label="Inbox" badge={unreadInbox > 0} onClick={() => onNavigate('messages')} active={true} />
       </div>
 
       {/* Investment Confirmation Modal */}
@@ -1087,6 +1086,18 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
           </div>
         )
       }
+      {isAiComposerOpen && selectedUser && (
+        <AiChatComposer
+          currentUser={currentUser}
+          recipientName={selectedUser.userName}
+          conversation={messages.slice(-8).filter(message => message.type === 'text').map(message => ({
+            role: message.senderId === currentUser.id ? 'user' as const : 'assistant' as const,
+            content: message.content,
+          }))}
+          onClose={() => setIsAiComposerOpen(false)}
+          onUseInChat={draft => { setMessageText(draft); setIsAiComposerOpen(false); }}
+        />
+      )}
     </div >
   );
 }

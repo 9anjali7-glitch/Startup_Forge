@@ -14,6 +14,7 @@ import ComplianceActions from "@/components/coi/ComplianceActions";
 import { Users, Bell, MessageSquare, X, BrainCircuit, Sparkles, ShieldCheck, Clock, Target, CheckCircle2, Building2, Home, Search } from 'lucide-react';
 import { MobileChatOverlay } from './common/MobileChatOverlay';
 import { toast } from "sonner";
+import { useUnreadBadges } from '../useUnreadBadges';
 
 interface ConflictReportPageProps {
     currentUser: User;
@@ -41,6 +42,7 @@ const ConflictReportPage = ({
     currentInvestorName,
     targetCompanyName
 }: ConflictReportPageProps) => {
+    const { unreadAlerts, unreadInbox } = useUnreadBadges(String(currentUser?.id || ''));
     // --- Header State (for consistency with HomePage) ---
     const [searchQuery, setSearchQuery] = useState('');
     const [showProfileModal, setShowProfileModal] = useState(false);
@@ -93,7 +95,7 @@ const ConflictReportPage = ({
             }
             setConflictData(data);
             setHasResults(true);
-            toast.success("Analysis Complete", { description: "Conflict detection finished successfully." });
+            toast.success(data.hasConflict ? "Potential conflict path found" : "Screening complete", { description: data.hasConflict ? "Review the recorded relationships and evidence." : "No direct or indirect path was found in the recorded graph." });
         } catch (err) {
             console.error("COI Analysis Failed", err);
             toast.error("Analysis Failed", { description: err instanceof Error ? err.message : "Could not connect to the analysis engine." });
@@ -135,7 +137,7 @@ const ConflictReportPage = ({
             level: 2,
             severity: "high",
             path: [selectedInvestor, c.investedParent, c.competingSubsidiary, selectedTarget],
-            reason: `Parent entity '${c.investedParent}' owns subsidiary '${c.competingSubsidiary}' which competes with the target.`
+            reason: `The investor backed ${c.investedParent}, which owns ${c.competingSubsidiary}; that subsidiary is listed as competing with ${selectedTarget}. This indirect link may need review, but it does not by itself prove wrongdoing or a legal conflict.`
         }));
     } else if (isLevel1) {
         explanationConflicts = level1Companies.map((name: string) => ({
@@ -143,8 +145,8 @@ const ConflictReportPage = ({
             severity: conflictData?.conflictType?.includes("sector") ? "medium" : "high",
             path: [selectedInvestor, name, selectedTarget],
             reason: conflictData?.conflictType?.includes("sector")
-                ? `Portfolio company '${name}' and the target share the ${conflictData?.sector || "same"} sector. This is a screening signal, not proof that the companies compete.`
-                : `The graph records an investment in '${name}' and a COMPETES_WITH relationship from that portfolio company to the target. Verify the source and current status independently.`
+                ? `The investor backed ${name}, and it shares the ${conflictData?.sector || "same"} sector with ${selectedTarget}. Sharing a sector is only a reason to look closer; it does not mean the companies directly compete.`
+                : `The investor backed ${name}, which is listed as a competitor to ${selectedTarget}. That creates a potential overlap worth reviewing; it does not by itself prove wrongdoing or a legal conflict.`
         }));
     }
 
@@ -247,8 +249,8 @@ const ConflictReportPage = ({
                     <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
                         <ActionItem icon={<Home />} label="Home" onClick={() => onNavigate('home')} />
                         <ActionItem icon={<Users />} label="Network" onClick={() => onNavigate('network')} />
-                        <ActionItem icon={<Bell />} label="Alerts" badge={true} onClick={() => onNavigate('notifications')} />
-                        <ActionItem icon={<MessageSquare />} label="Inbox" onClick={() => onNavigate('messages')} />
+                        <ActionItem icon={<Bell />} label="Alerts" badge={unreadAlerts > 0} onClick={() => onNavigate('notifications')} />
+                        <ActionItem icon={<MessageSquare />} label="Inbox" badge={unreadInbox > 0} onClick={() => onNavigate('messages')} />
                         <ActionItem icon={<BrainCircuit />} label="Deep Analysis" onClick={() => onNavigate('conflict-report')} active={true} />
                     </div>
                 </div>
@@ -361,7 +363,7 @@ const ConflictReportPage = ({
                                             <strong>Synthetic demo data.</strong> This relationship path is seeded for demonstration and is not a real-world investment or diligence finding.
                                         </div>
                                     )}
-                                    {conflictData?.dataClassification === "public-source demo example" && (
+                                    {conflictData?.dataClassification === "public-source screening path" && (
                                         <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-950">
                                             <strong>Public-source screening example.</strong> This is a potential screening path, not a finding of an actual legal or investment conflict. Source dates and scope matter; verify current status before relying on it.
                                             <ul className="mt-2 list-disc space-y-1 pl-4">
@@ -378,7 +380,7 @@ const ConflictReportPage = ({
                                                     <CheckCircle2 className="h-4 w-4" />
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-sm font-bold text-emerald-900 tracking-tight"><b>Analysis Complete</b></span>
+                                                    <span className={`text-sm font-bold tracking-tight ${conflictData?.hasConflict ? "text-amber-900" : "text-emerald-900"}`}><b>{conflictData?.hasConflict ? "Potential conflict path found" : "Screen complete — no recorded path found"}</b></span>
                                                     <span className="text-[10px] font-semibold text-emerald-600/70">
                                                         Finalized {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                                     </span>
@@ -421,6 +423,7 @@ const ConflictReportPage = ({
                                         conflicts={level2Details}
                                         level1Companies={level1Companies}
                                         conflictType={conflictData?.conflictType}
+                                        graph={conflictData?.graph}
                                     />
                                 </div>
                             ) : (
@@ -572,8 +575,8 @@ const ConflictReportPage = ({
                 <ActionItem icon={<Home />} label="Home" onClick={() => onNavigate('home')} />
                 <ActionItem icon={<Users className="w-6 h-6" />} label="Network" onClick={() => onNavigate('network')} />
                 <ActionItem icon={<BrainCircuit className="w-6 h-6" />} label="Analyze" onClick={() => onNavigate('conflict-report')} active={true} />
-                <ActionItem icon={<Bell className="w-6 h-6" />} label="Alerts" badge={true} onClick={() => onNavigate('notifications')} />
-                <ActionItem icon={<MessageSquare className="w-6 h-6" />} label="Inbox" onClick={() => onNavigate('messages')} />
+                <ActionItem icon={<Bell className="w-6 h-6" />} label="Alerts" badge={unreadAlerts > 0} onClick={() => onNavigate('notifications')} />
+                <ActionItem icon={<MessageSquare className="w-6 h-6" />} label="Inbox" badge={unreadInbox > 0} onClick={() => onNavigate('messages')} />
             </div>
 
             <MobileChatOverlay currentUser={currentUser} />

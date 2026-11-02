@@ -11,7 +11,7 @@ interface FoundersPanelProps {
 
 export const FoundersPanel = ({ topFounders, onNavigate, loading = false, error, onRetry }: FoundersPanelProps) => {
     return (
-        <div className="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col min-h-0">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col min-h-[360px]">
             <div className="px-5 py-3 border-b border-gray-100 flex justify-between items-center bg-white flex-shrink-0">
                 <div className="flex items-center gap-2">
                     <Users className="w-4 h-4 text-slate-700" />
@@ -22,7 +22,7 @@ export const FoundersPanel = ({ topFounders, onNavigate, loading = false, error,
                 <button type="button" onClick={() => onNavigate('network')} className="text-[10px] font-semibold text-indigo-600 hover:text-indigo-800 hover:underline">View all founders</button>
             </div>
             <p className="px-5 pt-2 text-[10px] text-slate-500">Profiles ordered by valuation recorded in the database; amounts and profile details are not independently verified.</p>
-            <div className="p-4 overflow-y-auto flex-1 h-full bg-gray-50/20 grid grid-cols-1 sm:grid-cols-2 gap-3 content-start">
+            <div className="p-4 bg-gray-50/20 grid grid-cols-1 sm:grid-cols-2 gap-3 content-start">
                 {loading && <div role="status" className="col-span-full rounded-xl border border-slate-100 bg-white p-5 text-sm text-slate-500">Loading founder profiles…</div>}
                 {!loading && error && <div role="alert" className="col-span-full rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900"><p>{error}</p><button type="button" onClick={onRetry} className="mt-2 font-bold underline">Try again</button></div>}
                 {!loading && !error && topFounders.length === 0 && <div className="col-span-full rounded-xl border border-dashed border-slate-200 bg-white p-5 text-sm text-slate-500">No founder profiles with valuation data are available yet. Use “View all founders” to browse the network.</div>}

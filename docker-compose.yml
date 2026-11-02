@@ -28,7 +28,9 @@ services:
       - app-network
 
   backend:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: startupforge-backend
     ports:
       - "3000:3000"
@@ -74,8 +76,12 @@ services:
     ports:
       - "8000:8000"
     environment:
+      AI_PROVIDER: "${AI_PROVIDER:-gemini}"
       GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
-      GEMINI_MODEL: "${GEMINI_MODEL:-gemini-3.8-flash}"
+      GEMINI_MODEL: "${GEMINI_MODEL:-gemini-3.6-flash}"
+      GEMINI_FALLBACK_MODEL: "${GEMINI_FALLBACK_MODEL:-gemini-3.8-flash}"
+      OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
+      OPENAI_MODEL: "${OPENAI_MODEL:-chat-latest}"
       MISTRAL_API_KEY: "${MISTRAL_API_KEY:-}"
       ENABLE_MISTRAL_API: "${ENABLE_MISTRAL_API:-false}"
       DB_HOST: db

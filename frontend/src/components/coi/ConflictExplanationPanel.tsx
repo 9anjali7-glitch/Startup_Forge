@@ -193,9 +193,9 @@ const ConflictExplanationPanel = ({
               <FileText className="h-8 w-8 text-slate-300" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-700">No Conflicts Detected</h3>
+              <h3 className="font-bold text-slate-700">No recorded match found</h3>
               <p className="text-slate-400 text-sm mt-1 max-w-xs mx-auto">
-                The analysis found no path of conflict between the investor and the target company.
+                No matching relationship path is currently recorded for these names. Unrecorded relationships may still exist.
               </p>
             </div>
           </div>

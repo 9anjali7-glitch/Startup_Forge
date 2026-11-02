@@ -35,7 +35,7 @@ export const StatsPanel = ({
 }: StatsPanelProps) => {
 
     return (
-        <div className="flex flex-col gap-4 lg:gap-6 flex-shrink-0 min-w-0 w-full h-auto lg:h-full lg:overflow-y-auto custom-scrollbar lg:pr-1 lg:flex-[20]">
+        <div className="flex flex-col gap-4 lg:gap-6 flex-shrink-0 min-w-0 w-full h-auto lg:flex-[20]">
             {/* Conflict (Flex 3 -> ~30%) to fit inputs */}
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex-shrink-0 flex flex-col relative z-40">
                 <div className="flex items-center gap-2 mb-3">

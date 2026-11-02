@@ -29,6 +29,11 @@ class ChatRequest(BaseModel):
     query: str = Field(min_length=1, max_length=2000)
     history: list[dict] = Field(default_factory=list, max_length=12)
 
+class AssistantChatRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=2000)
+    history: list[dict] = Field(default_factory=list, max_length=12)
+    userContext: str = Field(default="", max_length=3000)
+
 
 # ---------- Startup ----------
 @app.on_event("startup")
@@ -57,6 +62,15 @@ def health_check():
         "status": "ok",
         "gemini_configured": bool(os.getenv("GEMINI_API_KEY")),
         "gemini_model": os.getenv("GEMINI_MODEL", "gemini-3.8-flash"),
+        "openai_configured": bool(os.getenv("OPENAI_API_KEY")),
+        "openai_model": os.getenv("OPENAI_MODEL", "chat-latest"),
+        "assistant_provider": (
+            "openai" if os.getenv("AI_PROVIDER", "gemini").lower() in ("openai", "chatgpt") and os.getenv("OPENAI_API_KEY")
+            else "gemini" if os.getenv("GEMINI_API_KEY")
+            else "openai" if os.getenv("OPENAI_API_KEY")
+            else "mistral" if os.getenv("MISTRAL_API_KEY") and os.getenv("ENABLE_MISTRAL_API", "false").lower() == "true"
+            else "unconfigured"
+        ),
         "mistral_configured": bool(os.getenv("MISTRAL_API_KEY")) and os.getenv("ENABLE_MISTRAL_API", "false").lower() == "true",
         "local_model_configured": bool(ollama_url),
         "local_model_ready": local_model_ready,
@@ -108,16 +122,23 @@ def chat_endpoint(req: ChatRequest):
     answer = chat_with_rag(req.query, req.history)
     return {"response": answer}
 
+@app.post("/assistant/chat")
+def assistant_chat_endpoint(req: AssistantChatRequest):
+    from rag import assist_with_chat
+    answer = assist_with_chat(req.message, req.history, req.userContext)
+    return {"response": answer}
+
 # ---------- Autocomplete Endpoint ----------
 class AutocompleteRequest(BaseModel):
     history: list[dict] = Field(default_factory=list, max_length=12)
     userContext: str = Field(default="Standard User", max_length=1000)
+    draftText: str = Field(default="", max_length=2000)
 
 from rag import generate_chat_reply
 
 @app.post("/chat/autocomplete")
 def chat_autocomplete(req: AutocompleteRequest):
-    reply = generate_chat_reply(req.history, req.userContext)
+    reply = generate_chat_reply(req.history, req.userContext, req.draftText)
     return {"reply": reply}
 
 @app.get("/")

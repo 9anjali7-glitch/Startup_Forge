@@ -5,6 +5,7 @@ import { EditProfileModal } from './EditProfileModal';
 import { SearchResultsDropdown } from './SearchResultsDropdown';
 import { GrowthPredictionSection } from './GrowthPredictionSection';
 import { MobileChatOverlay } from './common/MobileChatOverlay';
+import { useUnreadBadges } from '../useUnreadBadges';
 
 type ProfilePageProps = {
   user: User; // The profile being viewed
@@ -41,6 +42,7 @@ const ActionItem = ({ icon, label, onClick, badge, active }: { icon: any, label:
 );
 
 export function ProfilePage({ user, currentUser, isOwnProfile, isFollowing, onUpdateProfile, onFollowUser, userPosts, onViewConflictReport, onNavigate, onSearch, onQueryChange, ragResults, isSearching }: ProfilePageProps) {
+  const { unreadAlerts, unreadInbox } = useUnreadBadges(String(currentUser?.id || ''));
   const safeCurrentUser = currentUser || { id: 'guest', name: 'Guest', avatar: 'https://i.pravatar.cc/150?u=guest', headline: '', connections: 0, about: '', experience: '', education: '', coverImage: '' };
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -197,8 +199,8 @@ export function ProfilePage({ user, currentUser, isOwnProfile, isFollowing, onUp
           <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
             <ActionItem icon={<Home />} label="Home" onClick={() => onNavigate('home')} />
             <ActionItem icon={<Users />} label="Network" onClick={() => onNavigate('network')} />
-            <ActionItem icon={<Bell />} label="Alerts" badge={true} onClick={() => onNavigate('notifications')} />
-            <ActionItem icon={<MessageSquare />} label="Inbox" onClick={() => onNavigate('messages')} />
+            <ActionItem icon={<Bell />} label="Alerts" badge={unreadAlerts > 0} onClick={() => onNavigate('notifications')} />
+            <ActionItem icon={<MessageSquare />} label="Inbox" badge={unreadInbox > 0} onClick={() => onNavigate('messages')} />
             <ActionItem icon={<BrainCircuit />} label="Deep Analysis" onClick={() => onNavigate('conflict-report')} />
           </div>
         </div>
@@ -317,7 +319,7 @@ export function ProfilePage({ user, currentUser, isOwnProfile, isFollowing, onUp
                 </span>
 
                 {/* Social Links */}
-                {(user.website || user.linkedin) && (
+                {(user.website || user.linkedin || user.otherLinks?.length) && (
                   <div className="flex gap-3 ml-2 border-l border-slate-200 pl-4">
                     {user.website && (
                       <a href={user.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-slate-900 transition-colors">
@@ -329,6 +331,11 @@ export function ProfilePage({ user, currentUser, isOwnProfile, isFollowing, onUp
                         <LinkIcon className="w-3.5 h-3.5" /> LinkedIn
                       </a>
                     )}
+                    {user.otherLinks?.filter((link) => link.url !== user.website && link.url !== user.linkedin).map((link) => (
+                      <a key={`${link.label}-${link.url}`} href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-indigo-700 transition-colors">
+                        <LinkIcon className="w-3.5 h-3.5" /> {link.label}
+                      </a>
+                    ))}
                   </div>
                 )}
               </div>
@@ -371,9 +378,51 @@ export function ProfilePage({ user, currentUser, isOwnProfile, isFollowing, onUp
                 <h2 className="text-2xl font-bold text-slate-900 mb-6">About</h2>
                 <p className="text-slate-600 leading-relaxed whitespace-pre-line text-lg max-w-4xl">{user.about}</p>
 
+                {user.publicConnections && user.publicConnections.length > 0 && (
+                  <section className="mt-8 max-w-4xl">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Public connections</h3>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {user.publicConnections.map((connection) => (
+                        <article key={`${connection.name}-${connection.relationship}`} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                          <p className="font-bold text-slate-800">{connection.name}</p>
+                          <p className="mt-1 text-sm leading-relaxed text-slate-600">{connection.relationship}</p>
+                          <a href={connection.source} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-indigo-700 hover:underline">
+                            View source <LinkIcon className="h-3.5 w-3.5" />
+                          </a>
+                        </article>
+                      ))}
+                    </div>
+                    <p className="mt-2 text-xs text-slate-400">Publicly documented work or investment relationships. These are not private contact or mutual-connection data.</p>
+                  </section>
+                )}
+
+                {(user.role === 'founder' && user.companyTenureLabel) || (user.role === 'investor' && user.investorFirmTenureLabel) ? (
+                  <section className="mt-8 max-w-4xl rounded-2xl border border-indigo-100 bg-indigo-50/70 p-6">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-xs font-bold uppercase tracking-wider text-indigo-700">{user.role === 'founder' ? 'Company age' : 'Firm history'}</span>
+                      <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-indigo-800">{user.role === 'founder' ? user.companyMaturity : user.investorFirmMaturity}</span>
+                    </div>
+                    <p className="mt-2 font-semibold text-slate-800">{user.role === 'founder' ? user.companyTenureLabel : user.investorFirmTenureLabel}</p>
+                    {(user.role === 'founder' ? user.companyTrendSummary : user.investmentTrendSummary) && (
+                      <p className="mt-2 text-sm leading-relaxed text-slate-600">{user.role === 'founder' ? user.companyTrendSummary : user.investmentTrendSummary}</p>
+                    )}
+                    {user.role === 'founder' && user.trendSources?.map((source, index) => <a key={source} href={source} target="_blank" rel="noreferrer" className="mt-3 mr-4 inline-flex items-center gap-2 text-sm font-semibold text-indigo-700 hover:underline">{index === 0 ? 'Company history source' : `Additional source ${index}`} <LinkIcon className="h-4 w-4" /></a>)}
+                    {user.role === 'investor' && user.firmHistorySource && <a href={user.firmHistorySource} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-indigo-700 hover:underline">Source for firm history <LinkIcon className="h-4 w-4" /></a>}
+                  </section>
+                ) : null}
+
                   {(user.role === 'investor' || user.role === 'founder') && user.dataStatus && (<p className="mt-4 text-xs text-slate-500">{user.dataStatus}</p>)}
                   {(user.role === 'investor' || user.role === 'founder') && user.profileSource && (<a href={user.profileSource} target="_blank" rel="noreferrer" className="inline-flex mt-4 items-center gap-2 text-sm font-semibold text-indigo-700 hover:underline">Verify profile at source <LinkIcon className="w-4 h-4" /></a>)}
                   {(user.role === 'investor' || user.role === 'founder') && user.avatarSource && (<a href={user.avatarSource} target="_blank" rel="noreferrer" className="inline-flex mt-4 ml-4 items-center gap-2 text-sm font-semibold text-slate-600 hover:underline">Portrait source <LinkIcon className="w-4 h-4" /></a>)}
+
+                {user.role === 'investor' && (user.investmentThesis || user.totalInvestmentsCount !== undefined) && (
+                  <section className="mt-6 max-w-4xl rounded-2xl border border-slate-200 bg-white p-6">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">Investment profile</h3>
+                    {user.totalInvestmentsCount !== undefined && <p className="mt-2 text-sm text-slate-700">Source-listed investments: <strong>{user.totalInvestmentsCount}</strong></p>}
+                    {user.investmentThesis && <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-slate-700">{user.investmentThesis}</p>}
+                    {user.sourceConfidence !== undefined && <p className="mt-2 text-xs text-slate-400">Source dataset confidence: {user.sourceConfidence}</p>}
+                  </section>
+                )}
 
                 {(user.primaryDomain || user.secondaryDomain) && (
                   <div className="mt-8 pt-8 border-t border-slate-100">
@@ -398,8 +447,9 @@ export function ProfilePage({ user, currentUser, isOwnProfile, isFollowing, onUp
             {activeTab === 'posts' && (
               <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
                 <h2 className="text-2xl font-bold text-slate-900 mb-6">{user.role === 'investor' ? 'Past Investments' : user.role === 'founder' ? 'Company & Funding' : 'Posts'}</h2>
-                {(user.role === 'investor' && user.pastInvestments) || (user.role === 'founder' && (user.companyFunding || user.pastInvestments)) ? (
+                {(user.role === 'investor' && user.pastInvestments) || (user.role === 'founder' && (user.companyFunding || user.pastInvestments || user.companyTenureLabel)) ? (
                   <div className="space-y-4">
+                    {user.role === 'founder' && user.companyTenureLabel && <section className="bg-indigo-50/70 p-8 rounded-2xl border border-indigo-100"><h3 className="text-sm font-bold uppercase tracking-wide text-indigo-700 mb-3">Operating history · {user.companyMaturity}</h3><p className="text-slate-700 leading-relaxed">{user.companyTenureLabel}</p>{user.companyTrendSummary && <p className="mt-3 text-slate-700 leading-relaxed">{user.companyTrendSummary}</p>}{user.trendSource && <a href={user.trendSource} target="_blank" rel="noreferrer" className="inline-flex mt-4 items-center gap-2 text-sm font-semibold text-indigo-700 hover:underline">Company and trend source <LinkIcon className="w-4 h-4" /></a>}</section>}
                     {user.role === 'founder' && user.companyFunding && <section className="bg-slate-50 p-8 rounded-2xl border border-slate-100"><h3 className="text-sm font-bold uppercase tracking-wide text-slate-500 mb-3">Company & funding context</h3><p className="text-slate-700 whitespace-pre-wrap leading-relaxed">{user.companyFunding}</p></section>}
                     {user.pastInvestments && <section className="bg-slate-50 p-8 rounded-2xl border border-slate-100"><h3 className="text-sm font-bold uppercase tracking-wide text-slate-500 mb-3">{user.role === 'founder' ? 'Founder and investment history' : 'Selected investment history'}</h3><p className="text-slate-700 whitespace-pre-wrap leading-relaxed">{user.pastInvestments}</p></section>}
                   </div>
@@ -459,7 +509,7 @@ export function ProfilePage({ user, currentUser, isOwnProfile, isFollowing, onUp
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-slate-900">{user.education}</h3>
-                    <p className="text-slate-500 mt-1">Public profile details; degree completion is specified only where stated.</p>
+                    <p className="text-slate-500 mt-1">{user.education.includes('For this project demo') ? 'Illustrative demo detail only; education is not verified and should not be treated as a real credential.' : 'Public profile details; degree completion is specified only where stated.'}</p>
                   </div>
                 </div>
               </div>
@@ -502,8 +552,8 @@ export function ProfilePage({ user, currentUser, isOwnProfile, isFollowing, onUp
         <ActionItem icon={<Home />} label="Home" onClick={() => onNavigate('home')} />
         <ActionItem icon={<Users className="w-6 h-6" />} label="Network" onClick={() => onNavigate('network')} />
         <ActionItem icon={<BrainCircuit className="w-6 h-6" />} label="Analyze" onClick={() => onNavigate('conflict-report')} />
-        <ActionItem icon={<Bell className="w-6 h-6" />} label="Alerts" badge={true} onClick={() => onNavigate('notifications')} />
-        <ActionItem icon={<MessageSquare className="w-6 h-6" />} label="Inbox" onClick={() => onNavigate('messages')} />
+        <ActionItem icon={<Bell className="w-6 h-6" />} label="Alerts" badge={unreadAlerts > 0} onClick={() => onNavigate('notifications')} />
+        <ActionItem icon={<MessageSquare className="w-6 h-6" />} label="Inbox" badge={unreadInbox > 0} onClick={() => onNavigate('messages')} />
       </div>
 
       <MobileChatOverlay currentUser={currentUser} />

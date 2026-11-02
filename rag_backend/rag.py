@@ -21,54 +21,118 @@ MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY") if os.getenv("ENABLE_MISTRAL_API"
 MISTRAL_CLIENT = MistralClient(api_key=MISTRAL_API_KEY) if MISTRAL_API_KEY else None
 MISTRAL_MODEL = "mistral-small-latest"
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
+GEMINI_FALLBACK_MODEL = os.getenv("GEMINI_FALLBACK_MODEL", "gemini-3.8-flash")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "chat-latest")
+AI_PROVIDER = os.getenv("AI_PROVIDER", "gemini").strip().lower()
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "").rstrip("/")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen3:0.6b")
 
 
-def generate_model_reply(messages, temperature=0.35):
-    """Prefer free Gemini, then local Ollama; paid Mistral is opt-in only."""
-    if GEMINI_API_KEY:
-        try:
-            system_instruction = next(
-                (item.get("content", "") for item in messages if item.get("role") == "system"), ""
-            )
-            contents = [
-                {
-                    "role": "model" if item.get("role") == "assistant" else "user",
-                    "parts": [{"text": item.get("content", "")}],
-                }
-                for item in messages
-                if item.get("role") in ("user", "assistant") and item.get("content")
-            ]
-            payload = {
-                "contents": contents,
-                "generationConfig": {"temperature": temperature, "maxOutputTokens": 1200},
-            }
-            if system_instruction:
-                payload["systemInstruction"] = {"parts": [{"text": system_instruction}]}
-            response = httpx.post(
-                f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent",
-                params={"key": GEMINI_API_KEY},
-                json=payload,
-                timeout=httpx.Timeout(60.0, connect=8.0),
-            )
-            response.raise_for_status()
-            candidates = response.json().get("candidates", [])
-            answer = "".join(
-                part.get("text", "")
-                for part in (candidates[0].get("content", {}).get("parts", []) if candidates else [])
-            )
-            if answer.strip():
-                return answer.strip()
-            print("Gemini returned an empty reply")
-        except Exception as exc:
-            # httpx exceptions can contain the full request URL, including the API key.
-            status_code = getattr(getattr(exc, "response", None), "status_code", None)
-            detail = f" HTTP {status_code}" if status_code else ""
-            print(f"Gemini chat failed ({type(exc).__name__}).{detail}")
+def _generate_openai_reply(messages):
+    try:
+        system_instruction = next(
+            (item.get("content", "") for item in messages if item.get("role") == "system"), ""
+        )
+        input_messages = [
+            {"role": item["role"], "content": item.get("content", "")}
+            for item in messages
+            if item.get("role") in ("user", "assistant") and item.get("content")
+        ]
+        response = httpx.post(
+            "https://api.openai.com/v1/responses",
+            headers={"Authorization": f"Bearer {OPENAI_API_KEY}"},
+            json={
+                "model": OPENAI_MODEL,
+                "instructions": system_instruction,
+                "input": input_messages,
+                "max_output_tokens": 1200,
+            },
+            timeout=httpx.Timeout(60.0, connect=8.0),
+        )
+        response.raise_for_status()
+        output = response.json().get("output", [])
+        answer = "\n".join(
+            part.get("text", "")
+            for item in output if item.get("type") == "message"
+            for part in item.get("content", []) if part.get("type") == "output_text"
+        )
+        if answer.strip():
+            return answer.strip()
+        print("OpenAI returned an empty reply")
+    except Exception as exc:
+        status_code = getattr(getattr(exc, "response", None), "status_code", None)
+        detail = f" HTTP {status_code}" if status_code else ""
+        print(f"OpenAI chat failed ({type(exc).__name__}).{detail}")
+    return None
 
-    if OLLAMA_BASE_URL:
+
+def generate_model_reply(messages, temperature=0.35, allow_local_fallback=True):
+    """Use the selected hosted model, with local Ollama only for legacy callers."""
+    openai_first = AI_PROVIDER in ("openai", "chatgpt")
+    if openai_first and OPENAI_API_KEY:
+        answer = _generate_openai_reply(messages)
+        if answer:
+            return answer
+
+    if GEMINI_API_KEY:
+        system_instruction = next(
+            (item.get("content", "") for item in messages if item.get("role") == "system"), ""
+        )
+        contents = [
+            {
+                "role": "model" if item.get("role") == "assistant" else "user",
+                "parts": [{"text": item.get("content", "")}],
+            }
+            for item in messages
+            if item.get("role") in ("user", "assistant") and item.get("content")
+        ]
+        payload = {
+            "contents": contents,
+            "generationConfig": {"temperature": temperature, "maxOutputTokens": 1200},
+        }
+        if system_instruction:
+            payload["systemInstruction"] = {"parts": [{"text": system_instruction}]}
+        models = list(dict.fromkeys((GEMINI_MODEL, GEMINI_FALLBACK_MODEL)))
+        for model in models:
+            for attempt in range(2):
+                try:
+                    response = httpx.post(
+                        f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+                        headers={"x-goog-api-key": GEMINI_API_KEY},
+                        json=payload,
+                        timeout=httpx.Timeout(45.0, connect=8.0),
+                    )
+                    response.raise_for_status()
+                    candidates = response.json().get("candidates", [])
+                    answer = "".join(
+                        part.get("text", "")
+                        for part in (candidates[0].get("content", {}).get("parts", []) if candidates else [])
+                    )
+                    if answer.strip():
+                        return answer.strip()
+                    print(f"Gemini model {model} returned an empty reply")
+                except Exception as exc:
+                    # httpx exceptions can contain the full request URL, including the API key.
+                    status_code = getattr(getattr(exc, "response", None), "status_code", None)
+                    detail = f" HTTP {status_code}" if status_code else ""
+                    print(f"Gemini model {model} failed ({type(exc).__name__}).{detail}")
+                    # Invalid credentials or malformed requests need config changes; transient
+                    # network, rate-limit, and server failures get one quick retry before failover.
+                    if status_code in (400, 401, 403):
+                        break
+                    if attempt == 0 and status_code in (None, 408, 429, 500, 502, 503, 504):
+                        time.sleep(0.8)
+                        continue
+                break
+
+    if not openai_first and OPENAI_API_KEY:
+        answer = _generate_openai_reply(messages)
+        if answer:
+            return answer
+
+    if allow_local_fallback and OLLAMA_BASE_URL:
         try:
             response = httpx.post(
                 f"{OLLAMA_BASE_URL}/api/chat",
@@ -587,7 +651,7 @@ def _offline_guide_answer(query: str) -> str | None:
         return "\n\n".join(matched_definitions) + "\n\nThis is general education, not transaction-specific legal, tax, or investment advice."
     return None
 
-def generate_chat_reply(history: list, user_context: str):
+def generate_chat_reply(history: list, user_context: str, draft_text: str = ""):
     # Retrieve My Data
     my_data_res = query_founders(f"Details about {user_context}", k=1)
     my_facts = my_data_res["documents"][0][0] if my_data_res["documents"][0] else "No data."
@@ -598,9 +662,18 @@ def generate_chat_reply(history: list, user_context: str):
         conversation_text += f"{sender}: {msg.get('content')}\n"
 
     system_prompt = (
-        "Draft a professional executive reply. Use the provided company data for facts."
+        "Help the user write a natural, concise professional chat message. Return only the message text, "
+        "usually one to three sentences. Do not add a subject line, greeting/sign-off block, markdown, "
+        "or facts that are not in the conversation. If the user supplied a draft, improve its clarity and "
+        "tone while preserving its meaning. Otherwise reply to the other person's latest message. "
+        "If there is no conversation yet, write a brief, friendly opening message."
     )
-    user_prompt = f"My Data: {my_facts}\nContext: {user_context}\nHistory:\n{conversation_text}\nDraft reply:"
+    user_prompt = (
+        f"User context: {user_context}\nRelevant company facts, only use if helpful: {my_facts}\n"
+        f"Recent chat:\n{conversation_text or '(No messages yet)'}\n"
+        f"Current draft to polish (if any): {draft_text.strip() or '(No draft; write a reply)'}\n"
+        "Write the chat message now."
+    )
 
     messages = [
         {"role": "system", "content": system_prompt},
@@ -609,11 +682,145 @@ def generate_chat_reply(history: list, user_context: str):
     answer = generate_model_reply(messages, temperature=0.2)
     if answer:
         return answer
-    if not MISTRAL_CLIENT and not OLLAMA_BASE_URL:
-        last_message = next((str(msg.get("content", "")).strip() for msg in reversed(history) if msg.get("content")), "")
-        if not last_message:
-            return "Thanks for reaching out. Could you share a little more context so I can respond usefully?"
-        return ("I can’t draft a tailored reply yet because no generative AI provider is available. "
-                "Configure the free Gemini API key or start the local Ollama model, then restart the RAG service. "
-                f"Latest message: “{last_message[:280]}”")
-    return "The AI model is temporarily unavailable. Please retry shortly; the profile search assistant is still available."
+    latest_other_message = next(
+        (str(msg.get("content", "")).strip() for msg in reversed(history)
+         if msg.get("content") and not msg.get("isMe")),
+        "",
+    )
+    if draft_text.strip():
+        return draft_text.strip()
+    if latest_other_message:
+        return "Thanks for sharing that. I appreciate the context and would be glad to discuss this further. What would be a good next step?"
+    return "Hi, thanks for connecting! I’d love to hear what you’re working on and see how we might be able to help each other."
+
+
+def _assistant_echoes_question(question: str, answer: str) -> bool:
+    normalize = lambda value: re.sub(r"[^a-z0-9]+", " ", value.lower()).strip()
+    normalized_question = normalize(question)
+    normalized_answer = normalize(answer)
+    if not normalized_question or not normalized_answer:
+        return False
+    return (
+        normalized_answer == normalized_question
+        or normalized_question in normalized_answer
+        or difflib.SequenceMatcher(None, normalized_question, normalized_answer).ratio() >= 0.78
+    )
+
+
+def _assistant_coaching_answer(question: str) -> str:
+    q = question.lower()
+    if re.search(r"follow.?up|no reply|hasn['’]?t replied|not replied", q):
+        return (
+            "A low-pressure follow-up can be brief: remind them what you discussed, add one relevant update if you have one, "
+            "and ask one simple next-step question. If you’ve already followed up more than once, give them space. "
+            "What was your last exchange, and what would you like to happen next?"
+        )
+    if re.search(r"meeting|intro|connect", q):
+        return (
+            "Keep the ask specific and easy to answer: explain why this person’s perspective is relevant, name one focused topic, "
+            "and ask for a short conversation with flexible timing. Avoid a broad pitch in the first ask. "
+            "What do you hope to learn from them?"
+        )
+    if re.search(r"pitch|feedback", q):
+        return (
+            "Ask for feedback on one clear part of the pitch, such as the customer problem, market, or business model. "
+            "That gives the other person something concrete to react to. Which part are you least confident about?"
+        )
+    if re.search(r"conflict|concern|overlap", q):
+        return (
+            "Start by separating what you know from what you suspect. Note the people or companies involved, the documented "
+            "relationship, and what decision it could affect. Then raise the specific concern without assuming intent. "
+            "What relationship or overlap are you looking at?"
+        )
+    if re.search(r"investor.*question|question.*investor|respond|answer", q):
+        return (
+            "Answer the investor’s specific question first, then support your answer with one concrete fact. If you don’t know a figure, "
+            "say you’ll verify it instead of guessing. What exactly did they ask?"
+        )
+    if re.search(r"offer|negotia|terms|next step", q):
+        return (
+            "Before agreeing, make sure you understand the amount, instrument, valuation or cap, key conditions, and timing. "
+            "Write down what is still open, then ask to resolve those points in order. What part of the offer is unclear?"
+        )
+    if re.search(r"startup|company|explain|describe", q):
+        return (
+            "A clear startup explanation usually covers four things: who the customer is, what painful problem they have, "
+            "how your product solves it, and what evidence shows it works. Which customer and problem are you focused on?"
+        )
+    return (
+        "I’m here to answer your question, not repeat it back. I need a little more context to give you a useful, accurate answer. "
+        "What outcome are you aiming for, and what detail should I take into account?"
+    )
+
+
+def assist_with_chat(message: str, history: list, user_context: str = ""):
+    """Answer the user's issue as a conversational startup networking coach."""
+    explicit_chat_copy_request = bool(re.search(
+        r"\b(?:write|draft|compose|word|rewrite|craft)\b.{0,50}\b(?:chat\s+)?(?:reply|message|text)\b|"
+        r"\b(?:reply|message|text)\b.{0,50}\b(?:write|draft|compose|rewrite)\b",
+        message,
+        re.IGNORECASE,
+    )) and not bool(re.search(r"\bemail\b", message, re.IGNORECASE))
+    system_prompt = (
+        "You are StartupForge's conversational AI helper for founder and investor networking. Have a real back-and-forth conversation: "
+        "answer the user's actual question, help reason through the situation, and ask one specific follow-up question only when it would "
+        "help. Do not turn every request into a message-writing task. Never use generic filler such as 'let me know if you need anything else' "
+        "as the whole answer. Do not write text addressed to the recipient unless the user explicitly asks you to write or edit a message. "
+        "Never mention email, email drafts, email subject lines, or email actions. When the user's latest request explicitly asks you to write or edit "
+        "a message for this in-app chat, give brief context if useful, then put the proposed message after the exact marker [CHAT_REPLY] on its own line. "
+        "Only the text after that marker is the optional chat message; it must be concise, natural, editable, and based only on facts the user supplied. "
+        "Never send anything or claim to have sent "
+        "anything. Do not invent personal or company facts, promises, metrics, investment terms, or recipient contact details. Treat legal, "
+        "investment, and conflict topics as general guidance and recommend checking primary documents or qualified professionals for consequential decisions."
+    )
+    messages = [{"role": "system", "content": system_prompt}]
+    for item in (history or [])[-8:]:
+        role = item.get("role") if isinstance(item, dict) else None
+        content = item.get("content") if isinstance(item, dict) else None
+        if role in ("user", "assistant") and isinstance(content, str) and content.strip():
+            messages.append({"role": role, "content": content.strip()[:2000]})
+    context = user_context.strip()[:3000]
+    messages.append({
+        "role": "user",
+        "content": (f"Context: {context}\n" if context else "") + f"User says: {message.strip()[:2000]}",
+    })
+    # This inbox assistant must use a hosted general-purpose model. The tiny
+    # local fallback is suitable for local profile search but was echoing users.
+    answer = generate_model_reply(messages, temperature=0.4, allow_local_fallback=False)
+    if answer:
+        # The small local model can ignore instructions. Enforce the product's
+        # chat-only flow before returning any generated text to the UI.
+        if re.search(r"\bemail\b|subject\s+line|mailto:", answer, re.IGNORECASE):
+            if explicit_chat_copy_request:
+                return "I can help prepare a reply for this in-app chat. What would you like the message to say, and what should it avoid?"
+            answer = (
+                "A low-pressure follow-up can be brief: remind them what you discussed, add one relevant update if you have one, "
+                "and ask one simple next-step question. What was your last exchange, and what would you like to happen next?"
+            )
+        if "[CHAT_REPLY]" in answer and not explicit_chat_copy_request:
+            answer = answer.split("[CHAT_REPLY]", 1)[0].strip()
+        if "[CHAT_REPLY]" in answer and explicit_chat_copy_request:
+            return answer
+        answer = answer.replace("[CHAT_REPLY]", "").strip()
+        if not explicit_chat_copy_request and _assistant_echoes_question(message, answer):
+            return _assistant_coaching_answer(message)
+        if explicit_chat_copy_request:
+            return f"[CHAT_REPLY]\n{answer}"
+        if not explicit_chat_copy_request and re.search(
+            r"(?im)^\s*(?:hi|hello|dear)\b|[\"“][^\"”\n]{12,}[\"”]|"
+            r"\b(?:let['’]s say|here(?: is|'s) (?:a )?(?:message|reply|draft)|subject line|"
+            r"schedule a (?:call|meeting)|reaching out)\b",
+            answer,
+        ):
+            return _assistant_coaching_answer(message)
+        return answer
+    if not GEMINI_API_KEY and not OPENAI_API_KEY and not MISTRAL_CLIENT:
+        return (
+            "No hosted AI model is connected yet. Add a Gemini key as GEMINI_API_KEY or a ChatGPT API key as OPENAI_API_KEY "
+            "to the project’s .env file, then rebuild the Docker services. "
+            "Your message has not been changed or sent."
+        )
+    return (
+        "The hosted AI service didn’t respond. Check the Gemini API key, model setting, and network connection, then try again. "
+        "Your message has not been changed or sent."
+    )

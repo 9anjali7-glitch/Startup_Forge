@@ -1,6 +1,6 @@
 # RAG Backend (Gemini free tier or local Ollama)
 
-This service answers chat questions using the SQL records and the curated founder/investor directory used by the frontend. The curated directory adds profile biography, education, career history, sources, and uncertainty notes. The assistant also has built-in product navigation and investment-literacy guidance, so these common questions remain useful when a generative model is unavailable. Gemini can generate replies through the free tier using `GEMINI_API_KEY`; local Qwen 3 0.6B through Ollama is the no-key fallback. Paid Mistral is opt-in only through `ENABLE_MISTRAL_API=true`.
+This service answers chat questions using the SQL records and the curated founder/investor directory used by the frontend. The curated directory adds profile biography, education, career history, sources, and uncertainty notes. The Inbox conversational helper uses Gemini (`GEMINI_API_KEY`) or OpenAI (`OPENAI_API_KEY`); use `AI_PROVIDER` to choose when both are configured. It reports clearly when no hosted model is connected and does not substitute the small local model for general-purpose answers. Local Qwen 3 0.6B through Ollama remains available for profile/search features. Paid Mistral is opt-in only through `ENABLE_MISTRAL_API=true`.
 
 ## Docker setup
 
@@ -15,7 +15,7 @@ The local model is downloaded once into the persistent `ollama_data` volume (abo
 
 ## Optional Gemini free tier
 
-Docker Compose reads `GEMINI_API_KEY` and `GEMINI_MODEL` from the repository-root `.env` file. Keep keys out of source control. The free tier has rate limits and may use prompts to improve Google products. Docker Compose mounts the two curated JSON profile files read-only into `/app/data`; rebuilding/recreating the RAG service refreshes its in-memory search index from those files and SQL.
+Docker Compose reads `GEMINI_API_KEY`, `GEMINI_MODEL`, and optional `GEMINI_FALLBACK_MODEL` from the repository-root `.env` file. Gemini 3.6 Flash is the default, with Gemini 3.8 Flash as a fallback for temporary model failures. Keep keys out of source control. The free tier has rate limits and may use prompts to improve Google products. Docker Compose mounts the two curated JSON profile files read-only into `/app/data`; rebuilding/recreating the RAG service refreshes its in-memory search index from those files and SQL.
 
 The assistant explains where to find Home, Network / Find Investors, profiles, Deep Analysis / Conflict, Alerts, and Inbox; it distinguishes recorded facts from general education and inference. Conflict paths are screening leads, not legal conclusions. Investor matches do not imply current interest or available capital. Transaction-specific legal, tax, and investment questions should be checked with qualified professionals.
 

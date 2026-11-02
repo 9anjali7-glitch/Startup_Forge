@@ -40,12 +40,29 @@ export type User = {
   secondaryDomain?: string;
   website?: string;
   linkedin?: string;
+  investmentThesis?: string;
+  totalInvestmentsCount?: number;
+  sourceConfidence?: string | number;
+  publicConnections?: { name: string; relationship: string; source: string }[];
+  otherLinks?: { label: string; url: string }[];
   isActive?: boolean;
   company?: string;
   location?: string;
   profileSource?: string;
   avatarSource?: string;
   dataStatus?: string;
+  companyFoundedYear?: number;
+  companyTenureLabel?: string;
+  companyMaturity?: string;
+  companyTrendSummary?: string;
+  trendSource?: string;
+  trendSources?: string[];
+  fundingHistory?: { round: string; year: number; amount: number; source: string }[];
+  investorFirmFoundedYear?: number;
+  investorFirmTenureLabel?: string;
+  investorFirmMaturity?: string;
+  investmentTrendSummary?: string;
+  firmHistorySource?: string;
   // Prediction Data
   valuation?: number;
   fundingYear?: number;
@@ -67,16 +84,26 @@ const getFounderProfile = (userId: string): User | undefined => {
     connections: 0,
     about: founder.about || `${founder.name} is listed as a founder associated with ${founder.company}. Verify current role and company details at the linked source.`,
     experience: founder.experience || `${founder.company} — role details not provided.`,
-    education: founder.education || 'Not provided in this directory.',
+    education: founder.education || 'Education was not listed in the available public profile sources.',
     role: 'founder',
     company: founder.company,
     pastInvestments: founder.pastInvestments,
     companyFunding: founder.companyFunding,
     primaryDomain: founder.primaryDomain || founder.domain,
     website: founder.website,
+    linkedin: founder.linkedin,
+    publicConnections: founder.publicConnections || [],
+    otherLinks: founder.otherLinks || [],
     profileSource: founder.profileSource,
     avatarSource: founder.avatarSource,
     dataStatus: founder.dataStatus,
+    companyFoundedYear: founder.companyFoundedYear,
+    companyTenureLabel: founder.companyTenureLabel,
+    companyMaturity: founder.companyMaturity,
+    companyTrendSummary: founder.companyTrendSummary,
+    trendSource: founder.trendSource,
+    trendSources: founder.trendSources || (founder.trendSource ? [founder.trendSource] : []),
+    fundingHistory: founder.fundingHistory || [],
   };
 };
 
@@ -94,17 +121,28 @@ const getInvestorProfile = (userId: string): User | undefined => {
     connections: 0,
     about: investor.about || `${investor.name} is a directory profile for ${investor.firm_name}. Treat this as a discovery lead; verify role, thesis, stage, check size, and current availability with the investor or fund before outreach.`,
     experience: investor.experience || investor.firm_name,
-    education: investor.education || 'Not provided in this directory.',
+    education: investor.education || 'Education was not listed in the available public profile sources.',
     role: 'investor',
     company: investor.firm_name,
     pastInvestments: investor.pastInvestments,
     investmentStage: investor.investmentStage,
     primaryDomain: investor.primaryDomain,
     website: investor.website,
+    linkedin: investor.linkedin,
+    investmentThesis: investor.investmentThesis,
+    totalInvestmentsCount: investor.totalInvestmentsCount,
+    sourceConfidence: investor.sourceConfidence,
+    publicConnections: investor.publicConnections || [],
+    otherLinks: investor.otherLinks || [],
     location: investor.location,
     profileSource: investor.profileSource,
     avatarSource: investor.avatarSource,
     dataStatus: investor.dataStatus,
+    investorFirmFoundedYear: investor.firmFoundedYear,
+    investorFirmTenureLabel: investor.firmTenureLabel,
+    investorFirmMaturity: investor.firmMaturity,
+    investmentTrendSummary: investor.investmentTrendSummary,
+    firmHistorySource: investor.firmHistorySource,
   };
 };
 
@@ -402,7 +440,7 @@ function App() {
   };
 
   // --- Connection Request Logic ---
-  const handleSendConnectionRequest = async (targetUserId: string, targetRole = 'founder') => {
+  const handleSendConnectionRequest = async (targetUserId: string, targetRole = 'founder', targetName = '', targetHeadline = '', targetCompany = ''): Promise<boolean> => {
     console.log("targetUserId =", targetUserId);
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -415,8 +453,14 @@ function App() {
         body: JSON.stringify({
           sender_id: currentUser.id,
           sender_role: currentUser.role,
+          sender_name: currentUser.name,
+          sender_headline: currentUser.headline,
+          sender_company: currentUser.company,
           receiver_id: String(targetUserId),
           receiver_role: targetRole,
+          receiver_name: targetName,
+          receiver_headline: targetHeadline,
+          receiver_company: targetCompany,
           message: `Hi, I'd like to connect!`
         })
       });
@@ -427,11 +471,13 @@ function App() {
         newFollowed.add(targetUserId);
         setFollowedUsers(newFollowed);
         alert("Connection request sent!");
+        return true;
       } else {
         const err = await res.json();
         alert(`Failed: ${err.error}`);
+        return false;
       }
-    } catch (e) { console.error(e); alert("Network error"); }
+    } catch (e) { console.error(e); alert("Network error"); return false; }
   };
 
   const handleUpdateProfile = (updatedUser: User) => {
@@ -761,7 +807,7 @@ function App() {
         onClick={handleAppLogout}
         title="Log out of StartupForge"
         aria-label="Log out of StartupForge"
-        className="fixed bottom-20 left-4 lg:bottom-4 z-[90] inline-flex items-center gap-2 rounded-full border border-rose-200 bg-white px-4 py-2.5 text-sm font-semibold text-rose-700 shadow-lg transition-colors hover:border-rose-300 hover:bg-rose-50 focus:outline-none focus:ring-2 focus:ring-rose-300"
+        className="fixed bottom-20 right-4 lg:bottom-4 lg:right-6 z-[70] inline-flex items-center gap-2 rounded-full border border-rose-200 bg-white px-4 py-2.5 text-sm font-semibold text-rose-700 shadow-lg transition-colors hover:border-rose-300 hover:bg-rose-50 focus:outline-none focus:ring-2 focus:ring-rose-300"
       >
         <LogOut className="h-4 w-4" />
         Log out

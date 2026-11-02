@@ -2,6 +2,7 @@ import { Search, MapPin, Briefcase, DollarSign, Filter, Bookmark, Home, Users, B
 import React, { useState, useEffect } from 'react';
 import { MobileChatOverlay } from './common/MobileChatOverlay';
 import { SearchResultsDropdown } from './SearchResultsDropdown';
+import { useUnreadBadges } from '../useUnreadBadges';
 
 type JobsPageProps = {
   currentUser?: any;
@@ -32,6 +33,7 @@ const ActionItem = ({ icon, label, onClick, badge, active }: { icon: any, label:
 );
 
 export function JobsPage({ currentUser, onNavigate, onSearch, onQueryChange, ragResults, isSearching }: JobsPageProps) {
+  const { unreadAlerts, unreadInbox } = useUnreadBadges(String(currentUser?.id || ''));
   const [savedJobs, setSavedJobs] = useState<Set<string>>(() => { try { return new Set(JSON.parse(localStorage.getItem(`startupforge:saved-jobs:${currentUser?.id || 'guest'}`) || '[]')); } catch { return new Set(); } });
   const [appliedJobs, setAppliedJobs] = useState<Set<string>>(() => { try { return new Set(JSON.parse(localStorage.getItem(`startupforge:applied-jobs:${currentUser?.id || 'guest'}`) || '[]')); } catch { return new Set(); } });
   const [jobTypeFilters, setJobTypeFilters] = useState<string[]>([]);
@@ -454,8 +456,8 @@ export function JobsPage({ currentUser, onNavigate, onSearch, onQueryChange, rag
         <ActionItem icon={<Home />} label="Home" onClick={() => onNavigate?.('home')} />
         <ActionItem icon={<Users className="w-6 h-6" />} label="Network" onClick={() => onNavigate?.('network')} />
         <ActionItem icon={<BrainCircuit className="w-6 h-6" />} label="Analyze" onClick={() => onNavigate?.('conflict-report')} />
-        <ActionItem icon={<Bell className="w-6 h-6" />} label="Alerts" badge={true} onClick={() => onNavigate?.('notifications')} />
-        <ActionItem icon={<MessageSquare className="w-6 h-6" />} label="Inbox" onClick={() => onNavigate?.('messages')} />
+        <ActionItem icon={<Bell className="w-6 h-6" />} label="Alerts" badge={unreadAlerts > 0} onClick={() => onNavigate?.('notifications')} />
+        <ActionItem icon={<MessageSquare className="w-6 h-6" />} label="Inbox" badge={unreadInbox > 0} onClick={() => onNavigate?.('messages')} />
       </div>
 
       <MobileChatOverlay currentUser={currentUser} />

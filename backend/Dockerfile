@@ -2,10 +2,12 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY backend/package*.json ./
 RUN npm install
 
-COPY . .
+COPY backend/ ./
+COPY frontend/src/data/investors.json ./data/investors.json
+COPY frontend/src/data/founders.json ./data/founders.json
 
 EXPOSE 3000
 

@@ -203,7 +203,7 @@ export const LandingPage = ({ onLogin }: LandingPageProps) => {
                         {productionAuth ? <div className="mt-6 text-center text-sm text-slate-500">
                             {mode === 'login' ? <>New to StartupForge? <button type="button" className="font-bold text-indigo-600 hover:underline" onClick={() => { setMode('register'); setError(''); }}>Create an account</button></> : <>Already registered? <button type="button" className="font-bold text-indigo-600 hover:underline" onClick={() => { setMode('login'); setError(''); }}>Sign in</button></>}
                         </div> : <div className="mt-6 text-center text-xs text-slate-400">
-                            Demo profiles: <span className="text-indigo-600 font-bold cursor-pointer hover:underline" onClick={() => { setName('Mark Suster'); setRole('investor'); }}>Mark Suster</span> or <span className="text-emerald-600 font-bold cursor-pointer hover:underline" onClick={() => { setName('1upHealth'); setRole('founder'); }}>1upHealth</span>
+                            Sample profiles: <span className="text-indigo-600 font-bold cursor-pointer hover:underline" onClick={() => { setName('Mark Suster'); setRole('investor'); }}>Mark Suster</span> or <span className="text-emerald-600 font-bold cursor-pointer hover:underline" onClick={() => { setName('1upHealth'); setRole('founder'); }}>1upHealth</span>
                         </div>}
                     </div>
                 </div>

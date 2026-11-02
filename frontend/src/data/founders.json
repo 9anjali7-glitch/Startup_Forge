@@ -13,7 +13,31 @@
     "primaryDomain": "Battery materials, energy storage, advanced manufacturing",
     "website": "https://group1.ai/",
     "profileSource": "https://www.ycombinator.com/companies/advano",
-    "dataStatus": "Founder/current role cross-checked against Y Combinator and Group1 profiles; 2026 ADVANO acquisition and facility investment checked against Louisiana Economic Development. Education comes from public professional-profile details. Updated 2026-11-01."
+    "dataStatus": "Founder/current role cross-checked against Y Combinator and Group1 profiles; 2026 ADVANO acquisition and facility investment checked against Louisiana Economic Development. Education comes from public professional-profile details. Updated 2026-11-01. Operating age and trend checked against linked company announcements/filings; age is approximate by founding year. Updated 2026-11-01.",
+    "companyFoundedYear": 2021,
+    "companyTenureLabel": "Operating since 2021 · about 5 years (as of Nov 2026)",
+    "companyMaturity": "Emerging · under 10 years",
+    "companyTrendSummary": "Group1 is an early-stage battery-systems company moving from potassium-ion cells toward integrated backup-power products. Its founder also built ADVANO, which Sicona acquired in 2026; that acquisition is separate from Group1.",
+    "trendSource": "https://group1.ai/",
+    "fundingHistory": [],
+    "trendSources": [
+      "https://group1.ai/"
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://group1.ai/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.ycombinator.com/companies/advano"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://group1.ai/"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/alexandergirau"
   },
   {
     "name": "Lucy Guo",
@@ -30,7 +54,37 @@
     "primaryDomain": "Creator economy, marketplaces, artificial intelligence",
     "website": "https://passes.com/",
     "profileSource": "https://www.sxswlondon.com/speakers/2025/lucy-guo-7d17d4f7",
-    "dataStatus": "Founder and current-company details checked against public event/company profiles; education and investment examples are intentionally limited to sourced claims. Updated 2026-11-01."
+    "dataStatus": "Founder and current-company details checked against public event/company profiles; education and investment examples are intentionally limited to sourced claims. Updated 2026-11-01. Operating age and trend checked against linked company announcements/filings; age is approximate by founding year. Updated 2026-11-01.",
+    "companyFoundedYear": 2022,
+    "companyTenureLabel": "Operating since 2022 · about 4 years (as of Nov 2026)",
+    "companyMaturity": "Emerging · under 10 years",
+    "companyTrendSummary": "Passes launched in late 2022 and announced a $40M Series A in February 2024. Its founder reported tens of millions of dollars paid to creators and plans to broaden creator monetization products; creator payouts are platform activity, not company revenue.",
+    "trendSource": "https://www.passes.com/blog/posts/passes-announces-40m-series-a",
+    "fundingHistory": [
+      {
+        "round": "Series A",
+        "year": 2024,
+        "amount": 40000000,
+        "source": "https://www.passes.com/blog/posts/passes-announces-40m-series-a"
+      }
+    ],
+    "trendSources": [
+      "https://www.passes.com/blog/posts/passes-announces-40m-series-a"
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://passes.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.sxswlondon.com/speakers/2025/lucy-guo-7d17d4f7"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://www.passes.com/blog/posts/passes-announces-40m-series-a"
+      }
+    ]
   },
   {
     "name": "Bryan Johnson",
@@ -47,7 +101,31 @@
     "primaryDomain": "Consumer health, longevity, biotechnology, technology entrepreneurship",
     "website": "https://blueprint.bryanjohnson.com/",
     "profileSource": "https://blueprint.bryanjohnson.com/pages/about",
-    "dataStatus": "Blueprint founder identity checked against the company's own about page. Education and earlier company history are from public biographies; verify before formal use. Updated 2026-11-01."
+    "dataStatus": "Blueprint founder identity checked against the company's own about page. Education and earlier company history are from public biographies; verify before formal use. Updated 2026-11-01. Operating age and trend checked against linked company announcements/filings; age is approximate by founding year. Updated 2026-11-01.",
+    "companyFoundedYear": 2021,
+    "companyTenureLabel": "Operating since 2021 · about 5 years (as of Nov 2026)",
+    "companyMaturity": "Emerging · under 10 years",
+    "companyTrendSummary": "Project Blueprint began in 2021 as a public longevity protocol and later developed into a consumer health brand. Public company financing and audited revenue series are not disclosed; its trajectory is product and audience expansion, not a verified financial growth rate.",
+    "trendSource": "https://dontdie.bryanjohnson.com/",
+    "fundingHistory": [],
+    "trendSources": [
+      "https://dontdie.bryanjohnson.com/"
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://blueprint.bryanjohnson.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://blueprint.bryanjohnson.com/pages/about"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://dontdie.bryanjohnson.com/"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/bryanrjohnson"
   },
   {
     "name": "Bassem Hamdy",
@@ -63,7 +141,49 @@
     "primaryDomain": "Construction technology, financial operations, vertical SaaS",
     "website": "https://www.briq.com/",
     "profileSource": "https://briq.com/blog/shift-to-autonomous-work",
-    "dataStatus": "Name and founder role corrected using a professional speaker biography; education and title should be rechecked against Briq's current leadership page. Updated 2026-11-01."
+    "dataStatus": "Name and founder role corrected using a professional speaker biography; education and title should be rechecked against Briq's current leadership page. Updated 2026-11-01. Operating age and trend checked against linked company announcements/filings; age is approximate by founding year. Updated 2026-11-01.",
+    "companyFoundedYear": 2018,
+    "companyTenureLabel": "Operating since 2018 · about 8 years (as of Nov 2026)",
+    "companyMaturity": "Emerging · under 10 years",
+    "companyTrendSummary": "Briq raised a $30M Series B in 2021 and an $8M extension at a reported $150M valuation in 2024. The smaller extension followed a funding-market pause; it is a financing history, not evidence of declining revenue.",
+    "trendSource": "https://techcrunch.com/2024/01/18/briq-a-startup-that-uses-ai-to-automate-finances-in-construction-raises-8m-extension-at-a-150m-valuation/",
+    "fundingHistory": [
+      {
+        "round": "Series B",
+        "year": 2021,
+        "amount": 30000000,
+        "source": "https://techcrunch.com/2021/06/07/tiger-global-leads-30m-investment-into-briq-a-fintech-for-the-construction-industry/"
+      },
+      {
+        "round": "Series B extension",
+        "year": 2024,
+        "amount": 8000000,
+        "source": "https://techcrunch.com/2024/01/18/briq-a-startup-that-uses-ai-to-automate-finances-in-construction-raises-8m-extension-at-a-150m-valuation/"
+      }
+    ],
+    "trendSources": [
+      "https://techcrunch.com/2024/01/18/briq-a-startup-that-uses-ai-to-automate-finances-in-construction-raises-8m-extension-at-a-150m-valuation/",
+      "https://techcrunch.com/2021/06/07/tiger-global-leads-30m-investment-into-briq-a-fintech-for-the-construction-industry/"
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://www.briq.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://briq.com/blog/shift-to-autonomous-work"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://techcrunch.com/2024/01/18/briq-a-startup-that-uses-ai-to-automate-finances-in-construction-raises-8m-extension-at-a-150m-valuation/"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://techcrunch.com/2021/06/07/tiger-global-leads-30m-investment-into-briq-a-fintech-for-the-construction-industry/"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/bassem-hamdy"
   },
   {
     "name": "Wang Xing",
@@ -79,7 +199,30 @@
     "primaryDomain": "Local commerce, food delivery, travel, consumer internet",
     "website": "https://about.meituan.com/",
     "profileSource": "https://www.aspeninstitute.org/people/mr-xing-wang/",
-    "dataStatus": "Career and education details use public executive biographies. Current title should be checked against Meituan's most recent annual report. Updated 2026-11-01."
+    "dataStatus": "Career and education details use public executive biographies. Current title should be checked against Meituan's most recent annual report. Updated 2026-11-01. Operating age and trend checked against linked company announcements/filings; age is approximate by founding year. Updated 2026-11-01.",
+    "companyFoundedYear": 2010,
+    "companyTenureLabel": "Operating since 2010 · about 16 years (as of Nov 2026)",
+    "companyMaturity": "Established · 10+ years",
+    "companyTrendSummary": "Meituan expanded from group-buying into a broad local-services and retail technology platform and listed in Hong Kong in 2018. It is a public company; private startup funding rounds are no longer a useful growth measure.",
+    "trendSource": "https://www.meituan.com/en-US/about-us",
+    "fundingHistory": [],
+    "trendSources": [
+      "https://www.meituan.com/en-US/about-us"
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://about.meituan.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.aspeninstitute.org/people/mr-xing-wang/"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://www.meituan.com/en-US/about-us"
+      }
+    ]
   },
   {
     "name": "Pierre Omidyar",
@@ -96,7 +239,30 @@
     "primaryDomain": "Marketplaces, technology, philanthropy, impact investing",
     "website": "https://www.omidyargroup.com/",
     "profileSource": "https://www.omidyargroup.com/about-us/",
-    "dataStatus": "Founder and current relationship checked against Omidyar Group and eBay governance pages. Updated 2026-11-01."
+    "dataStatus": "Founder and current relationship checked against Omidyar Group and eBay governance pages. Updated 2026-11-01. Operating age and trend checked against linked company announcements/filings; age is approximate by founding year. Updated 2026-11-01.",
+    "companyFoundedYear": 1995,
+    "companyTenureLabel": "Operating since 1995 · about 31 years (as of Nov 2026)",
+    "companyMaturity": "Established · 10+ years",
+    "companyTrendSummary": "eBay is a 31-year-old public marketplace. Its 2025 annual report says it enabled nearly $80B in gross merchandise volume and served 135M buyers; Pierre Omidyar later founded the Omidyar Network in 2004. Public-market operating metrics, not venture rounds, describe this mature company.",
+    "trendSource": "https://www.sec.gov/Archives/edgar/data/1065088/000106508826000027/ebay-20251231.htm",
+    "fundingHistory": [],
+    "trendSources": [
+      "https://www.sec.gov/Archives/edgar/data/1065088/000106508826000027/ebay-20251231.htm"
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://www.omidyargroup.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.omidyargroup.com/about-us/"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://www.sec.gov/Archives/edgar/data/1065088/000106508826000027/ebay-20251231.htm"
+      }
+    ]
   },
   {
     "name": "Jeremy Lappin",
@@ -113,7 +279,31 @@
     "primaryDomain": "Procurement, accounts payable, B2B fintech, enterprise software",
     "website": "https://www.candex.com/",
     "profileSource": "https://www.candex.com/AboutUs",
-    "dataStatus": "Co-founder names and founding year verified on Candex's own about page. Education and individual deal history are not stated. Updated 2026-11-01."
+    "dataStatus": "Co-founder names and founding year verified on Candex's own about page. Education and individual deal history are not stated. Updated 2026-11-01. Operating age and trend checked against linked company announcements/filings; age is approximate by founding year. Updated 2026-11-01.",
+    "companyFoundedYear": 2011,
+    "companyTenureLabel": "Operating since 2011 · about 15 years (as of Nov 2026)",
+    "companyMaturity": "Established · 10+ years",
+    "companyTrendSummary": "Candex has operated since 2011, expanding its tail-spend procurement and vendor-payment platform across North America, Europe, Asia, and Japan. The company does not publish a comparable audited revenue series or a complete round-by-round financing timeline.",
+    "trendSource": "https://www.candex.com/AboutUs",
+    "fundingHistory": [],
+    "trendSources": [
+      "https://www.candex.com/AboutUs"
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://www.candex.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.candex.com/AboutUs"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://www.candex.com/AboutUs"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/jeremy-lappin-555718"
   },
   {
     "name": "Melanie Perkins",
@@ -130,7 +320,95 @@
     "primaryDomain": "Design software, collaboration, visual communication, AI tools",
     "website": "https://www.canva.com/",
     "profileSource": "https://www.canva.com/newsroom/news/author/melanie-perkins/",
-    "dataStatus": "Current founder/CEO role checked against Canva's newsroom. Education and early-company history are from public biographies. Updated 2026-11-01."
+    "dataStatus": "Current founder/CEO role checked against Canva's newsroom. Education and early-company history are from public biographies. Updated 2026-11-01. Operating age and trend checked against linked company announcements/filings; age is approximate by founding year. Updated 2026-11-01.",
+    "companyFoundedYear": 2013,
+    "companyTenureLabel": "Operating since 2013 · about 13 years (as of Nov 2026)",
+    "companyMaturity": "Established · 10+ years",
+    "companyTrendSummary": "Canva grew from 60M monthly users in 2021 to more than 170M people in 2023. Reported funding rounds rose from $15M in 2015 to $200M in 2021, while its 2023 recap described its tenth and biggest year. User growth and financing are distinct measures.",
+    "trendSource": "https://www.canva.com/newsroom/news/canva-2023-wrap/",
+    "fundingHistory": [
+      {
+        "round": "Series A",
+        "year": 2015,
+        "amount": 15000000,
+        "source": "https://www.canva.com/newsroom/news/canva-10-year-timeline/"
+      },
+      {
+        "round": "Series B",
+        "year": 2017,
+        "amount": 6000000,
+        "source": "https://www.canva.com/newsroom/news/canva-10-year-timeline/"
+      },
+      {
+        "round": "Funding round",
+        "year": 2018,
+        "amount": 40000000,
+        "source": "https://www.canva.com/newsroom/news/canva-10-year-timeline/"
+      },
+      {
+        "round": "Funding round",
+        "year": 2020,
+        "amount": 60000000,
+        "source": "https://www.canva.com/newsroom/news/canva-10-year-timeline/"
+      },
+      {
+        "round": "Funding round",
+        "year": 2021,
+        "amount": 71000000,
+        "source": "https://www.canva.com/newsroom/news/canva-10-year-timeline/"
+      },
+      {
+        "round": "Funding round",
+        "year": 2021,
+        "amount": 200000000,
+        "source": "https://www.canva.com/newsroom/news/canva-10-year-timeline/"
+      }
+    ],
+    "trendSources": [
+      "https://www.canva.com/newsroom/news/canva-2023-wrap/",
+      "https://www.canva.com/newsroom/news/canva-10-year-timeline/",
+      "https://www.canva.com/newsroom/news/announcing-canva-for-work/",
+      "https://www.canva.com/newsroom/news/record-growth-canva-sees-new-6b-valuation/",
+      "https://www.canva.com/newsroom/news/canva-announces-usd-40-billion-valuation-fueled-global-demand-visual-communication/"
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://www.canva.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.canva.com/newsroom/news/author/melanie-perkins/"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://www.canva.com/newsroom/news/canva-2023-wrap/"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://www.canva.com/newsroom/news/canva-10-year-timeline/"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://www.canva.com/newsroom/news/announcing-canva-for-work/"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://www.canva.com/newsroom/news/record-growth-canva-sees-new-6b-valuation/"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://www.canva.com/newsroom/news/canva-announces-usd-40-billion-valuation-fueled-global-demand-visual-communication/"
+      }
+    ],
+    "linkedin": "https://au.linkedin.com/in/melanieperkins",
+    "publicConnections": [
+      {
+        "name": "Mary Meeker · BOND",
+        "relationship": "Investment relationship: BOND lists Canva among its portfolio or investment examples. This documents a firm-level link, not personal contact.",
+        "source": "https://www.bondcap.com/partners/mary-meeker/"
+      }
+    ]
   },
   {
     "name": "Dylan Field",
@@ -147,40 +425,247 @@
     "primaryDomain": "Design software, developer tools, collaboration, product development",
     "website": "https://www.figma.com/",
     "profileSource": "https://www.figma.com/blog/7-moments-that-shaped-figma/",
-    "dataStatus": "Founder, role, and education checked against Figma's own company history; funding/market status is intentionally not expressed as a live figure. Updated 2026-11-01."
+    "dataStatus": "Founder, role, and education checked against Figma's own company history; funding/market status is intentionally not expressed as a live figure. Updated 2026-11-01. Operating age and trend checked against linked company announcements/filings; age is approximate by founding year. Updated 2026-11-01.",
+    "companyFoundedYear": 2012,
+    "companyTenureLabel": "Operating since 2012 · about 14 years (as of Nov 2026)",
+    "companyMaturity": "Established · 10+ years",
+    "companyTrendSummary": "Figma grew reported revenue from $505M in 2023 to $749M in 2024 (about 48%); its 2025 IPO marked a transition from private financing to public markets. The IPO included both newly issued and shareholder-sold shares, so its offering size is not treated as an equity round here.",
+    "trendSource": "https://investor.figma.com/news-events/news/news-details/2025/Figma-Announces-Pricing-of-Initial-Public-Offering/default.aspx",
+    "fundingHistory": [
+      {
+        "round": "Series B",
+        "year": 2018,
+        "amount": 25000000,
+        "source": "https://www.figma.com/blog/figma-raises-usd25mm-series-b/"
+      },
+      {
+        "round": "Series C",
+        "year": 2019,
+        "amount": 40000000,
+        "source": "https://www.figma.com/blog/figma-series-c/"
+      },
+      {
+        "round": "Series D",
+        "year": 2020,
+        "amount": 50000000,
+        "source": "https://www.figma.com/blog/figmas-series-d-round/"
+      }
+    ],
+    "trendSources": [
+      "https://investor.figma.com/news-events/news/news-details/2025/Figma-Announces-Pricing-of-Initial-Public-Offering/default.aspx",
+      "https://www.sec.gov/Archives/edgar/data/1579878/000162828025036090/figmas-1a2.htm",
+      "https://www.figma.com/blog/figma-raises-usd25mm-series-b/",
+      "https://www.figma.com/blog/figma-series-c/",
+      "https://www.figma.com/blog/figmas-series-d-round/"
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://www.figma.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.figma.com/blog/7-moments-that-shaped-figma/"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://investor.figma.com/news-events/news/news-details/2025/Figma-Announces-Pricing-of-Initial-Public-Offering/default.aspx"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://www.sec.gov/Archives/edgar/data/1579878/000162828025036090/figmas-1a2.htm"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://www.figma.com/blog/figma-raises-usd25mm-series-b/"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://www.figma.com/blog/figma-series-c/"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://www.figma.com/blog/figmas-series-d-round/"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/dylanfield",
+    "publicConnections": [
+      {
+        "name": "Gokul Rajaram · Marathon Management Partners",
+        "relationship": "Investment relationship: Marathon Management Partners lists Figma among its portfolio or investment examples. This documents a firm-level link, not personal contact.",
+        "source": "https://gokulrajaram.com/home"
+      },
+      {
+        "name": "Sarah Guo · Conviction",
+        "relationship": "Investment relationship: Conviction lists Figma among its portfolio or investment examples. This documents a firm-level link, not personal contact.",
+        "source": "https://www.conviction.com/launching-with-conviction.html"
+      }
+    ]
   },
   {
     "name": "Henrique Dubugras",
     "company": "Brex",
     "domain": "brex.com",
-    "headline": "Brex co-founder; former co-CEO",
+    "headline": "Brex co-founder; former Co-CEO and board chair before 2026 acquisition",
     "avatar": "https://www.brex.com/_next/image?q=85&url=https%3A%2F%2Fbrand.brex.com%2Ftransform%2Faa7fb50a-107a-47dc-80ff-be9b8d2a952d%2FHenrique-Dubugras&w=3840",
     "avatarSource": "https://www.brex.com/journal/evolving-brexs-co-ceo-model",
     "about": "Dubugras co-founded Brex with Pedro Franceschi in 2017 after they built Brazilian payments company Pagar.me. Brex's June 2024 role update describes the pair's evolving co-CEO model; current executive responsibility should be checked against Brex's leadership page rather than assuming the old co-CEO title remains current.",
-    "experience": "Brex (Co-founder; former co-CEO); Pagar.me (Co-founder); board service at Expedia Group (appointed 2022).",
+    "experience": "Brex (Co-founder; former Co-CEO, then Board Chair; Capital One completed its acquisition of Brex in April 2026); Pagar.me (Co-founder).",
     "education": "Attended Stanford University after selling Pagar.me; left to build Brex (public biographies).",
     "pastInvestments": "Founder/operator history includes Pagar.me and Brex. No personal outside portfolio is asserted.",
     "companyFunding": "Brex has raised multiple institutional rounds and is privately held. Static profile does not assert current valuation or capitalization.",
     "primaryDomain": "Fintech, corporate cards, spend management, financial software",
     "website": "https://www.brex.com/",
     "profileSource": "https://www.brex.com/journal/evolving-brexs-co-ceo-model",
-    "dataStatus": "Co-founder history and role transition checked against Brex's own 2024 post. Current title should be verified on the live leadership page. Updated 2026-11-01."
+    "dataStatus": "Co-founder history and role transition checked against Brex's own 2024 post. Current title should be verified on the live leadership page. Updated 2026-11-01. Operating age and trend checked against linked company announcements/filings; age is approximate by founding year. Updated 2026-11-01.",
+    "companyFoundedYear": 2017,
+    "companyTenureLabel": "Founded 2017 · about 9 years to its 2026 acquisition (as of Nov 2026)",
+    "companyMaturity": "Emerging · under 10 years",
+    "companyTrendSummary": "Brex raised through multiple rounds, reaching a $12.3B reported valuation in 2022. Capital One completed its acquisition of Brex on April 7, 2026, in a cash-and-stock transaction; Brex now operates within Capital One. The acquisition, not the old private valuation, is the latest company milestone.",
+    "trendSource": "https://www.capitalone.com/about/newsroom/capital-one-completes-acquisition-of-brex/",
+    "fundingHistory": [
+      {
+        "round": "Series C",
+        "year": 2018,
+        "amount": 125000000,
+        "source": "https://www.brex.com/journal/press/series-c"
+      },
+      {
+        "round": "Series D",
+        "year": 2021,
+        "amount": 425000000,
+        "source": "https://www.brex.com/journal/press/series-d-investment"
+      },
+      {
+        "round": "Series D-2",
+        "year": 2022,
+        "amount": 300000000,
+        "source": "https://www.brex.com/journal/press/brex-appoints-karandeep-anand-as-chief-product-officer-raises-usd300-million-in-series-d-2-round"
+      }
+    ],
+    "trendSources": [
+      "https://www.capitalone.com/about/newsroom/capital-one-completes-acquisition-of-brex/",
+      "https://www.brex.com/journal/press/series-c",
+      "https://www.brex.com/journal/press/series-d-investment",
+      "https://www.brex.com/journal/press/brex-appoints-karandeep-anand-as-chief-product-officer-raises-usd300-million-in-series-d-2-round"
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://www.brex.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.brex.com/journal/evolving-brexs-co-ceo-model"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://www.capitalone.com/about/newsroom/capital-one-completes-acquisition-of-brex/"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://www.brex.com/journal/press/series-c"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://www.brex.com/journal/press/series-d-investment"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://www.brex.com/journal/press/brex-appoints-karandeep-anand-as-chief-product-officer-raises-usd300-million-in-series-d-2-round"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/henriquedubugras"
   },
   {
     "name": "Alexandr Wang",
     "company": "Scale AI / Meta",
     "domain": "scale.com",
-    "headline": "Scale AI co-founder; Meta AI leader",
+    "headline": "Meta Chief AI Officer; Scale AI founder and board chair",
     "avatar": null,
     "about": "Wang co-founded Scale AI in 2016. In 2025 he left the CEO role and joined Meta in an AI leadership role; Scale appointed Jason Droege as interim CEO. This profile keeps his Scale AI connection historical and does not label him Scale's current CEO.",
-    "experience": "Meta (AI leadership role, joined 2025); Scale AI (Co-founder; former CEO); MIT (attended, left to build Scale AI).",
+    "experience": "Meta (Chief AI Officer, since 2025); Scale AI (Founder & CEO, 2016–2025; Chairman of the Board). Scale appointed Francis deSouza CEO effective August 2026.",
     "education": "Attended the Massachusetts Institute of Technology; left before completing his degree (public reporting).",
     "pastInvestments": "No personal investment portfolio included. Scale AI is his co-founded operating company.",
     "companyFunding": "Scale AI has raised venture and strategic capital. Ownership and financing changed around the 2025 Meta transaction; this static profile does not assert present equity ownership or valuation.",
     "primaryDomain": "AI data infrastructure, machine learning, applied AI",
     "website": "https://scale.com/",
     "profileSource": "https://time.com/7296215/alexandr-wang-interview/",
-    "dataStatus": "Role correction reflects 2025 reporting on his departure from Scale's CEO role and move to Meta. Verify current responsibilities and company ownership from current company disclosures. Updated 2026-11-01."
+    "dataStatus": "Role correction reflects 2025 reporting on his departure from Scale's CEO role and move to Meta. Verify current responsibilities and company ownership from current company disclosures. Updated 2026-11-01. Operating age and trend checked against linked company announcements/filings; age is approximate by founding year. Updated 2026-11-01.",
+    "companyFoundedYear": 2016,
+    "companyTenureLabel": "Operating since 2016 · about 10 years (as of Nov 2026)",
+    "companyMaturity": "Established · 10+ years",
+    "companyTrendSummary": "Scale raised a $1B mixed primary/secondary financing transaction in 2024 at a $13.8B valuation. In 2025 Meta made a strategic $14.3B investment for a minority stake valued at over $29B; Wang moved to Meta and remained on Scale’s board. Scale appointed Francis deSouza CEO effective August 10, 2026. Scale remains independent; these are financing and leadership milestones, not recurring revenue growth.",
+    "trendSource": "https://scale.com/blog/scale-appoints-new-ceo",
+    "fundingHistory": [
+      {
+        "round": "Series C",
+        "year": 2019,
+        "amount": 100000000,
+        "source": "https://scale.com/blog/series-c"
+      },
+      {
+        "round": "Series D",
+        "year": 2020,
+        "amount": 155000000,
+        "source": "https://scale.com/blog/series-d"
+      },
+      {
+        "round": "Series E",
+        "year": 2021,
+        "amount": 325000000,
+        "source": "https://scale.com/blog/series-e"
+      },
+      {
+        "round": "Series F (mixed primary/secondary transaction)",
+        "year": 2024,
+        "amount": 1000000000,
+        "source": "https://scale.com/blog/scale-ai-series-f"
+      }
+    ],
+    "trendSources": [
+      "https://scale.com/blog/scale-appoints-new-ceo",
+      "https://scale.com/blog/scale-ai-series-f",
+      "https://scale.com/blog/scale-ai-announces-next-phase-of-company-evolution",
+      "https://scale.com/blog/series-c",
+      "https://scale.com/blog/series-d",
+      "https://scale.com/blog/series-e"
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://scale.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://time.com/7296215/alexandr-wang-interview/"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://scale.com/blog/scale-appoints-new-ceo"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://scale.com/blog/scale-ai-series-f"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://scale.com/blog/scale-ai-announces-next-phase-of-company-evolution"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://scale.com/blog/series-c"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://scale.com/blog/series-d"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://scale.com/blog/series-e"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/alexandrwang"
   },
   {
     "name": "Parker Conrad",
@@ -197,7 +682,65 @@
     "primaryDomain": "HR technology, payroll, IT management, workforce software",
     "website": "https://www.rippling.com/",
     "profileSource": "https://www.rippling.com/company/about",
-    "dataStatus": "Role and company information cross-checked against company materials and public biographies; education details should be verified before formal use. Updated 2026-11-01."
+    "dataStatus": "Role and company information cross-checked against company materials and public biographies; education details should be verified before formal use. Updated 2026-11-01. Operating age and trend checked against linked company announcements/filings; age is approximate by founding year. Updated 2026-11-01.",
+    "companyFoundedYear": 2016,
+    "companyTenureLabel": "Operating since 2016 · about 10 years (as of Nov 2026)",
+    "companyMaturity": "Established · 10+ years",
+    "companyTrendSummary": "Rippling reports $1.8B raised from institutional investors and continues to expand its connected HR, IT, finance, and payroll platform. The company announced $250M financing in 2025 at a $6.5B valuation; valuation and capital raised are not operating revenue.",
+    "trendSource": "https://www.rippling.com/company/newsroom",
+    "fundingHistory": [
+      {
+        "round": "Series B",
+        "year": 2020,
+        "amount": 145000000,
+        "source": "https://www.rippling.com/blog/rippling-series-b-funding"
+      },
+      {
+        "round": "Series D",
+        "year": 2022,
+        "amount": 250000000,
+        "source": "https://www.rippling.com/blog/rippling-raises-250m-in-series-d-funding"
+      },
+      {
+        "round": "Series E",
+        "year": 2023,
+        "amount": 500000000,
+        "source": "https://www.rippling.com/blog/rippling-raises-500m-in-series-e-funding"
+      }
+    ],
+    "trendSources": [
+      "https://www.rippling.com/company/newsroom",
+      "https://www.rippling.com/blog/rippling-series-b-funding",
+      "https://www.rippling.com/blog/rippling-raises-250m-in-series-d-funding",
+      "https://www.rippling.com/blog/rippling-raises-500m-in-series-e-funding"
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://www.rippling.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.rippling.com/company/about"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://www.rippling.com/company/newsroom"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://www.rippling.com/blog/rippling-series-b-funding"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://www.rippling.com/blog/rippling-raises-250m-in-series-d-funding"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://www.rippling.com/blog/rippling-raises-500m-in-series-e-funding"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/parkerconrad"
   },
   {
     "name": "Nik Storonsky",
@@ -214,7 +757,82 @@
     "primaryDomain": "Fintech, digital banking, payments, consumer financial services",
     "website": "https://www.revolut.com/",
     "profileSource": "https://www.revolut.com/ro-RO/discover-our-company/",
-    "dataStatus": "Role wording updated to distinguish his founder history from current board status; check the current company leadership page for changes. Updated 2026-11-01."
+    "dataStatus": "Role wording updated to distinguish his founder history from current board status; check the current company leadership page for changes. Updated 2026-11-01. Operating age and trend checked against linked company announcements/filings; age is approximate by founding year. Updated 2026-11-01.",
+    "companyFoundedYear": 2015,
+    "companyTenureLabel": "Operating since 2015 · about 11 years (as of Nov 2026)",
+    "companyMaturity": "Established · 10+ years",
+    "companyTrendSummary": "Revolut reported 2025 revenue of $6.0B, up 46% from $4.0B in 2024, and profit before tax of $2.3B, up 57%. Its retail customer base reached 68.3M, 30% above 2024; it reported five consecutive years of net profitability.",
+    "trendSource": "https://www.revolut.com/news/revolut_reports_record_profit_of_2_3bn_for_2025_as_revenue_surges_to_6bn/",
+    "fundingHistory": [
+      {
+        "round": "Series A",
+        "year": 2016,
+        "amount": 15000000,
+        "source": "https://assets.revolut.com/pdf/annualreport2025.pdf"
+      },
+      {
+        "round": "Series B",
+        "year": 2017,
+        "amount": 66000000,
+        "source": "https://assets.revolut.com/pdf/annualreport2025.pdf"
+      },
+      {
+        "round": "Series C",
+        "year": 2018,
+        "amount": 250000000,
+        "source": "https://www.revolut.com/news/revolut_raises_250m_at_1_7b_valuation_targets_100m_users_in_the_next_five_years_/"
+      },
+      {
+        "round": "Series D",
+        "year": 2020,
+        "amount": 580000000,
+        "source": "https://www.revolut.com/news/revolut_raises_500_million_in_series_d_funding_as_it_sets_sight_on_profitability_and_daily_adoption_in_2020_/"
+      },
+      {
+        "round": "Series E",
+        "year": 2021,
+        "amount": 800000000,
+        "source": "https://www.revolut.com/en-US/news/revolut_raises_800m_series_e_funding_from_softbank_vision_fund_2_and_tiger_global/"
+      }
+    ],
+    "trendSources": [
+      "https://www.revolut.com/news/revolut_reports_record_profit_of_2_3bn_for_2025_as_revenue_surges_to_6bn/",
+      "https://assets.revolut.com/pdf/annualreport2025.pdf",
+      "https://www.revolut.com/news/revolut_raises_250m_at_1_7b_valuation_targets_100m_users_in_the_next_five_years_/",
+      "https://www.revolut.com/news/revolut_raises_500_million_in_series_d_funding_as_it_sets_sight_on_profitability_and_daily_adoption_in_2020_/",
+      "https://www.revolut.com/en-US/news/revolut_raises_800m_series_e_funding_from_softbank_vision_fund_2_and_tiger_global/"
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://www.revolut.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.revolut.com/ro-RO/discover-our-company/"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://www.revolut.com/news/revolut_reports_record_profit_of_2_3bn_for_2025_as_revenue_surges_to_6bn/"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://assets.revolut.com/pdf/annualreport2025.pdf"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://www.revolut.com/news/revolut_raises_250m_at_1_7b_valuation_targets_100m_users_in_the_next_five_years_/"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://www.revolut.com/news/revolut_raises_500_million_in_series_d_funding_as_it_sets_sight_on_profitability_and_daily_adoption_in_2020_/"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://www.revolut.com/en-US/news/revolut_raises_800m_series_e_funding_from_softbank_vision_fund_2_and_tiger_global/"
+      }
+    ],
+    "linkedin": "https://uk.linkedin.com/in/nstoronsky"
   },
   {
     "name": "Guillaume Pousaz",
@@ -231,7 +849,71 @@
     "primaryDomain": "Payments infrastructure, fintech, commerce technology",
     "website": "https://www.checkout.com/",
     "profileSource": "https://www.checkout.com/leadership/guillaume-pousaz",
-    "dataStatus": "Company and founder role checked against company materials; the founding timeline and current executive title should be confirmed on the latest company page. Updated 2026-11-01."
+    "dataStatus": "Company and founder role checked against company materials; the founding timeline and current executive title should be confirmed on the latest company page. Updated 2026-11-01. Operating age and trend checked against linked company announcements/filings; age is approximate by founding year. Updated 2026-11-01.",
+    "companyFoundedYear": 2012,
+    "companyTenureLabel": "Operating since 2012 · about 14 years (as of Nov 2026)",
+    "companyMaturity": "Established · 10+ years",
+    "companyTrendSummary": "Checkout.com reported 45% year-on-year net revenue growth in its core business and a profitable end to 2024; 40+ merchants processed over $1B annually on its network. In 2025, it reported more than $300B in payment volume and a return to full-year EBITDA profitability.",
+    "trendSource": "https://www.checkout.com/newsroom/checkout-com-achieves-45-growth-and-sets-stage-for-return-to-profitability",
+    "fundingHistory": [
+      {
+        "round": "Series A",
+        "year": 2019,
+        "amount": 230000000,
+        "source": "https://www.checkout.com/mission"
+      },
+      {
+        "round": "Series B",
+        "year": 2020,
+        "amount": 150000000,
+        "source": "https://www.checkout.com/mission"
+      },
+      {
+        "round": "Series C",
+        "year": 2021,
+        "amount": 450000000,
+        "source": "https://www.checkout.com/newsroom/checkout-triples-valuation-to-15bn-with-450m"
+      },
+      {
+        "round": "Series D",
+        "year": 2022,
+        "amount": 1000000000,
+        "source": "https://www.checkout.com/newsroom/checkout-com-raises-1-billion-in-series-d-amid-major-us-market-push"
+      }
+    ],
+    "trendSources": [
+      "https://www.checkout.com/newsroom/checkout-com-achieves-45-growth-and-sets-stage-for-return-to-profitability",
+      "https://www.checkout.com/mission",
+      "https://www.checkout.com/newsroom/checkout-triples-valuation-to-15bn-with-450m",
+      "https://www.checkout.com/newsroom/checkout-com-raises-1-billion-in-series-d-amid-major-us-market-push"
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://www.checkout.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.checkout.com/leadership/guillaume-pousaz"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://www.checkout.com/newsroom/checkout-com-achieves-45-growth-and-sets-stage-for-return-to-profitability"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://www.checkout.com/mission"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://www.checkout.com/newsroom/checkout-triples-valuation-to-15bn-with-450m"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://www.checkout.com/newsroom/checkout-com-raises-1-billion-in-series-d-amid-major-us-market-push"
+      }
+    ],
+    "linkedin": "https://ch.linkedin.com/in/guillaumepousaz"
   },
   {
     "name": "Sebastian Siemiatkowski",
@@ -248,7 +930,64 @@
     "primaryDomain": "Payments, commerce, consumer finance, shopping services",
     "website": "https://www.klarna.com/",
     "profileSource": "https://www.klarna.com/international/about-us/",
-    "dataStatus": "Founder details checked against company history; current executive title and market data must be confirmed from current filings. Updated 2026-11-01."
+    "dataStatus": "Founder details checked against company history; current executive title and market data must be confirmed from current filings. Updated 2026-11-01. Operating age and trend checked against linked company announcements/filings; age is approximate by founding year. Updated 2026-11-01.",
+    "companyFoundedYear": 2005,
+    "companyTenureLabel": "Operating since 2005 · about 21 years (as of Nov 2026)",
+    "companyMaturity": "Established · 10+ years",
+    "companyTrendSummary": "Klarna’s financing and valuation moved sharply across cycles: $650M at a $10.65B valuation in 2020, a $1B round in 2021, and $800M at a $6.7B valuation in 2022. Klarna completed its NYSE IPO in September 2025. This is a long-running company with volatile private valuations and a recent move to public markets.",
+    "trendSource": "https://investors.klarna.com/News--Events/news/news-details/2025/Klarna-Completes-Initial-Public-Offering-1f8a0a074/",
+    "fundingHistory": [
+      {
+        "round": "Equity financing",
+        "year": 2020,
+        "amount": 650000000,
+        "source": "https://www.klarna.com/international/press/klarna-announces-650m-funding-round-to-further-accelerate-global-growth/"
+      },
+      {
+        "round": "Equity financing",
+        "year": 2021,
+        "amount": 1000000000,
+        "source": "https://owp.klarna.com/legacy/assets/2021/03/30041745/Annual-Report-Klarna-Holding-AB-2020-210329.pdf"
+      },
+      {
+        "round": "Equity financing",
+        "year": 2022,
+        "amount": 800000000,
+        "source": "https://investors.klarna.com/News--Events/news/news-details/2022/Klarna-closes-major-financing-round-during-worst-stock-downturn-in-50-years-holding/default.aspx"
+      }
+    ],
+    "trendSources": [
+      "https://investors.klarna.com/News--Events/news/news-details/2025/Klarna-Completes-Initial-Public-Offering-1f8a0a074/",
+      "https://www.klarna.com/international/press/klarna-announces-650m-funding-round-to-further-accelerate-global-growth/",
+      "https://owp.klarna.com/legacy/assets/2021/03/30041745/Annual-Report-Klarna-Holding-AB-2020-210329.pdf",
+      "https://investors.klarna.com/News--Events/news/news-details/2022/Klarna-closes-major-financing-round-during-worst-stock-downturn-in-50-years-holding/default.aspx"
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://www.klarna.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.klarna.com/international/about-us/"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://investors.klarna.com/News--Events/news/news-details/2025/Klarna-Completes-Initial-Public-Offering-1f8a0a074/"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://www.klarna.com/international/press/klarna-announces-650m-funding-round-to-further-accelerate-global-growth/"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://owp.klarna.com/legacy/assets/2021/03/30041745/Annual-Report-Klarna-Holding-AB-2020-210329.pdf"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://investors.klarna.com/News--Events/news/news-details/2022/Klarna-closes-major-financing-round-during-worst-stock-downturn-in-50-years-holding/default.aspx"
+      }
+    ]
   },
   {
     "name": "Jensen Huang",
@@ -265,7 +1004,31 @@
     "primaryDomain": "Semiconductors, GPUs, accelerated computing, AI infrastructure",
     "website": "https://www.nvidia.com/",
     "profileSource": "https://www.nvidia.com/en-us/about-nvidia/board-of-directors/jensen-huang/",
-    "dataStatus": "Founder, role, and education checked against NVIDIA's public materials. Public-market figures intentionally omitted because they change continuously. Updated 2026-11-01."
+    "dataStatus": "Founder, role, and education checked against NVIDIA's public materials. Public-market figures intentionally omitted because they change continuously. Updated 2026-11-01. Operating age and trend checked against linked company announcements/filings; age is approximate by founding year. Updated 2026-11-01.",
+    "companyFoundedYear": 1993,
+    "companyTenureLabel": "Operating since 1993 · about 33 years (as of Nov 2026)",
+    "companyMaturity": "Established · 10+ years",
+    "companyTrendSummary": "NVIDIA, founded in 1993, reported fiscal 2026 revenue of $215.9B, up from $130.5B in fiscal 2025. Its growth mix has shifted from graphics toward data-center accelerated computing and AI infrastructure. It is a mature public company, so venture-round trend analysis does not apply.",
+    "trendSource": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm",
+    "fundingHistory": [],
+    "trendSources": [
+      "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm"
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://www.nvidia.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.nvidia.com/en-us/about-nvidia/board-of-directors/jensen-huang/"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/jenhsunhuang"
   },
   {
     "name": "Saket Modi",
@@ -282,7 +1045,55 @@
     "primaryDomain": "Cybersecurity, cyber risk quantification, threat exposure management, third-party risk",
     "website": "https://safe.security/",
     "profileSource": "https://safe.security/about-us/",
-    "dataStatus": "Founder biography, education, portrait, and financing timeline taken from SAFE Security's official site, checked 2026-11-01. The database record only said “Safe”; this directory match is SAFE Security (safe.security), not Safe{Wallet}."
+    "dataStatus": "Founder biography, education, portrait, and financing timeline taken from SAFE Security's official site, checked 2026-11-01. The database record only said “Safe”; this directory match is SAFE Security (safe.security), not Safe{Wallet}. Operating age and trend checked against linked company announcements/filings; age is approximate by founding year. Updated 2026-11-01.",
+    "companyFoundedYear": 2012,
+    "companyTenureLabel": "Operating since 2012 · about 14 years (as of Nov 2026)",
+    "companyMaturity": "Established · 10+ years",
+    "companyTrendSummary": "SAFE began in 2012, launched its platform in 2020, and says it has grown at an average 120% year on year since launch. It raised a $70M Series C in 2025 and expanded through the RiskLens and Balbix acquisitions. Growth and financing figures are company-reported.",
+    "trendSource": "https://safe.security/about-us/",
+    "fundingHistory": [
+      {
+        "round": "Series A",
+        "year": 2021,
+        "amount": 33000000,
+        "source": "https://safe.security/about-us/"
+      },
+      {
+        "round": "Series B",
+        "year": 2023,
+        "amount": 50000000,
+        "source": "https://safe.security/about-us/"
+      },
+      {
+        "round": "Series C",
+        "year": 2025,
+        "amount": 70000000,
+        "source": "https://safe.security/resources/press-release/safe-series-c-ctem-launch/"
+      }
+    ],
+    "trendSources": [
+      "https://safe.security/about-us/",
+      "https://safe.security/resources/press-release/safe-series-c-ctem-launch/"
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://safe.security/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://safe.security/about-us/"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://safe.security/about-us/"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://safe.security/resources/press-release/safe-series-c-ctem-launch/"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/samodi"
   },
   {
     "name": "Vidit Baxi",
@@ -299,7 +1110,54 @@
     "primaryDomain": "Cybersecurity, threat research, cyber risk management",
     "website": "https://safe.security/",
     "profileSource": "https://safe.security/about-us/",
-    "dataStatus": "Role, education, portrait, and company funding timeline checked against SAFE Security's official biography, 2026-11-01. The database node says only “Safe” and has no domain; SAFE Security is the demo's selected interpretation, so confirm the entity before external use."
+    "dataStatus": "Role, education, portrait, and company funding timeline checked against SAFE Security's official biography, 2026-11-01. The database node says only “Safe” and has no domain; SAFE Security is the demo's selected interpretation, so confirm the entity before external use. Operating age and trend checked against linked company announcements/filings; age is approximate by founding year. Updated 2026-11-01.",
+    "companyFoundedYear": 2012,
+    "companyTenureLabel": "Operating since 2012 · about 14 years (as of Nov 2026)",
+    "companyMaturity": "Established · 10+ years",
+    "companyTrendSummary": "SAFE began in 2012, launched its platform in 2020, and says it has grown at an average 120% year on year since launch. It raised a $70M Series C in 2025 and expanded through the RiskLens and Balbix acquisitions. Growth and financing figures are company-reported.",
+    "trendSource": "https://safe.security/about-us/",
+    "fundingHistory": [
+      {
+        "round": "Series A",
+        "year": 2021,
+        "amount": 33000000,
+        "source": "https://safe.security/about-us/"
+      },
+      {
+        "round": "Series B",
+        "year": 2023,
+        "amount": 50000000,
+        "source": "https://safe.security/about-us/"
+      },
+      {
+        "round": "Series C",
+        "year": 2025,
+        "amount": 70000000,
+        "source": "https://safe.security/resources/press-release/safe-series-c-ctem-launch/"
+      }
+    ],
+    "trendSources": [
+      "https://safe.security/about-us/",
+      "https://safe.security/resources/press-release/safe-series-c-ctem-launch/"
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://safe.security/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://safe.security/about-us/"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://safe.security/about-us/"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://safe.security/resources/press-release/safe-series-c-ctem-launch/"
+      }
+    ]
   },
   {
     "name": "Rahul Tyagi",
@@ -316,6 +1174,426 @@
     "primaryDomain": "Cybersecurity, cyber risk quantification, enterprise security",
     "website": "https://safe.security/",
     "profileSource": "https://safe.security/about-us/",
-    "dataStatus": "Role, education, portrait, and company funding timeline checked against SAFE Security's official biography, 2026-11-01. The database node says only “Safe” and has no domain; SAFE Security is the demo's selected interpretation, so confirm the entity before external use."
+    "dataStatus": "Role, education, portrait, and company funding timeline checked against SAFE Security's official biography, 2026-11-01. The database node says only “Safe” and has no domain; SAFE Security is the demo's selected interpretation, so confirm the entity before external use. Operating age and trend checked against linked company announcements/filings; age is approximate by founding year. Updated 2026-11-01.",
+    "companyFoundedYear": 2012,
+    "companyTenureLabel": "Operating since 2012 · about 14 years (as of Nov 2026)",
+    "companyMaturity": "Established · 10+ years",
+    "companyTrendSummary": "SAFE began in 2012, launched its platform in 2020, and says it has grown at an average 120% year on year since launch. It raised a $70M Series C in 2025 and expanded through the RiskLens and Balbix acquisitions. Growth and financing figures are company-reported.",
+    "trendSource": "https://safe.security/about-us/",
+    "fundingHistory": [
+      {
+        "round": "Series A",
+        "year": 2021,
+        "amount": 33000000,
+        "source": "https://safe.security/about-us/"
+      },
+      {
+        "round": "Series B",
+        "year": 2023,
+        "amount": 50000000,
+        "source": "https://safe.security/about-us/"
+      },
+      {
+        "round": "Series C",
+        "year": 2025,
+        "amount": 70000000,
+        "source": "https://safe.security/resources/press-release/safe-series-c-ctem-launch/"
+      }
+    ],
+    "trendSources": [
+      "https://safe.security/about-us/",
+      "https://safe.security/resources/press-release/safe-series-c-ctem-launch/"
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://safe.security/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://safe.security/about-us/"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://safe.security/about-us/"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://safe.security/resources/press-release/safe-series-c-ctem-launch/"
+      }
+    ]
+  },
+  {
+    "name": "Brian Chesky",
+    "company": "Airbnb",
+    "domain": "airbnb.com",
+    "headline": "Co-founder and CEO of Airbnb",
+    "avatar": null,
+    "about": "Designer and entrepreneur who co-founded Airbnb with Joe Gebbia and Nathan Blecharczyk. Airbnb began with hosted stays in 2007 and developed into a global marketplace for lodging and experiences. Chesky leads company vision and strategy.",
+    "experience": "Airbnb — Co-founder and CEO; first host in 2007; leads company strategy and product direction. Before Airbnb, worked as an industrial designer in Los Angeles.",
+    "education": "Bachelor of Fine Arts, Rhode Island School of Design (RISD).",
+    "pastInvestments": "This profile focuses on Chesky’s founder and operating history; it does not claim a complete personal investment portfolio.",
+    "companyFunding": "Airbnb became a publicly listed company in 2020. Its latest cited full-year results show 2025 revenue growth of 12% in Q4, gross booking value growth of 16%, and nights and seats booked growth of 10% year over year. These are operating metrics, not financing-round sizes.",
+    "primaryDomain": "Travel marketplace, lodging, experiences, consumer internet, product design",
+    "website": "https://www.airbnb.com/",
+    "profileSource": "https://news.airbnb.com/about-us/leadership/brian-chesky",
+    "dataStatus": "Role and RISD education verified on Airbnb’s leadership page; 2007 first-host milestone and 2025 operating trend verified from Airbnb company sources. Trend describes company metrics, not personal wealth or fundraising. Updated 2026-11-01. Public LinkedIn profile, external links, and relationship sources added 2026-11-01.",
+    "companyFoundedYear": 2008,
+    "companyTenureLabel": "Operating since 2008 · about 18 years (as of Nov 2026)",
+    "companyMaturity": "Established · 10+ years",
+    "companyTrendSummary": "Airbnb grew from a small home-sharing launch into a marketplace with more than 5.5 million hosts and over 2.5 billion guest arrivals across 220+ countries and regions, according to its company profile. In Q4 2025 revenue grew 12%, gross booking value 16%, and nights and seats booked 10% year over year. The company is extending beyond stays into services, experiences, and AI-supported product changes.",
+    "trendSource": "https://news.airbnb.com/airbnb-q4-2025-financial-results",
+    "fundingHistory": [],
+    "trendSources": [
+      "https://news.airbnb.com/airbnb-q4-2025-financial-results",
+      "https://news.airbnb.com/about-us/leadership/brian-chesky"
+    ],
+    "linkedin": "https://www.linkedin.com/in/brianchesky",
+    "publicConnections": [
+      {
+        "name": "Joe Gebbia",
+        "relationship": "Airbnb co-founder and early teammate.",
+        "source": "https://news.airbnb.com/about-us/leadership/brian-chesky"
+      },
+      {
+        "name": "Nathan Blecharczyk",
+        "relationship": "Airbnb co-founder and early teammate.",
+        "source": "https://news.airbnb.com/about-us/leadership/brian-chesky"
+      },
+      {
+        "name": "Mary Meeker · BOND",
+        "relationship": "Investment relationship: BOND lists Airbnb among its portfolio or investment examples. This documents a firm-level link, not personal contact.",
+        "source": "https://www.bondcap.com/partners/mary-meeker/"
+      },
+      {
+        "name": "Peter Thiel · Founders Fund",
+        "relationship": "Investment relationship: Founders Fund lists Airbnb among its portfolio or investment examples. This documents a firm-level link, not personal contact.",
+        "source": "https://foundersfund.com/team/peter-thiel/"
+      },
+      {
+        "name": "Reid Hoffman · Greylock Partners",
+        "relationship": "Investment relationship: Greylock Partners lists Airbnb among its portfolio or investment examples. This documents a firm-level link, not personal contact.",
+        "source": "https://greylock.com/team/reid-hoffman/"
+      },
+      {
+        "name": "Alfred Lin · Sequoia Capital",
+        "relationship": "Investment relationship: Sequoia Capital lists Airbnb among its portfolio or investment examples. This documents a firm-level link, not personal contact.",
+        "source": "https://sequoiacap.com/people/alfred-lin"
+      }
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://www.airbnb.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://news.airbnb.com/about-us/leadership/brian-chesky"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://news.airbnb.com/airbnb-q4-2025-financial-results"
+      }
+    ]
+  },
+  {
+    "name": "Tobi Lütke",
+    "company": "Shopify",
+    "domain": "shopify.com",
+    "headline": "Co-founder and CEO of Shopify",
+    "avatar": null,
+    "about": "German-born programmer and entrepreneur who co-founded Shopify after building software for an online snowboard shop. He helped turn that internal commerce software into a merchant platform and served first as CTO, then CEO from 2008. His route into technology included vocational software training rather than a university degree.",
+    "experience": "Shopify — Co-founder, CTO (2004–2008), CEO since 2008, and board member. Core team member of Ruby on Rails and author of open-source commerce libraries including Active Merchant and Liquid.",
+    "education": "Left school at 16 and completed a German vocational apprenticeship in computer programming (Fachinformatiker); no university degree is claimed.",
+    "pastInvestments": "This profile focuses on Shopify and open-source software work. It does not present a complete personal investment portfolio.",
+    "companyFunding": "Shopify has been publicly listed since 2015. In Q2 2026, revenue was $3.583 billion, up 34% year over year, while gross merchandise volume was $115.6 billion, up 32%. GMV is merchant sales processed through the platform, not Shopify revenue.",
+    "primaryDomain": "Commerce infrastructure, e-commerce, merchant software, payments, entrepreneurship",
+    "website": "https://www.shopify.com/",
+    "profileSource": "https://www.shopify.com/investors/board-of-directors",
+    "dataStatus": "Co-founder timeline and CEO tenure verified on Shopify’s board page; apprenticeship background cross-checked against Lütke’s own writing; Q2 2026 metrics from Shopify investor relations. Updated 2026-11-01. Public LinkedIn profile, external links, and relationship sources added 2026-11-01.",
+    "companyFoundedYear": 2004,
+    "companyTenureLabel": "Co-founded in 2004 · about 22 years (as of Nov 2026)",
+    "companyMaturity": "Established · 10+ years",
+    "companyTrendSummary": "Shopify began as software for Snowdevil and launched as a merchant platform in 2006. Its trajectory expanded from online storefronts into in-person commerce, payments, fulfillment partners, lending, and merchant services. Q2 2026 revenue grew 34% and GMV 32% year over year; millions of businesses in 175+ countries use Shopify.",
+    "trendSource": "https://www.shopify.com/investors/press-releases/shopify-delivers-big-30-growth-across-gmv-revenue-gross-profit",
+    "fundingHistory": [],
+    "trendSources": [
+      "https://www.shopify.com/investors/press-releases/shopify-delivers-big-30-growth-across-gmv-revenue-gross-profit",
+      "https://www.shopify.com/investors/board-of-directors",
+      "https://tobi.lutke.com/pages/about"
+    ],
+    "linkedin": "https://ca.linkedin.com/in/tobiaslutke",
+    "publicConnections": [
+      {
+        "name": "Scott Lake",
+        "relationship": "Shopify co-founder; partnered with Lütke to build the company after the founders launched an online snowboard store.",
+        "source": "https://www.shopify.com/investors/board-of-directors"
+      },
+      {
+        "name": "Harley Finkelstein",
+        "relationship": "Shopify President and long-time executive collaborator.",
+        "source": "https://www.shopify.com/investors/board-of-directors"
+      }
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://www.shopify.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.shopify.com/investors/board-of-directors"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://www.shopify.com/investors/press-releases/shopify-delivers-big-30-growth-across-gmv-revenue-gross-profit"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://tobi.lutke.com/pages/about"
+      }
+    ]
+  },
+  {
+    "name": "Tony Xu",
+    "company": "DoorDash",
+    "domain": "doordash.com",
+    "headline": "Co-founder and CEO of DoorDash",
+    "avatar": null,
+    "about": "Technology and local-commerce entrepreneur who co-founded DoorDash and helped build it from a restaurant-delivery service into a broader local commerce platform. He has served as CEO and a director since May 2013 and joined Meta’s board in 2022.",
+    "experience": "DoorDash — Co-founder, CEO, and director since May 2013; helped execute early local merchant delivery and later expansion into grocery, retail, merchant software, and international markets. Meta Platforms — board director since 2022.",
+    "education": "BS, Industrial Engineering and Operations Research, University of California, Berkeley; MBA, Stanford Graduate School of Business.",
+    "pastInvestments": "Public director roles listed by DoorDash include Meta Platforms. No personal private-market investment portfolio is asserted.",
+    "companyFunding": "DoorDash has been publicly listed since 2020. In Q3 2026 it reported 993 million total orders (+28% year over year), $33.9 billion Marketplace GOV (+36%), and $4.6 billion revenue (+34%); excluding Deliveroo, reported growth was lower. It announced a proposed Instacart acquisition on Oct. 29, 2026, expected to close in late 2027 or H1 2028 if approvals are obtained.",
+    "primaryDomain": "Local commerce, food delivery, logistics, merchant technology, marketplaces",
+    "website": "https://www.doordash.com/",
+    "profileSource": "https://ir.doordash.com/governance/board-of-directors/person-details/default.aspx",
+    "dataStatus": "Co-founder role, CEO tenure, board service, and education verified on DoorDash investor relations; current operating metrics and proposed acquisition checked against Q3 2026 results. Acquisition is announced, not completed. Updated 2026-11-01. Public LinkedIn profile, external links, and relationship sources added 2026-11-01.",
+    "companyFoundedYear": 2013,
+    "companyTenureLabel": "Operating since May 2013 · about 13 years (as of Nov 2026)",
+    "companyMaturity": "Established · 10+ years",
+    "companyTrendSummary": "DoorDash expanded from restaurant delivery into grocery, retail, merchant tools, reservations, and international operations through Wolt and Deliveroo. Q3 2026 total orders grew 28%, Marketplace GOV 36%, and revenue 34% year over year; excluding Deliveroo, orders grew 17% and revenue 23%. A proposed Instacart acquisition is pending regulatory and shareholder approvals.",
+    "trendSource": "https://ir.doordash.com/news/news-details/2026/DoorDash-Releases-Third-Quarter-2026-Financial-Results/default.aspx",
+    "fundingHistory": [],
+    "trendSources": [
+      "https://ir.doordash.com/news/news-details/2026/DoorDash-Releases-Third-Quarter-2026-Financial-Results/default.aspx",
+      "https://ir.doordash.com/governance/board-of-directors/person-details/default.aspx"
+    ],
+    "linkedin": "https://www.linkedin.com/in/xutony",
+    "publicConnections": [
+      {
+        "name": "Andy Fang",
+        "relationship": "DoorDash co-founder and engineering leader.",
+        "source": "https://ir.doordash.com/governance/board-of-directors/person-details/default.aspx"
+      },
+      {
+        "name": "Stanley Tang",
+        "relationship": "DoorDash co-founder and product leader.",
+        "source": "https://ir.doordash.com/governance/board-of-directors/person-details/default.aspx"
+      },
+      {
+        "name": "Meta Platforms",
+        "relationship": "Xu has served on Meta’s board of directors.",
+        "source": "https://ir.doordash.com/governance/board-of-directors/person-details/default.aspx"
+      },
+      {
+        "name": "Vinod Khosla · Khosla Ventures",
+        "relationship": "Investment relationship: Khosla Ventures lists DoorDash among its portfolio or investment examples. This documents a firm-level link, not personal contact.",
+        "source": "https://www.khoslaventures.com/team/vinod-khosla"
+      }
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://www.doordash.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://ir.doordash.com/governance/board-of-directors/person-details/default.aspx"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://ir.doordash.com/news/news-details/2026/DoorDash-Releases-Third-Quarter-2026-Financial-Results/default.aspx"
+      }
+    ]
+  },
+  {
+    "name": "Katrina Lake",
+    "company": "Stitch Fix",
+    "domain": "stitchfix.com",
+    "headline": "Founder and Executive Chair of Stitch Fix",
+    "avatar": null,
+    "about": "Founder and retail technology entrepreneur who started Stitch Fix while studying at Harvard Business School. The company combines algorithm-assisted item selection with human stylists and client feedback. Lake has been CEO, executive chair, and interim CEO at different points; she is listed as founder and Executive Chair in the company’s current public materials.",
+    "experience": "Stitch Fix — Founder (2011), former CEO, interim CEO in 2023, and Executive Chairperson of the Board. Before founding the company, worked at Polyvore, The Parthenon Group, and Leader Ventures.",
+    "education": "BA, Economics, Stanford University; MBA, Harvard Business School.",
+    "pastInvestments": "Public biographies describe earlier work with startups at Leader Ventures and board service at consumer companies; no comprehensive personal investment portfolio is claimed.",
+    "companyFunding": "Stitch Fix became publicly listed in 2017. Fiscal 2026 net revenue was $1.348 billion, up 6.4% year over year; net revenue per active client rose 7.8%. The company forecast a 2.8% decline to 0.9% growth in FY2027 revenue and cited a lower client base and consumer pressure, so the recent rebound remains uneven.",
+    "primaryDomain": "Retail technology, apparel, personal styling, data science, consumer subscription",
+    "website": "https://www.stitchfix.com/",
+    "profileSource": "https://www.stitchfix.com/about",
+    "dataStatus": "Founder story from Stitch Fix; education and earlier roles from company-issued biography; current role and FY2026 results verified with current company investor-relations materials. Updated 2026-11-01. Public LinkedIn profile, external links, and relationship sources added 2026-11-01.",
+    "companyFoundedYear": 2011,
+    "companyTenureLabel": "Founded February 2011 · about 15 years (as of Nov 2026)",
+    "companyMaturity": "Established · 10+ years",
+    "companyTrendSummary": "Stitch Fix grew from Lake shipping the first curated clothing boxes from her Cambridge apartment into an online personal styling business with Fix shipments and Freestyle direct shopping. Revenue returned to growth in FY2026 (+6.4%) and revenue per active client increased 7.8%, but FY2027 guidance points to flat-to-down revenue amid a lower client base and consumer pressure. The trajectory is recovery with execution risks, not uninterrupted growth.",
+    "trendSource": "https://investors.stitchfix.com/news-events/press-releases/news-details/2026/Stitch-Fix-Announces-Fourth-Quarter-and-Full-Fiscal-Year-2026-Financial-Results/default.aspx",
+    "fundingHistory": [],
+    "trendSources": [
+      "https://investors.stitchfix.com/news-events/press-releases/news-details/2026/Stitch-Fix-Announces-Fourth-Quarter-and-Full-Fiscal-Year-2026-Financial-Results/default.aspx",
+      "https://www.stitchfix.com/about",
+      "https://investors.stitchfix.com/shareholder-services/investor-faqs/"
+    ],
+    "linkedin": "https://www.linkedin.com/in/kmlake",
+    "publicConnections": [
+      {
+        "name": "Emily Weiss",
+        "relationship": "Katrina Lake joined the Glossier board; Emily Weiss is Glossier’s founder.",
+        "source": "https://www.linkedin.com/in/kmlake"
+      },
+      {
+        "name": "Kirsten Green · Forerunner Ventures",
+        "relationship": "Publicly documented Glossier connection: Forerunner lists Glossier among its investments, and Lake announced joining Glossier’s board.",
+        "source": "https://www.forerunnerventures.com/"
+      },
+      {
+        "name": "Bill Gurley · Benchmark",
+        "relationship": "Investment relationship: Benchmark lists Stitch Fix among its portfolio or investment examples. This documents a firm-level link, not personal contact.",
+        "source": "https://www.p3.institute/about/"
+      }
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://www.stitchfix.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.stitchfix.com/about"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://investors.stitchfix.com/news-events/press-releases/news-details/2026/Stitch-Fix-Announces-Fourth-Quarter-and-Full-Fiscal-Year-2026-Financial-Results/default.aspx"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://investors.stitchfix.com/shareholder-services/investor-faqs/"
+      }
+    ]
+  },
+  {
+    "name": "Patrick Collison",
+    "company": "Stripe",
+    "domain": "stripe.com",
+    "headline": "Co-founder and CEO of Stripe",
+    "avatar": null,
+    "about": "Irish technology entrepreneur who co-founded Stripe with his brother John to make online payments and other financial infrastructure easier for businesses to use. Before Stripe, Patrick co-founded Auctomatic, a marketplace software company. His public bio also names him as a co-founder of the Arc Institute.",
+    "experience": "Stripe — Co-founder and CEO since 2010. Auctomatic — Co-founder; company acquired in 2008. Arc Institute — Co-founder. Earlier work includes entrepreneurship and programming from a young age.",
+    "education": "Studied mathematics at MIT, leaving before graduating to build Auctomatic; later returned to MIT before leaving again to co-found Stripe. No completed university degree is claimed.",
+    "pastInvestments": "This profile emphasizes company-building roles. Stripe’s annual letter mentions some outside investor activities by the company but does not establish a complete personal investment list for Collison.",
+    "companyFunding": "Stripe is privately held. In Feb. 2026, the company said businesses processed $1.9 trillion in total volume in 2025 (+34% from 2024), and its financial-products Revenue suite was on track for a $1 billion annual run rate in 2026. Payment volume is not Stripe revenue.",
+    "primaryDomain": "Financial infrastructure, payments, internet economy, developer tools, company formation",
+    "website": "https://stripe.com/",
+    "profileSource": "https://stripe.com/gb/newsroom/information",
+    "dataStatus": "Current Stripe role and operating metrics verified from Stripe newsroom and annual letter; education detail checked against Patrick Collison’s self-authored bio and public interviews. Updated 2026-11-01. Public LinkedIn profile, external links, and relationship sources added 2026-11-01.",
+    "companyFoundedYear": 2010,
+    "companyTenureLabel": "Operating since 2010 · about 16 years (as of Nov 2026)",
+    "companyMaturity": "Established · 10+ years",
+    "companyTrendSummary": "Stripe has expanded from online card processing to billing, tax, invoicing, incorporation services, and programmable financial products. Businesses on Stripe processed $1.9 trillion in 2025, up 34% year over year; Stripe said its Revenue suite was tracking toward a $1 billion annual run rate in 2026 and the company remained profitable. These figures reflect platform volume and product run rate, not venture funding.",
+    "trendSource": "https://stripe.com/newsroom/news/stripe-2025-update",
+    "fundingHistory": [],
+    "trendSources": [
+      "https://stripe.com/newsroom/news/stripe-2025-update",
+      "https://stripe.com/gb/newsroom/information",
+      "https://patrickcollison.com/about"
+    ],
+    "linkedin": "https://www.linkedin.com/in/patrickcollison",
+    "publicConnections": [
+      {
+        "name": "John Collison",
+        "relationship": "Stripe co-founder and company president; Patrick and John are brothers.",
+        "source": "https://stripe.com/gb/newsroom/information"
+      },
+      {
+        "name": "Arc Institute",
+        "relationship": "Collison is a co-founder of the nonprofit biomedical research institute.",
+        "source": "https://patrickcollison.com/about"
+      },
+      {
+        "name": "Vinod Khosla · Khosla Ventures",
+        "relationship": "Investment relationship: Khosla Ventures lists Stripe among its portfolio or investment examples. This documents a firm-level link, not personal contact.",
+        "source": "https://www.khoslaventures.com/team/vinod-khosla"
+      }
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://stripe.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://stripe.com/gb/newsroom/information"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://stripe.com/newsroom/news/stripe-2025-update"
+      },
+      {
+        "label": "Company trend source",
+        "url": "https://patrickcollison.com/about"
+      }
+    ]
+  },
+  {
+    "name": "Whitney Wolfe Herd",
+    "company": "Bumble",
+    "domain": "bumble.com",
+    "headline": "Founder and CEO of Bumble",
+    "avatar": null,
+    "about": "Consumer technology founder who co-founded Tinder and then founded Bumble in 2014 around a women-centered approach to initiating conversations. She served as Bumble CEO, became Executive Chair in 2024, and returned as CEO in March 2025.",
+    "experience": "Bumble — Founder; CEO from 2020 to Jan. 2024 and again since March 2025; Executive Chair from Jan. 2024 to March 2025. Tinder — Co-founder and Vice President of Marketing from 2012 to 2014.",
+    "education": "BA, International Studies, Southern Methodist University.",
+    "pastInvestments": "This profile focuses on founder and operator history; it does not claim a complete personal investment portfolio.",
+    "companyFunding": "Bumble has been publicly listed since 2021. In Q2 2026, total revenue declined 15.2% year over year to $210.5 million and total paying users declined 16.4% to 3.2 million. The company is investing in a platform migration, new matching and conversation features, and new ways to meet offline; the reported trend is a business transformation amid near-term contraction.",
+    "primaryDomain": "Consumer social, dating, online communities, relationships, mobile applications",
+    "website": "https://bumble.com/",
+    "profileSource": "https://ir.bumble.com/governance/board-of-directors/person-details/default.aspx?ItemId=b318523a-18dd-4fde-8495-f1211b9f0659",
+    "dataStatus": "CEO transitions, Tinder role, and SMU education verified on Bumble investor relations. Q2 2026 operating results and transformation plan verified against the company’s results announcement. Updated 2026-11-01. Public LinkedIn profile, external links, and relationship sources added 2026-11-01.",
+    "companyFoundedYear": 2014,
+    "companyTenureLabel": "Founded in 2014 · nearly 12 years (as of Nov 2026)",
+    "companyMaturity": "Established · 10+ years",
+    "companyTrendSummary": "Bumble grew from a dating app into a public consumer platform with Bumble, Badoo, and BFF products. The current trajectory is a product and platform reset rather than simple growth: Q2 2026 revenue was down 15.2% and paying users down 16.4% year over year, while leadership is changing the matching experience, conversation tools, and in-person discovery.",
+    "trendSource": "https://ir.bumble.com/news/news-details/2026/Bumble-Inc--Announces-Second-Quarter-2026-Results/default.aspx",
+    "fundingHistory": [],
+    "trendSources": [
+      "https://ir.bumble.com/news/news-details/2026/Bumble-Inc--Announces-Second-Quarter-2026-Results/default.aspx",
+      "https://ir.bumble.com/governance/board-of-directors/person-details/default.aspx?ItemId=b318523a-18dd-4fde-8495-f1211b9f0659"
+    ],
+    "linkedin": "https://www.linkedin.com/in/whitney-wolfe-herd-1791a299/",
+    "publicConnections": [
+      {
+        "name": "Andrey Andreev",
+        "relationship": "Partnered with Wolfe Herd to launch Bumble; he supplied early backing and technology through Badoo.",
+        "source": "https://ir.bumble.com/governance/board-of-directors/person-details/default.aspx?ItemId=b318523a-18dd-4fde-8495-f1211b9f0659"
+      },
+      {
+        "name": "Tinder founding team",
+        "relationship": "Wolfe Herd was a co-founder and early marketing executive at Tinder before starting Bumble.",
+        "source": "https://ir.bumble.com/governance/board-of-directors/person-details/default.aspx?ItemId=b318523a-18dd-4fde-8495-f1211b9f0659"
+      }
+    ],
+    "otherLinks": [
+      {
+        "label": "Company site",
+        "url": "https://bumble.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://ir.bumble.com/governance/board-of-directors/person-details/default.aspx?ItemId=b318523a-18dd-4fde-8495-f1211b9f0659"
+      },
+      {
+        "label": "Company and trend source",
+        "url": "https://ir.bumble.com/news/news-details/2026/Bumble-Inc--Announces-Second-Quarter-2026-Results/default.aspx"
+      }
+    ]
   }
 ]

@@ -6,7 +6,7 @@
     "firm_name": "Upfront Ventures",
     "avatar": "https://assets-global.website-files.com/61fb37e7b711d5877396fabd/62202e18fa9f5f46a254c4ed_gg-board-of-directors-mark-suster.jpg",
     "avatarSource": "https://gumgum.com/leadership",
-    "dataStatus": "Career, education, and listed investment examples checked against public reporting dated 2026; verify changes with Upfront.",
+    "dataStatus": "Career, education, and listed investment examples checked against public reporting dated 2026; verify changes with Upfront. Firm age and investment focus checked against the linked firm source; age is approximate by founding year. Updated 2026-11-01.",
     "profileSource": "https://labusinessjournal.com/la500-2026/banking-finance-2026/la500-2026-mark-suster/",
     "website": "https://upfront.com",
     "about": "Managing Partner at Upfront Ventures and a two-time software founder. He founded Citadon and Koral; Koral was acquired by Salesforce, where he served as a vice president. Public reporting names Invoca, Density, Nanit, and Maker Studios among investments he led.",
@@ -15,7 +15,27 @@
     "pastInvestments": "Reported investments: Invoca, Density, Nanit, Maker Studios. Past founder/operator roles: Koral (acquired by Salesforce) and Citadon. Deal attribution and current status should be checked against Upfront disclosures.",
     "investmentStage": "Early stage; verify current fund mandate",
     "primaryDomain": "Enterprise software, SaaS, marketplaces; confirm sector fit",
-    "location": "Los Angeles, California"
+    "location": "Los Angeles, California",
+    "firmFoundedYear": 1996,
+    "firmTenureLabel": "Firm active since 1996 · about 30 years (as of Nov 2026)",
+    "firmMaturity": "Established · 10+ years",
+    "firmHistorySource": "https://www.linkedin.com/company/upfront-ventures",
+    "investmentTrendSummary": "Upfront has backed more than 200 companies since its 1996 founding and is an established Los Angeles multi-stage investor. This profile lists selected investments, not a complete portfolio.",
+    "otherLinks": [
+      {
+        "label": "Fund / platform",
+        "url": "https://upfront.com"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://labusinessjournal.com/la500-2026/banking-finance-2026/la500-2026-mark-suster/"
+      },
+      {
+        "label": "Fund history source",
+        "url": "https://www.linkedin.com/company/upfront-ventures"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/marksuster"
   },
   {
     "id": 2,
@@ -23,7 +43,7 @@
     "headline": "Co-founder & General Partner at Hustle Fund",
     "firm_name": "Hustle Fund",
     "avatar": "https://cdn.prod.website-files.com/6331a9a50eb8aa050b52dd52/633567d4ef2ab96b875547a2_elizabeth.png",
-    "dataStatus": "Profile checked against Hustle Fund public pages on 2026-11-01; confirm current role, mandate, and availability.",
+    "dataStatus": "Profile checked against Hustle Fund public pages on 2026-11-01; confirm current role, mandate, and availability. Firm age and investment focus checked against the linked firm source; age is approximate by founding year. Updated 2026-11-01.",
     "profileSource": "https://www.hustlefund.vc/e-book",
     "about": "Co-founder and General Partner at Hustle Fund. Before Hustle Fund, she was a partner at 500 Startups, where she invested in seed-stage companies and ran the Mountain View accelerator. Earlier, she co-founded ad-tech company LaunchBit, acquired in 2014.",
     "experience": "Hustle Fund (Co-founder & General Partner); 500 Startups (Partner; seed investor and accelerator lead); LaunchBit (Co-founder).",
@@ -32,7 +52,27 @@
     "location": "San Francisco Bay Area",
     "website": "https://hustlefund.vc",
     "education": "Not stated on the linked public biography.",
-    "pastInvestments": "Career and investment examples: LaunchBit (co-founded; acquired 2014); at 500 Startups, she invested in seed-stage companies. No Hustle Fund deal is attributed to her individually here."
+    "pastInvestments": "Career and investment examples: LaunchBit (co-founded; acquired 2014); at 500 Startups, she invested in seed-stage companies. No Hustle Fund deal is attributed to her individually here.",
+    "firmFoundedYear": 2017,
+    "firmTenureLabel": "Firm active since 2017 · about 9 years (as of Nov 2026)",
+    "firmMaturity": "Emerging · under 10 years",
+    "firmHistorySource": "https://www.hustlefund.vc/",
+    "investmentTrendSummary": "Hustle Fund is a newer firm focused on pre-seed and seed deals; its founder came from 500 Startups and previously built LaunchBit. The current profile emphasizes early-stage investing.",
+    "otherLinks": [
+      {
+        "label": "Fund / platform",
+        "url": "https://hustlefund.vc"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.hustlefund.vc/e-book"
+      },
+      {
+        "label": "Fund history source",
+        "url": "https://www.hustlefund.vc/"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/elizabethyin"
   },
   {
     "id": 3,
@@ -40,7 +80,7 @@
     "headline": "General Partner at NFX",
     "firm_name": "NFX",
     "avatar": "https://content.nfx.com/wp-content/uploads/2019/07/Pete-Flint-Thumbnail-V2.png",
-    "dataStatus": "Profile checked against NFX public page on 2026-11-01; confirm current role, mandate, and availability.",
+    "dataStatus": "Profile checked against NFX public page on 2026-11-01; confirm current role, mandate, and availability. Firm age and investment focus checked against the linked firm source; age is approximate by founding year. Updated 2026-11-01.",
     "profileSource": "https://www.nfx.com/team/pete-flint",
     "about": "General Partner at NFX; co-founder and former CEO of Trulia and founding team member at lastminute.com. NFX lists focus areas including proptech, fintech, marketplaces, generative AI and space.",
     "experience": "NFX (General Partner, 2016–present); Trulia (Founder & CEO, 2004–2015); lastminute.com (founding team, 1998–2003).",
@@ -49,7 +89,27 @@
     "primaryDomain": "Proptech, fintech, marketplaces, generative AI, space",
     "location": "San Francisco",
     "website": "https://www.nfx.com",
-    "pastInvestments": "NFX profile examples include Tomo, Let’s Do This, Lev, SESO, Tailorbird, DNK, Camu, and Hitch. This is a selected profile list, not a complete current portfolio."
+    "pastInvestments": "NFX profile examples include Tomo, Let’s Do This, Lev, SESO, Tailorbird, DNK, Camu, and Hitch. This is a selected profile list, not a complete current portfolio.",
+    "firmFoundedYear": 2015,
+    "firmTenureLabel": "Firm active since 2015 · about 11 years (as of Nov 2026)",
+    "firmMaturity": "Established · 10+ years",
+    "firmHistorySource": "https://www.nfx.com/about",
+    "investmentTrendSummary": "NFX is an 11-year-old early-stage firm organized around network effects and founders building marketplaces, fintech, and related technology companies.",
+    "otherLinks": [
+      {
+        "label": "Fund / platform",
+        "url": "https://www.nfx.com"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.nfx.com/team/pete-flint"
+      },
+      {
+        "label": "Fund history source",
+        "url": "https://www.nfx.com/about"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/peteflint"
   },
   {
     "id": 4,
@@ -58,7 +118,7 @@
     "firm_name": "Marathon Management Partners",
     "avatar": "https://pbs.twimg.com/profile_images/967146848082321408/6IHD3HIa.jpg",
     "avatarSource": "https://x.com/gokulr",
-    "dataStatus": "Profile details checked against personal site on 2026-11-01; confirm current firm and investment availability.",
+    "dataStatus": "Profile details checked against personal site on 2026-11-01; confirm current firm and investment availability. Firm age and investment focus checked against the linked firm source; age is approximate by founding year. Updated 2026-11-01.",
     "profileSource": "https://gokulrajaram.com/home",
     "website": "https://gokulrajaram.com/home",
     "about": "Early-stage technology investor, product leader, operator, and board member. His personal site describes leadership work at Alphabet, Block, Coinbase, DoorDash, Meta, Pinterest, and The Trade Desk, and lists investments across enterprise software, fintech, marketplaces, and developer tools.",
@@ -67,7 +127,30 @@
     "pastInvestments": "Publicly listed angel investments include Alation, Airtable, BetterUp, Cockroach Labs, Coda, Cohesity, Deel, Faire, FanDuel, Figma, Groq, Ironclad, Postman, Supabase, Vercel, and Vungle. Listed by his personal site; may not be exhaustive.",
     "investmentStage": "Early-stage technology; specific check size and availability not published",
     "primaryDomain": "Product-led technology, enterprise software, fintech, marketplaces",
-    "location": "United States; confirm current location"
+    "location": "United States; confirm current location",
+    "firmFoundedYear": null,
+    "firmTenureLabel": "Newer vehicle · public founding year not confirmed",
+    "firmMaturity": "Emerging / year unconfirmed",
+    "firmHistorySource": "https://gokulrajaram.com/home",
+    "investmentTrendSummary": "Marathon Management Partners is presented as a newer independent investment vehicle. A reliable public launch year was not identified; the profile describes Gokul’s broader angel and operator history instead.",
+    "otherLinks": [
+      {
+        "label": "Fund / platform",
+        "url": "https://gokulrajaram.com/home"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://gokulrajaram.com/home"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/gokulrajaram1",
+    "publicConnections": [
+      {
+        "name": "Dylan Field · Figma",
+        "relationship": "Portfolio relationship: Figma is named in Gokul Rajaram’s public investment examples. This is a firm or portfolio link, not a claim of personal contact.",
+        "source": "https://gokulrajaram.com/home"
+      }
+    ]
   },
   {
     "id": 5,
@@ -76,7 +159,7 @@
     "firm_name": "Bowery Capital",
     "avatar": "https://cdn.prod.website-files.com/62f543f81cd426262b783c80/640271b92020646f719d4998_1516239421871.jpeg",
     "avatarSource": "https://www.vcsheet.com/who/michael-brown",
-    "dataStatus": "Name corrected from “Mike Brown Jr” to Michael Brown based on Bowery Capital public bylines; confirm current title and investment role.",
+    "dataStatus": "Name corrected from “Mike Brown Jr” to Michael Brown based on Bowery Capital public bylines; confirm current title and investment role. Firm age and investment focus checked against the linked firm source; age is approximate by founding year. Updated 2026-11-01.",
     "profileSource": "https://bowerycap.com/blog/insights/our-mission-our-values-our-ambition",
     "website": "https://bowerycap.com",
     "about": "Bowery Capital describes a B2B-focused investment firm supporting founders with go-to-market, hiring, business development, and revenue expertise. Michael Brown has published the firm’s mission and strategy. Public sources do not establish that every firm portfolio deal was personally led by him.",
@@ -85,7 +168,26 @@
     "pastInvestments": "Firm-level examples shown on Bowery Capital’s site include Cerby, Klir, and Harmonyze testimonials. These are firm relationships, not verified personal deal attribution.",
     "investmentStage": "Pre-seed and seed; B2B only (firm strategy)",
     "primaryDomain": "B2B software, SaaS, marketplaces, go-to-market",
-    "location": "New York, New York"
+    "location": "New York, New York",
+    "firmFoundedYear": 2013,
+    "firmTenureLabel": "Firm active since 2013 · about 13 years (as of Nov 2026)",
+    "firmMaturity": "Established · 10+ years",
+    "firmHistorySource": "https://bowerycap.com/",
+    "investmentTrendSummary": "Bowery Capital is a 13-year-old B2B-focused venture firm; its stated investment lens centers on enterprise software and technology-enabled business services.",
+    "otherLinks": [
+      {
+        "label": "Fund / platform",
+        "url": "https://bowerycap.com"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://bowerycap.com/blog/insights/our-mission-our-values-our-ambition"
+      },
+      {
+        "label": "Fund history source",
+        "url": "https://bowerycap.com/"
+      }
+    ]
   },
   {
     "id": 6,
@@ -93,7 +195,7 @@
     "headline": "Founding GP at Eniac Ventures",
     "firm_name": "Eniac Ventures",
     "avatar": "https://cdn.prod.website-files.com/65075d908dc606f15ff84293/656f999248f78c7e23072616_Nihal%20%281%29.png",
-    "dataStatus": "Profile checked against Eniac public page on 2026-11-01; confirm current role, mandate, and availability.",
+    "dataStatus": "Profile checked against Eniac public page on 2026-11-01; confirm current role, mandate, and availability. Firm age and investment focus checked against the linked firm source; age is approximate by founding year. Updated 2026-11-01.",
     "profileSource": "https://www.eniac.vc/team",
     "about": "Co-founder and General Partner at Eniac Ventures. Eniac describes him as a serial founder and early-stage investor, with experience across consumer technology and company building.",
     "experience": "Eniac Ventures (Co-founder & General Partner); founded multiple startups; angel investor.",
@@ -101,7 +203,27 @@
     "investmentStage": "Early-stage; confirm current fund mandate",
     "primaryDomain": "Technology and consumer; validate fit with Eniac",
     "website": "https://www.eniac.vc",
-    "pastInvestments": "Selected Eniac profile examples: Alloy, Brightwheel, AdMob, Tala, Uber, Vistar Media, Vungle, mParticle, Ghost, and Ginger. Eniac lists current and realized investments; verify each company’s status on its profile."
+    "pastInvestments": "Selected Eniac profile examples: Alloy, Brightwheel, AdMob, Tala, Uber, Vistar Media, Vungle, mParticle, Ghost, and Ginger. Eniac lists current and realized investments; verify each company’s status on its profile.",
+    "firmFoundedYear": 2009,
+    "firmTenureLabel": "Firm active since 2009 · about 17 years (as of Nov 2026)",
+    "firmMaturity": "Established · 10+ years",
+    "firmHistorySource": "https://eniac.vc/",
+    "investmentTrendSummary": "Eniac Ventures has operated since 2009 and has maintained a seed-stage focus across consumer, mobile, and enterprise technology.",
+    "otherLinks": [
+      {
+        "label": "Fund / platform",
+        "url": "https://www.eniac.vc"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.eniac.vc/team"
+      },
+      {
+        "label": "Fund history source",
+        "url": "https://eniac.vc/"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/nihalmehta"
   },
   {
     "id": 7,
@@ -110,7 +232,7 @@
     "firm_name": "Boost VC",
     "avatar": "https://s3.us-west-1.amazonaws.com/redwood-labs/showpage/uploads/images/66867ea01289460ba4e1985fae25b4b6.png",
     "avatarSource": "https://www.futurized.org/guests/adam-draper/",
-    "dataStatus": "Profile checked against Boost VC public site on 2026-11-01; verify current program terms.",
+    "dataStatus": "Profile checked against Boost VC public site on 2026-11-01; verify current program terms. Firm age and investment focus checked against the linked firm source; age is approximate by founding year. Updated 2026-11-01.",
     "profileSource": "https://www.boost.vc/",
     "website": "https://www.boost.vc/",
     "about": "Founder and Managing Director of Boost VC, an early-stage firm focused on deep technology. Boost VC says it leads pre-seed rounds and targets areas such as aerospace, robotics, biotech, health, AI/ML, energy, defense, climate, oceans, AR/VR, and materials.",
@@ -119,7 +241,27 @@
     "pastInvestments": "Boost VC biography identifies angel investments including Coinbase, Bitcoin-related ventures, Amplitude, and PlanGrid. These are examples, not a complete or current fund portfolio.",
     "investmentStage": "Pre-seed; Boost VC publicly describes a typical $500,000 initial check (verify current terms)",
     "primaryDomain": "Deep tech: aerospace, robotics, biotech, health, AI/ML, energy, defense, climate, oceans, AR/VR, materials",
-    "location": "San Mateo, California"
+    "location": "San Mateo, California",
+    "firmFoundedYear": 2012,
+    "firmTenureLabel": "Firm active since 2012 · about 14 years (as of Nov 2026)",
+    "firmMaturity": "Established · 10+ years",
+    "firmHistorySource": "https://www.boost.vc/faq",
+    "investmentTrendSummary": "Boost VC has operated since 2012. It describes a continued pre-seed focus on frontier and deep-tech categories, with a thesis that has broadened from crypto into AI, robotics, energy, space, and materials.",
+    "otherLinks": [
+      {
+        "label": "Fund / platform",
+        "url": "https://www.boost.vc/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.boost.vc/"
+      },
+      {
+        "label": "Fund history source",
+        "url": "https://www.boost.vc/faq"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/adraper"
   },
   {
     "id": 8,
@@ -127,7 +269,7 @@
     "headline": "Founder and President, P3 Institute; former General Partner at Benchmark",
     "firm_name": "Benchmark",
     "avatar": "https://www.p3.institute/assets/bill-gurley.jpg",
-    "dataStatus": "Role updated from former Benchmark GP to P3 Institute Founder & President using current P3 biography (checked 2026-11-01).",
+    "dataStatus": "Role updated from former Benchmark GP to P3 Institute Founder & President using current P3 biography (checked 2026-11-01). Firm age and investment focus checked against the linked firm source; age is approximate by founding year. Updated 2026-11-01.",
     "profileSource": "https://www.p3.institute/about/",
     "website": "https://www.p3.institute/about/",
     "about": "Bill Gurley is now Founder and President of the P3 Institute. He was previously a General Partner at Benchmark for 25 years and is known for investments in Uber, Zillow, Nextdoor, Stitch Fix, and OpenTable. Do not treat the old Benchmark title as current.",
@@ -137,7 +279,34 @@
     "investmentStage": "No current venture mandate published; former Benchmark investor",
     "primaryDomain": "Technology, marketplaces, network economics, public policy",
     "location": "Austin, Texas; verify",
-    "avatarSource": "https://www.p3.institute/about/"
+    "avatarSource": "https://www.p3.institute/about/",
+    "firmFoundedYear": 1995,
+    "firmTenureLabel": "Firm active since 1995 · about 31 years (as of Nov 2026)",
+    "firmMaturity": "Established · 10+ years",
+    "firmHistorySource": "https://www.benchmark.com/",
+    "investmentTrendSummary": "Benchmark is a 31-year-old, early-stage partnership with a concentrated portfolio approach. Bill Gurley’s selected investments include marketplace and consumer technology companies.",
+    "otherLinks": [
+      {
+        "label": "Fund / platform",
+        "url": "https://www.p3.institute/about/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.p3.institute/about/"
+      },
+      {
+        "label": "Fund history source",
+        "url": "https://www.benchmark.com/"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/billgurley",
+    "publicConnections": [
+      {
+        "name": "Katrina Lake · Stitch Fix",
+        "relationship": "Portfolio relationship: Stitch Fix is named in Bill Gurley’s public investment examples. This is a firm or portfolio link, not a claim of personal contact.",
+        "source": "https://www.p3.institute/about/"
+      }
+    ]
   },
   {
     "id": 9,
@@ -145,7 +314,7 @@
     "headline": "Co-founder & General Partner at Andreessen Horowitz",
     "firm_name": "Andreessen Horowitz",
     "avatar": "https://d1lamhf6l6yk6d.cloudfront.net/uploads/2023/04/Marc-Andreessen-3-1024x1024.png",
-    "dataStatus": "Profile checked against a16z public biography on 2026-11-01; portfolio examples are firm/board disclosures, not complete personal deal attribution.",
+    "dataStatus": "Profile checked against a16z public biography on 2026-11-01; portfolio examples are firm/board disclosures, not complete personal deal attribution. Firm age and investment focus checked against the linked firm source; age is approximate by founding year. Updated 2026-11-01.",
     "profileSource": "https://a16z.com/author/marc-andreessen/",
     "website": "https://a16z.com",
     "about": "Cofounded Andreessen Horowitz in 2009. Earlier, he co-created the Mosaic browser, cofounded Netscape, and cofounded Loudcloud/Opsware. a16z identifies him as a General Partner and lists board roles across selected portfolio companies.",
@@ -155,7 +324,26 @@
     "investmentStage": "Firm invests from seed through growth; individual participation varies",
     "primaryDomain": "Technology; firm platforms include AI, bio/health, consumer, crypto, enterprise, fintech, games, infrastructure, and American Dynamism",
     "location": "United States; firm offices include Menlo Park and San Francisco",
-    "avatarSource": "https://a16z.com/author/marc-andreessen/"
+    "avatarSource": "https://a16z.com/author/marc-andreessen/",
+    "firmFoundedYear": 2009,
+    "firmTenureLabel": "Firm active since 2009 · about 17 years (as of Nov 2026)",
+    "firmMaturity": "Established · 10+ years",
+    "firmHistorySource": "https://a16z.com/about/",
+    "investmentTrendSummary": "a16z has operated since 2009 and expanded from a software-centered venture firm into multiple seed, venture, and growth funds across technology categories; it reported more than $100B in AUM as of April 2026.",
+    "otherLinks": [
+      {
+        "label": "Fund / platform",
+        "url": "https://a16z.com"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://a16z.com/author/marc-andreessen/"
+      },
+      {
+        "label": "Fund history source",
+        "url": "https://a16z.com/about/"
+      }
+    ]
   },
   {
     "id": 10,
@@ -163,7 +351,7 @@
     "headline": "Co-founder & General Partner at Andreessen Horowitz",
     "firm_name": "Andreessen Horowitz",
     "avatar": "https://d1lamhf6l6yk6d.cloudfront.net/uploads/2023/04/Ben-Horowitz-3-1024x1024.png",
-    "dataStatus": "Profile checked against a16z public biography and 2026 firm update; individual deal attribution not assumed.",
+    "dataStatus": "Profile checked against a16z public biography and 2026 firm update; individual deal attribution not assumed. Firm age and investment focus checked against the linked firm source; age is approximate by founding year. Updated 2026-11-01.",
     "profileSource": "https://a16z.com/about/",
     "website": "https://a16z.com",
     "about": "Cofounded Andreessen Horowitz in 2009 after building Loudcloud/Opsware, where he served as co-founder and CEO. He is an author and investor; a16z current investing activity is spread across specialist funds and teams.",
@@ -173,7 +361,23 @@
     "investmentStage": "Firm invests from seed through growth; individual participation varies",
     "primaryDomain": "Technology and company building; firm platforms include AI, bio/health, consumer, crypto, enterprise, fintech, games, infrastructure, and American Dynamism",
     "location": "United States; firm offices include Menlo Park and San Francisco",
-    "avatarSource": "https://a16z.com/about/"
+    "avatarSource": "https://a16z.com/about/",
+    "firmFoundedYear": 2009,
+    "firmTenureLabel": "Firm active since 2009 · about 17 years (as of Nov 2026)",
+    "firmMaturity": "Established · 10+ years",
+    "firmHistorySource": "https://a16z.com/about/",
+    "investmentTrendSummary": "a16z has operated since 2009 and expanded from a software-centered venture firm into multiple seed, venture, and growth funds across technology categories; it reported more than $100B in AUM as of April 2026.",
+    "otherLinks": [
+      {
+        "label": "Fund / platform",
+        "url": "https://a16z.com"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://a16z.com/about/"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/behorowitz"
   },
   {
     "id": 11,
@@ -182,7 +386,7 @@
     "firm_name": "BOND",
     "avatar": "https://images.barrons.com/im-494646?height=467&width=700",
     "avatarSource": "https://www.barrons.com/articles/barrons-100-most-influential-women-in-u-s-finance-mary-meeker-51650009601",
-    "dataStatus": "Profile and portfolio checked against BOND page on 2026-11-01; portfolio status changes over time.",
+    "dataStatus": "Profile and portfolio checked against BOND page on 2026-11-01; portfolio status changes over time. Firm age and investment focus checked against the linked firm source; age is approximate by founding year. Updated 2026-11-01.",
     "profileSource": "https://www.bondcap.com/partners/mary-meeker/",
     "website": "https://bondcap.com",
     "about": "Founder and General Partner at BOND. Before BOND, she worked at Morgan Stanley as a technology research analyst and at Kleiner Perkins, where she co-led its Digital Growth Fund team. BOND publicly lists current and prior portfolio companies.",
@@ -191,7 +395,39 @@
     "pastInvestments": "BOND current portfolio examples include Applied Intuition, Block, Canva, Checkr, Dapper Labs, Hipcamp, Intercom, Ironclad, Nextdoor, OpenEvidence, Outschool, and Plaid. Prior examples include Airbnb, DocuSign, Instacart, Pinterest, Snap, Spotify, and Waze. Portfolio-level, not personal deal attribution.",
     "investmentStage": "Growth-oriented technology investing; verify current stage mandate",
     "primaryDomain": "Technology, consumer internet, digital growth",
-    "location": "San Francisco, California"
+    "location": "San Francisco, California",
+    "firmFoundedYear": 2019,
+    "firmTenureLabel": "Firm active since 2019 · about 7 years (as of Nov 2026)",
+    "firmMaturity": "Emerging · under 10 years",
+    "firmHistorySource": "https://bondcap.com/",
+    "investmentTrendSummary": "BOND is a newer global technology investment firm launched in 2019. Its partners’ investment histories span consumer internet, marketplaces, fintech, and software, while BOND invests through multiple company growth stages.",
+    "otherLinks": [
+      {
+        "label": "Fund / platform",
+        "url": "https://bondcap.com"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.bondcap.com/partners/mary-meeker/"
+      },
+      {
+        "label": "Fund history source",
+        "url": "https://bondcap.com/"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/mary-meeker-5823ba48",
+    "publicConnections": [
+      {
+        "name": "Melanie Perkins · Canva",
+        "relationship": "Portfolio relationship: Canva is named in Mary Meeker’s public investment examples. This is a firm or portfolio link, not a claim of personal contact.",
+        "source": "https://www.bondcap.com/partners/mary-meeker/"
+      },
+      {
+        "name": "Brian Chesky · Airbnb",
+        "relationship": "Portfolio relationship: Airbnb is named in Mary Meeker’s public investment examples. This is a firm or portfolio link, not a claim of personal contact.",
+        "source": "https://www.bondcap.com/partners/mary-meeker/"
+      }
+    ]
   },
   {
     "id": 12,
@@ -200,7 +436,7 @@
     "firm_name": "Founders Fund",
     "avatar": "https://cdn.pulse2.com/cdn/2019/11/Peter-Thiel.jpg",
     "avatarSource": "https://pulse2.com/founders-fund-vii-lp-1-5-billion/",
-    "dataStatus": "Profile checked against Founders Fund page on 2026-11-01; listed portfolio examples are not exhaustive.",
+    "dataStatus": "Profile checked against Founders Fund page on 2026-11-01; listed portfolio examples are not exhaustive. Firm age and investment focus checked against the linked firm source; age is approximate by founding year. Updated 2026-11-01.",
     "profileSource": "https://foundersfund.com/team/peter-thiel/",
     "website": "https://foundersfund.com",
     "about": "Entrepreneur and investor. He cofounded PayPal, made the first outside investment in Facebook, and cofounded Palantir, where Founders Fund says he serves as chairman. He is a Partner at Founders Fund.",
@@ -209,7 +445,34 @@
     "pastInvestments": "Publicly documented early investments and company ties include Facebook, LinkedIn, Yelp, SpaceX, and Airbnb; examples do not constitute a complete portfolio or current availability.",
     "investmentStage": "Firm invests across stages and sectors; confirm partner-level mandate",
     "primaryDomain": "Technology, aerospace, life sciences, energy, and other frontier sectors (firm portfolio)",
-    "location": "San Francisco Bay Area"
+    "location": "San Francisco Bay Area",
+    "firmFoundedYear": 2005,
+    "firmTenureLabel": "Firm active since 2005 · about 21 years (as of Nov 2026)",
+    "firmMaturity": "Established · 10+ years",
+    "firmHistorySource": "https://foundersfund.com/our_team/",
+    "investmentTrendSummary": "Founders Fund is a 21-year-old venture firm with a broad technology mandate and a founder/operator-centered investment identity. Peter Thiel’s investment history also includes PayPal and early-stage technology companies.",
+    "otherLinks": [
+      {
+        "label": "Fund / platform",
+        "url": "https://foundersfund.com"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://foundersfund.com/team/peter-thiel/"
+      },
+      {
+        "label": "Fund history source",
+        "url": "https://foundersfund.com/our_team/"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/peterthiel",
+    "publicConnections": [
+      {
+        "name": "Brian Chesky · Airbnb",
+        "relationship": "Portfolio relationship: Airbnb is named in Peter Thiel’s public investment examples. This is a firm or portfolio link, not a claim of personal contact.",
+        "source": "https://foundersfund.com/team/peter-thiel/"
+      }
+    ]
   },
   {
     "id": 13,
@@ -217,7 +480,7 @@
     "headline": "Partner at Greylock",
     "firm_name": "Greylock Partners",
     "avatar": "https://cdn.sanity.io/images/uz672vkd/production/50ee7288fdde1552007336d2ed27a9ebf5c21a1a-1536x1214.jpg",
-    "dataStatus": "Profile checked against Greylock public biography on 2026-11-01; portfolio list changes over time.",
+    "dataStatus": "Profile checked against Greylock public biography on 2026-11-01; portfolio list changes over time. Firm age and investment focus checked against the linked firm source; age is approximate by founding year. Updated 2026-11-01.",
     "profileSource": "https://greylock.com/team/reid-hoffman/",
     "website": "https://greylock.com",
     "about": "Partner at Greylock since 2009. He cofounded LinkedIn and held an executive role at PayPal. Greylock says his investment focus centers on products with network effects and businesses capable of reaching very large user communities.",
@@ -227,7 +490,34 @@
     "investmentStage": "Early-stage focus; verify current partner availability",
     "primaryDomain": "Network-effect businesses, consumer technology, marketplaces, autonomous transport, crypto, logistics",
     "location": "United States; Greylock is based in Menlo Park",
-    "avatarSource": "https://greylock.com/team/reid-hoffman/"
+    "avatarSource": "https://greylock.com/team/reid-hoffman/",
+    "firmFoundedYear": 1965,
+    "firmTenureLabel": "Firm active since 1965 · about 61 years (as of Nov 2026)",
+    "firmMaturity": "Established · 10+ years",
+    "firmHistorySource": "https://greylock.com/team/alumni-partners/",
+    "investmentTrendSummary": "Greylock is a 61-year-old venture partnership. It has financed technology companies across several generations and currently describes its main focus as partnering with early enterprise and consumer founders.",
+    "otherLinks": [
+      {
+        "label": "Fund / platform",
+        "url": "https://greylock.com"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://greylock.com/team/reid-hoffman/"
+      },
+      {
+        "label": "Fund history source",
+        "url": "https://greylock.com/team/alumni-partners/"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/reidhoffman",
+    "publicConnections": [
+      {
+        "name": "Brian Chesky · Airbnb",
+        "relationship": "Portfolio relationship: Airbnb is named in Reid Hoffman’s public investment examples. This is a firm or portfolio link, not a claim of personal contact.",
+        "source": "https://greylock.com/team/reid-hoffman/"
+      }
+    ]
   },
   {
     "id": 14,
@@ -235,7 +525,7 @@
     "headline": "Founder at Khosla Ventures",
     "firm_name": "Khosla Ventures",
     "avatar": "https://cdn.prod.website-files.com/675c812bdbda0c0936ed3866/6764c916a1b8cf55853aa574_675b9169de2d00ca8eb5a97b_VinodKhosla-1-scaled.avif",
-    "dataStatus": "Profile checked against Khosla Ventures biography on 2026-11-01; portfolio examples are firm-level.",
+    "dataStatus": "Profile checked against Khosla Ventures biography on 2026-11-01; portfolio examples are firm-level. Firm age and investment focus checked against the linked firm source; age is approximate by founding year. Updated 2026-11-01.",
     "profileSource": "https://www.khoslaventures.com/team/vinod-khosla",
     "website": "https://khoslaventures.com",
     "about": "Founder of Khosla Ventures and technology entrepreneur. He was a co-founder of Daisy Systems and founding CEO of Sun Microsystems. The firm describes a thesis spanning impactful technology in software, AI, robotics, healthcare, energy, and sustainability.",
@@ -245,7 +535,39 @@
     "investmentStage": "Early-stage and later-stage technology; verify current fund and check-size fit",
     "primaryDomain": "Software, AI, robotics, healthcare, energy, sustainability, and infrastructure",
     "location": "Menlo Park, California",
-    "avatarSource": "https://www.khoslaventures.com/team/vinod-khosla"
+    "avatarSource": "https://www.khoslaventures.com/team/vinod-khosla",
+    "firmFoundedYear": 2004,
+    "firmTenureLabel": "Firm active since 2004 · about 22 years (as of Nov 2026)",
+    "firmMaturity": "Established · 10+ years",
+    "firmHistorySource": "https://www.khoslaventures.com/about",
+    "investmentTrendSummary": "Khosla Ventures has operated since 2004 and continues to prioritize early, technology-led bets in deep tech, healthcare, climate, and other large markets.",
+    "otherLinks": [
+      {
+        "label": "Fund / platform",
+        "url": "https://khoslaventures.com"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.khoslaventures.com/team/vinod-khosla"
+      },
+      {
+        "label": "Fund history source",
+        "url": "https://www.khoslaventures.com/about"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/vinod-khosla-65387416",
+    "publicConnections": [
+      {
+        "name": "Tony Xu · DoorDash",
+        "relationship": "Portfolio relationship: DoorDash is named in Vinod Khosla’s public investment examples. This is a firm or portfolio link, not a claim of personal contact.",
+        "source": "https://www.khoslaventures.com/team/vinod-khosla"
+      },
+      {
+        "name": "Patrick Collison · Stripe",
+        "relationship": "Portfolio relationship: Stripe is named in Vinod Khosla’s public investment examples. This is a firm or portfolio link, not a claim of personal contact.",
+        "source": "https://www.khoslaventures.com/team/vinod-khosla"
+      }
+    ]
   },
   {
     "id": 15,
@@ -253,7 +575,7 @@
     "headline": "Partner at Sequoia Capital",
     "firm_name": "Sequoia Capital",
     "avatar": "https://framerusercontent.com/images/jDDGVUz0ylqBhqwsXVS93GjNMc.webp?height=768&width=768",
-    "dataStatus": "Profile checked against Sequoia public biography on 2026-11-01; education wording kept cautious.",
+    "dataStatus": "Profile checked against Sequoia public biography on 2026-11-01; education wording kept cautious. Firm age and investment focus checked against the linked firm source; age is approximate by founding year. Updated 2026-11-01.",
     "profileSource": "https://sequoiacap.com/people/alfred-lin",
     "website": "https://www.sequoiacap.com",
     "about": "Partner at Sequoia focused on seed and early-stage companies. Before Sequoia, he was COO/CFO at Zappos and helped grow the business; he also cofounded Venture Frogs with Tony Hsieh after LinkExchange was acquired by Microsoft.",
@@ -263,7 +585,34 @@
     "investmentStage": "Seed and early stage (Sequoia profile)",
     "primaryDomain": "Early-stage technology; company building and operations",
     "location": "United States; Sequoia has a Menlo Park office",
-    "avatarSource": "https://sequoiacap.com/people/alfred-lin"
+    "avatarSource": "https://sequoiacap.com/people/alfred-lin",
+    "firmFoundedYear": 1972,
+    "firmTenureLabel": "Firm active since 1972 · about 54 years (as of Nov 2026)",
+    "firmMaturity": "Established · 10+ years",
+    "firmHistorySource": "https://sequoiacap.com/our-history",
+    "investmentTrendSummary": "Sequoia has operated since 1972. Its firm history shows a long arc from early semiconductor and personal-computing investments to modern software, fintech, and consumer platforms.",
+    "otherLinks": [
+      {
+        "label": "Fund / platform",
+        "url": "https://www.sequoiacap.com"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://sequoiacap.com/people/alfred-lin"
+      },
+      {
+        "label": "Fund history source",
+        "url": "https://sequoiacap.com/our-history"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/linalfred",
+    "publicConnections": [
+      {
+        "name": "Brian Chesky · Airbnb",
+        "relationship": "Portfolio relationship: Airbnb is named in Alfred Lin’s public investment examples. This is a firm or portfolio link, not a claim of personal contact.",
+        "source": "https://sequoiacap.com/people/alfred-lin"
+      }
+    ]
   },
   {
     "id": 16,
@@ -271,7 +620,7 @@
     "headline": "Y Combinator co-founder (retired)",
     "firm_name": "Y Combinator",
     "avatar": "https://bookface-static.ycombinator.com/assets/ycdc/people/paulg-52c0664126bbf1e906f07b207f57a7f46c1a597bdbe5c8cd4751ca689e0ffb5f.jpg",
-    "dataStatus": "Status checked against Y Combinator public people page on 2026-11-01; marked retired to avoid implying current availability.",
+    "dataStatus": "Status checked against Y Combinator public people page on 2026-11-01; marked retired to avoid implying current availability. Firm age and investment focus checked against the linked firm source; age is approximate by founding year. Updated 2026-11-01.",
     "profileSource": "https://www.ycombinator.com/people",
     "website": "https://www.ycombinator.com/",
     "about": "Y Combinator identifies Paul Graham as a Founder, Retired. He cofounded Viaweb, which became Yahoo Store, and cofounded Y Combinator. This is a historical founder profile, not an indication that he currently reviews pitches or makes investments.",
@@ -281,6 +630,2750 @@
     "investmentStage": "No current individual mandate published; YC accelerator is a separate organization",
     "primaryDomain": "Historical startup formation, software, and early-stage company building",
     "location": "Current location not asserted",
-    "avatarSource": "https://www.ycombinator.com/people"
+    "avatarSource": "https://www.ycombinator.com/people",
+    "firmFoundedYear": 2005,
+    "firmTenureLabel": "Firm active since 2005 · about 21 years (as of Nov 2026)",
+    "firmMaturity": "Established · 10+ years",
+    "firmHistorySource": "https://www.ycombinator.com/press/",
+    "investmentTrendSummary": "Y Combinator has operated since 2005. Its batch-based accelerator model has scaled to thousands of funded companies and more than 7,000 founders, while retaining a seed-stage entry point.",
+    "otherLinks": [
+      {
+        "label": "Fund / platform",
+        "url": "https://www.ycombinator.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.ycombinator.com/people"
+      },
+      {
+        "label": "Fund history source",
+        "url": "https://www.ycombinator.com/press/"
+      }
+    ],
+    "linkedin": "https://www.linkedin.com/in/paul-graham-899452316"
+  },
+  {
+    "id": 17,
+    "name": "Josh Kopelman",
+    "headline": "Co-founder and Partner at First Round Capital",
+    "firm_name": "First Round Capital",
+    "avatar": null,
+    "dataStatus": "Biography, company history, and Wharton education cross-checked against First Round’s investor profile. Investment examples are selected entries from the firm’s public materials. Updated 2026-11-01. Public LinkedIn profile, external links, and relationship sources added 2026-11-01.",
+    "profileSource": "https://www.firstround.com/team/investing/josh-kopelman",
+    "website": "https://www.firstround.com/",
+    "about": "Entrepreneur and seed investor who co-founded First Round Capital in 2004 after building and selling internet companies. He brings first-hand founder experience from Infonautics, Half.com, and TurnTide and has spent his investing career focused on the earliest stages of company building.",
+    "experience": "First Round Capital — Co-founder and Partner (2004–present). Infonautics — Co-founder; company went public in 1996. Half.com — Co-founder; acquired by eBay in 2000. TurnTide — Co-founder; acquired by Symantec in 2004.",
+    "education": "BS, Entrepreneurial Management and Marketing, The Wharton School, University of Pennsylvania (cum laude).",
+    "pastInvestments": "Selected First Round portfolio examples named on the firm biography include Notion, Upstart, Clover Health, Roblox, and Square. The firm’s public profile describes 500+ startups across its history; these examples are not a complete list or a prediction of current interest.",
+    "investmentStage": "Pre-seed and seed; First Round says it works at the earliest stage, often before product-market fit.",
+    "primaryDomain": "Generalist seed, internet software, marketplaces, fintech, productivity, health technology",
+    "location": "Philadelphia, Pennsylvania / United States",
+    "firmFoundedYear": 2004,
+    "firmTenureLabel": "Firm active since 2004 · about 22 years (as of Nov 2026)",
+    "firmMaturity": "Established · 10+ years",
+    "firmHistorySource": "https://www.firstround.com/team/investing/josh-kopelman",
+    "investmentTrendSummary": "First Round has operated for about 22 years and remains focused on company beginnings. Its current message emphasizes hands-on seed support: customer discovery, product positioning, pricing, distribution, hiring, and fundraising preparation. The team reports a history of more than 500 startup investments.",
+    "linkedin": "https://www.linkedin.com/in/jkopelman",
+    "publicConnections": [
+      {
+        "name": "First Round Capital founders and partners",
+        "relationship": "Kopelman is a founding partner and invests with First Round’s early-stage team.",
+        "source": "https://www.firstround.com/team/investing/josh-kopelman"
+      },
+      {
+        "name": "Founders in First Round’s portfolio",
+        "relationship": "The firm’s portfolio and founder resources document its public company relationships.",
+        "source": "https://www.firstround.com/"
+      }
+    ],
+    "otherLinks": [
+      {
+        "label": "Fund / platform",
+        "url": "https://www.firstround.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.firstround.com/team/investing/josh-kopelman"
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "name": "Kirsten Green",
+    "headline": "Founder and Managing Partner at Forerunner Ventures",
+    "firm_name": "Forerunner Ventures",
+    "avatar": null,
+    "dataStatus": "Current biography, firm tenure, investment examples, and strategy checked against Forerunner’s official team and portfolio pages. Updated 2026-11-01. Public LinkedIn profile, external links, and relationship sources added 2026-11-01.",
+    "profileSource": "https://www.forerunnerventures.com/team/kirsten-green",
+    "website": "https://www.forerunnerventures.com/",
+    "about": "Consumer-focused venture investor who founded Forerunner in 2012. She built the firm around the view that changing human behavior and consumer expectations can create large new markets, at a time when much venture investment centered on enterprise software and infrastructure.",
+    "experience": "Forerunner Ventures — Founder and Managing Partner (2012–present). More than 20 years working across public and private markets. She has raised institutional capital and partnered with companies from pre-revenue through IPO.",
+    "education": "BA, Business Economics, University of California, Los Angeles; licensed CPA and CFA charterholder.",
+    "pastInvestments": "Selected companies named in Forerunner’s biography include Warby Parker, Dollar Shave Club, Glossier, Chime, Hims & Hers, and Faire. The firm reports more than 100 investments; this is a sample, not a complete portfolio.",
+    "investmentStage": "Early stage through growth; Forerunner says it leads or co-leads seed and Series A rounds and has growth vehicles.",
+    "primaryDomain": "Consumer, commerce, brands, retail, fintech, marketplaces, AI-enabled consumer products",
+    "location": "San Francisco, California / United States",
+    "firmFoundedYear": 2012,
+    "firmTenureLabel": "Firm active since 2012 · about 14 years (as of Nov 2026)",
+    "firmMaturity": "Established · 10+ years",
+    "firmHistorySource": "https://www.forerunnerventures.com/about",
+    "investmentTrendSummary": "Forerunner is a 14-year-old consumer-centered venture firm with more than 100 investments and about $3 billion raised, according to the current firm biography. Its original consumer-behavior thesis now spans commerce, brands, financial products, and technology; the public portfolio includes newer AI-driven commerce and platform companies as well as established consumer brands.",
+    "linkedin": "https://www.linkedin.com/in/kirstengreen",
+    "publicConnections": [
+      {
+        "name": "Forerunner Ventures team",
+        "relationship": "Green founded and leads Forerunner alongside its investing team.",
+        "source": "https://www.forerunnerventures.com/about"
+      },
+      {
+        "name": "Katrina Lake · Stitch Fix",
+        "relationship": "Publicly documented Glossier connection: Forerunner lists Glossier among its investments, and Lake announced joining Glossier’s board.",
+        "source": "https://www.forerunnerventures.com/"
+      }
+    ],
+    "otherLinks": [
+      {
+        "label": "Fund / platform",
+        "url": "https://www.forerunnerventures.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.forerunnerventures.com/team/kirsten-green"
+      },
+      {
+        "label": "Fund history source",
+        "url": "https://www.forerunnerventures.com/about"
+      }
+    ]
+  },
+  {
+    "id": 19,
+    "name": "Aileen Lee",
+    "headline": "Founder and Managing Partner at Cowboy Ventures",
+    "firm_name": "Cowboy Ventures",
+    "avatar": null,
+    "dataStatus": "Founder biography, firm history, sector focus, and stage statistics cross-checked against Cowboy Ventures’ official team, history, and approach pages. Education credentials follow the wording of her official biography. Updated 2026-11-01. Public LinkedIn profile, external links, and relationship sources added 2026-11-01.",
+    "profileSource": "https://www.cowboy.vc/team/aileen-lee",
+    "website": "https://www.cowboy.vc/",
+    "about": "Early-stage venture investor and former operator who founded Cowboy Ventures in 2012. Before launching Cowboy, she spent more than a decade at Kleiner Perkins, held operating roles at Gap Inc., and began her career at Morgan Stanley. She is also a co-founder of All Raise and is widely known for popularizing “unicorn” as a venture-company term.",
+    "experience": "Cowboy Ventures — Founder and Managing Partner (2012–present). Kleiner Perkins — more than a decade investing with companies from Series A through IPO; founding CEO of KPCB-backed RMG Networks. Gap Inc. — operating roles. Morgan Stanley — early career.",
+    "education": "Official Cowboy biography lists degrees from MIT and Harvard Business School, and Millburn High School; degree names are not specified on that page.",
+    "pastInvestments": "Prior KPCB work included Bloom Energy, Rent the Runway, and Trendyol. Cowboy’s current public portfolio spans enterprise, fintech, healthcare, consumer, security, and future-of-work companies. These examples are associated with her firms at different career stages.",
+    "investmentStage": "Pre-seed and seed, with selected companies supported through Series A and later growth.",
+    "primaryDomain": "Enterprise software, fintech, healthcare, consumer, security, future of work, seed investing",
+    "location": "Palo Alto, California / United States",
+    "firmFoundedYear": 2012,
+    "firmTenureLabel": "Firm active since 2012 · about 14 years (as of Nov 2026)",
+    "firmMaturity": "Established · 10+ years",
+    "firmHistorySource": "https://www.cowboy.vc/news/marking-cowboy-ventures-10-year-anniversary",
+    "investmentTrendSummary": "Cowboy has invested since 2012 and remains seed-focused. The firm reports that roughly 70% of its investments are pre-product and publishes a seed-to-Series-A progression metric; its own materials describe hands-on help with recruiting, fundraising, product strategy, sales, and operations. A decade of investing now spans AI, infrastructure, fintech, healthcare, security, and consumer.",
+    "linkedin": "https://www.linkedin.com/in/aileenwlee",
+    "publicConnections": [
+      {
+        "name": "All Raise",
+        "relationship": "Lee co-founded the nonprofit supporting women and underrepresented founders and investors.",
+        "source": "https://www.cowboy.vc/team/aileen-lee"
+      },
+      {
+        "name": "Kleiner Perkins",
+        "relationship": "Lee spent more than a decade investing at Kleiner Perkins before founding Cowboy Ventures.",
+        "source": "https://www.cowboy.vc/team/aileen-lee"
+      }
+    ],
+    "otherLinks": [
+      {
+        "label": "Fund / platform",
+        "url": "https://www.cowboy.vc/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.cowboy.vc/team/aileen-lee"
+      },
+      {
+        "label": "Fund history source",
+        "url": "https://www.cowboy.vc/news/marking-cowboy-ventures-10-year-anniversary"
+      }
+    ]
+  },
+  {
+    "id": 20,
+    "name": "Sarah Guo",
+    "headline": "Founder and General Partner at Conviction",
+    "firm_name": "Conviction",
+    "avatar": null,
+    "dataStatus": "Role, 2022 fund launch, fund size, and AI-only strategy verified against Conviction’s official launch materials; education and prior roles checked against public biographies. Updated 2026-11-01. Public LinkedIn profile, external links, and relationship sources added 2026-11-01.",
+    "profileSource": "https://www.conviction.com/launching-with-conviction.html",
+    "website": "https://www.conviction.com/",
+    "about": "Venture investor focused on AI-native and “Software 3.0” companies. She founded Conviction in 2022 after working at Goldman Sachs and Greylock Partners, where she became a General Partner. Conviction was built as a specialized AI investment firm rather than a traditional broad-sector fund.",
+    "experience": "Conviction — Founder and General Partner (2022–present). Greylock Partners — investor and General Partner (2013–2022). Goldman Sachs — technology investment banking analyst (2012–2013). Co-host of the No Priors AI podcast.",
+    "education": "Four degrees from the University of Pennsylvania: BA and MA in Chinese history and literature, BS in economics, and MBA (as described in 2026 public reporting).",
+    "pastInvestments": "Publicly reported portfolio examples include Harvey, Sierra, Mistral, and Figma. Conviction states that it often invests as a first investor; examples are not a complete portfolio or guarantee of ongoing support.",
+    "investmentStage": "Pre-seed through early growth; Conviction says it often invests first and writes $1M–$25M checks.",
+    "primaryDomain": "Artificial intelligence, AI-native software, developer tools, enterprise software, foundational technology",
+    "location": "San Francisco Bay Area / United States",
+    "firmFoundedYear": 2022,
+    "firmTenureLabel": "Firm active since 2022 · about 4 years (as of Nov 2026)",
+    "firmMaturity": "Emerging · under 10 years",
+    "firmHistorySource": "https://www.conviction.com/launching-with-conviction.html",
+    "investmentTrendSummary": "Conviction launched in 2022 with a $100 million first fund devoted to AI-native “Software 3.0” companies. The firm describes a $1 million–$25 million check range and a preference for leading early. Its focus tracks the shift from foundational models toward products that use AI to change workflows and industries.",
+    "linkedin": "https://www.linkedin.com/in/sarahxguo",
+    "publicConnections": [
+      {
+        "name": "Conviction investment team",
+        "relationship": "Guo founded Conviction to back AI and software companies at early stages.",
+        "source": "https://www.conviction.com/launching-with-conviction.html"
+      },
+      {
+        "name": "Greylock Partners",
+        "relationship": "Guo was a general partner at Greylock before launching Conviction.",
+        "source": "https://www.conviction.com/launching-with-conviction.html"
+      },
+      {
+        "name": "Dylan Field · Figma",
+        "relationship": "Portfolio relationship: Figma is named in Sarah Guo’s public investment examples. This is a firm or portfolio link, not a claim of personal contact.",
+        "source": "https://www.conviction.com/launching-with-conviction.html"
+      }
+    ],
+    "otherLinks": [
+      {
+        "label": "Fund / platform",
+        "url": "https://www.conviction.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.conviction.com/launching-with-conviction.html"
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "name": "Arlan Hamilton",
+    "headline": "Founder and Managing Partner at Backstage Capital",
+    "firm_name": "Backstage Capital",
+    "avatar": null,
+    "dataStatus": "Role, founding year, historical accelerator work, focus, and portfolio-count statements checked against Backstage’s company materials and public fund filings. Education reflects the SEC-filed fund report. Current vehicle availability is not implied. Updated 2026-11-01. Public LinkedIn profile, external links, and relationship sources added 2026-11-01.",
+    "profileSource": "https://backstagecapital.com/crew/",
+    "website": "https://backstagecapital.com/",
+    "about": "Investor and former music-industry tour manager who founded Backstage Capital in 2015. The firm was created to invest in founders who are underrepresented in technology, including people of color, women, and LGBTQ+ founders. Hamilton built the firm without a conventional college-to-finance path and made access and founder networks central to its identity.",
+    "experience": "Backstage Capital — Founder and Managing Partner (2015–present in firm biography). Music industry — tour and production manager before entering venture. Backstage Studio — co-founded in 2018 and launched accelerator programs in several cities.",
+    "education": "High-school diploma, Lake Highlands High School. No college degree is reported in the firm’s public story.",
+    "pastInvestments": "Backstage’s current team biography says the firm has invested in 170+ startup companies led by underestimated founders. No individual company list is treated as exhaustive in this profile.",
+    "investmentStage": "Historically pre-seed and seed; verify the active fund and current check-writing mandate before a new approach.",
+    "primaryDomain": "Inclusive entrepreneurship, early-stage technology, consumer, media, education, health, and fintech",
+    "location": "Los Angeles, California / United States",
+    "firmFoundedYear": 2015,
+    "firmTenureLabel": "Firm active since 2015 · about 11 years (as of Nov 2026)",
+    "firmMaturity": "Established · 10+ years",
+    "firmHistorySource": "https://backstagecapital.com/crew/",
+    "investmentTrendSummary": "Backstage began in 2015 with a mission to reduce funding disparities. It added accelerator programs in 2018 and reports 170+ portfolio companies in its current team biography. Its distinctive trend is investing around founder access and networks; historical fund and accelerator activity should not be read as proof of a currently open fund.",
+    "linkedin": "https://www.linkedin.com/in/arlanhamilton",
+    "publicConnections": [
+      {
+        "name": "Backstage Capital portfolio founders",
+        "relationship": "Hamilton founded Backstage Capital to invest in underrepresented founders; the firm publishes its company portfolio.",
+        "source": "https://backstagecapital.com/crew/"
+      },
+      {
+        "name": "Backstage Capital",
+        "relationship": "Founder and managing partner of the early-stage investment firm.",
+        "source": "https://backstagecapital.com/crew/"
+      }
+    ],
+    "otherLinks": [
+      {
+        "label": "Fund / platform",
+        "url": "https://backstagecapital.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://backstagecapital.com/crew/"
+      }
+    ]
+  },
+  {
+    "id": 22,
+    "name": "Naval Ravikant",
+    "headline": "Entrepreneur, angel investor, and AngelList co-founder",
+    "firm_name": "AngelList",
+    "avatar": null,
+    "dataStatus": "AngelList founding year and platform evolution verified against AngelList’s official materials; Ravikant’s education checked against his own published answers. Selected examples are historical public investments, not a complete current portfolio. Updated 2026-11-01. Public LinkedIn profile, external links, and relationship sources added 2026-11-01.",
+    "profileSource": "https://www.angellist.com/blog/q-a-with-angellist-co-founder-naval-ravikant",
+    "website": "https://www.angellist.com/",
+    "about": "Entrepreneur and angel investor who co-founded AngelList with Babak Nivi. Ravikant began as a company founder, then built an angel-investing track record before creating a platform intended to make startup investing and fundraising more accessible. AngelList is now venture-fund software and administration infrastructure with its own separate management team.",
+    "experience": "AngelList — Co-founder and former CEO/Chairman; platform launched in 2010. Epinions — Co-founder and CEO. Vast.com — Founder. Hit Forge — early venture fund. Angel investor and advisor to startups over multiple decades.",
+    "education": "Studied computer science and economics at Dartmouth College, according to Ravikant’s own published education account.",
+    "pastInvestments": "AngelList’s co-founder interview names historical angel investments including Uber, Twitter, and Postmates. These examples are historical and do not state present ownership, current role, or future investment interest.",
+    "investmentStage": "Angel and early-stage investing historically; AngelList now provides fund administration, SPV, and venture-fund software services. Vehicle and check size vary.",
+    "primaryDomain": "Angel investing, venture infrastructure, startup finance software, marketplaces, technology",
+    "location": "United States",
+    "firmFoundedYear": 2010,
+    "firmTenureLabel": "Platform launched in 2010 · about 16 years (as of Nov 2026)",
+    "firmMaturity": "Established · 10+ years",
+    "firmHistorySource": "https://www.angellist.com/llm-info",
+    "investmentTrendSummary": "AngelList has spent about 16 years evolving from a founder-investor introduction network into software and administration infrastructure for venture funds, SPVs, and syndicates. Its first syndicate and fund tools expanded early-stage participation beyond traditional institutional partnerships. Ravikant’s personal role should be distinguished from the platform’s current management.",
+    "linkedin": "https://www.linkedin.com/in/navalr/",
+    "publicConnections": [
+      {
+        "name": "Babak Nivi",
+        "relationship": "AngelList co-founder and long-time collaborator.",
+        "source": "https://www.angellist.com/blog/q-a-with-angellist-co-founder-naval-ravikant"
+      },
+      {
+        "name": "AngelList",
+        "relationship": "Ravikant co-founded AngelList; the platform now has a separate operating leadership team.",
+        "source": "https://www.angellist.com/llm-info"
+      }
+    ],
+    "otherLinks": [
+      {
+        "label": "Fund / platform",
+        "url": "https://www.angellist.com/"
+      },
+      {
+        "label": "Biography source",
+        "url": "https://www.angellist.com/blog/q-a-with-angellist-co-founder-naval-ravikant"
+      },
+      {
+        "label": "Fund history source",
+        "url": "https://www.angellist.com/llm-info"
+      }
+    ]
+  },
+  {
+    "id": 23,
+    "name": "Matt Freeman",
+    "headline": "Managing Director at Bain Capital",
+    "firm_name": "Bain Capital",
+    "about": "Managing Director at Bain Capital",
+    "experience": "Managing Director at Bain Capital",
+    "education": "Not listed in the linked source.",
+    "location": "Boston, Massachusetts",
+    "website": "https://baincapital.com/",
+    "linkedin": "https://www.linkedin.com/in/mattfreeman1/",
+    "profileSource": "https://signal.nfx.com/investors/matt-freeman",
+    "pastInvestments": "[]",
+    "investmentStage": "['Seed', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "Advertising, ['Advertising', 'MarketingTech', 'Media/Content', 'Social Networks', 'Boston / New England']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 0,
+    "isActive": false,
+    "tags": [
+      "['Advertising'",
+      "'MarketingTech'",
+      "'Media/Content'",
+      "'Social Networks'",
+      "'Boston / New England']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:02:40.047179+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://baincapital.com/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/matt-freeman"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/mattfreeman1/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "[]"
+  },
+  {
+    "id": 24,
+    "name": "Mike Brown Jr",
+    "headline": "General Partner at Bowery Capital",
+    "firm_name": "Bowery Capital",
+    "about": "General Partner at Bowery Capital",
+    "experience": "General Partner at Bowery Capital",
+    "education": "Not listed in the linked source.",
+    "location": "New York",
+    "website": "https://bowerycap.com/team/michael-brown",
+    "linkedin": "https://www.linkedin.com/in/browmich/",
+    "profileSource": "https://signal.nfx.com/investors/mike-brown-jr",
+    "pastInvestments": "[{'year': 2025, 'company_name': 'Pantomath'}, {'year': 2023, 'company_name': 'Pantomath'}, {'year': 2022, 'company_name': 'Pantomath'}, {'year': 2024, 'company_name': 'Singulate'}, {'year': 2023, 'company_name': 'Cerby'}, {'year': 2020, 'company_name': 'Cerby'}, {'year': 2023, 'company_name': 'Obie'}, {'year': 2022, 'company_name': 'Castiron'}, {'year': 2021, 'company_name': 'Inpher.io'}, {'year': 2021, 'company_name': 'Inpher.io'}, {'year': 2018, 'company_name': 'Inpher.io'}, {'year': 2016, 'company_name': 'Inpher.io'}, {'year': 2020, 'company_name': 'ActionIQ'}, {'year': 2017, 'company_name': 'ActionIQ'}, {'year': 2014, 'company_name': 'ActionIQ'}, {'year': 2019, 'company_name': 'VNDLY'}, {'year': 2019, 'company_name': 'VNDLY'}, {'year': 2017, 'company_name': 'VNDLY'}]",
+    "investmentStage": "['Other Lists', 'Pre-seed', 'Post-seed']",
+    "primaryDomain": "New York City, ['New York City', 'Advertising', 'Analytics', 'Enterprise Applications', 'SaaS', 'Supply Chain Tech']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 52,
+    "isActive": true,
+    "tags": [
+      "['New York City'",
+      "'Advertising'",
+      "'Analytics'",
+      "'Enterprise Applications'",
+      "'SaaS'",
+      "'Supply Chain Tech']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T06:26:57.162618+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://bowerycap.com/team/michael-brown"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/mike-brown-jr"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/browmich/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['VNDLY', 'ActionIQ', 'Pantomath', 'Obie', 'Cerby']"
+  },
+  {
+    "id": 25,
+    "name": "Matthew Mulvey",
+    "headline": "Partner at Liquid 2 Ventures",
+    "firm_name": "Liquid 2 Ventures",
+    "about": "Partner at Liquid 2 Ventures",
+    "experience": "Partner at Liquid 2 Ventures",
+    "education": "Not listed in the linked source.",
+    "location": "San Francisco, California",
+    "website": "https://liquid2.vc/",
+    "linkedin": "https://www.linkedin.com/in/mattmulvey/",
+    "profileSource": "https://signal.nfx.com/investors/matthew-mulvey",
+    "pastInvestments": "[{'year': 2025, 'company_name': 'Freckle'}, {'year': 2025, 'company_name': 'Paraform'}, {'year': 2024, 'company_name': 'Handle'}, {'year': 2021, 'company_name': 'Hosta Labs'}, {'year': 2021, 'company_name': 'Hosta a.i.'}, {'year': 2021, 'company_name': 'Chord'}, {'year': 2020, 'company_name': 'Jitsu'}]",
+    "investmentStage": "['Seed', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "Retail, ['Retail', 'AgTech', 'Logistics', 'Manufacturing', 'Health IT', 'Health & Hospital Services', 'San Francisco Bay Area']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 7,
+    "isActive": true,
+    "tags": [
+      "['Retail'",
+      "'AgTech'",
+      "'Logistics'",
+      "'Manufacturing'",
+      "'Health IT'",
+      "'Health & Hospital Services'",
+      "'San Francisco Bay Area']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:17:33.181216+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://liquid2.vc/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/matthew-mulvey"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "https://www.twitter.com/mattmulvey17?lang=en"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/mattmulvey/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Paraform', 'Jitsu', 'Chord', 'Hosta Labs', 'Hosta a.i.']"
+  },
+  {
+    "id": 26,
+    "name": "Joe Hurd",
+    "headline": "Operating Partner @SOSV, Director @GoCompare, Wants to Join Another Board",
+    "firm_name": "The Katama Group, LC",
+    "about": "Operating Partner @SOSV, Director @GoCompare, Wants to Join Another Board",
+    "experience": "Operating Partner @SOSV, Director @GoCompare, Wants to Join Another Board",
+    "education": "Not listed in the linked source.",
+    "location": "Los Altos, California",
+    "website": "https://www.katamagroup.com",
+    "linkedin": "https://www.linkedin.com/in/joehurd/",
+    "profileSource": "https://signal.nfx.com/investors/joe-hurd",
+    "pastInvestments": "[{'year': 2015, 'company_name': 'Antengo'}]",
+    "investmentStage": "['Seed', 'Other Lists', 'Pre-seed', 'Post-seed']",
+    "primaryDomain": "Local Services, ['Local Services', 'Messaging', 'Advertising', 'Payments', 'Media/Content', 'Social Networks', 'Consumer Health', 'E-commerce', 'Consumer Internet', 'San Francisco Bay Area']",
+    "investmentThesis": "Fintech\r\nInsurtech\r\nUS businesses scaling in Asia/EU\r\nAsia/EU businesses looking to scale in the US",
+    "totalInvestmentsCount": 1,
+    "isActive": false,
+    "tags": [
+      "['Local Services'",
+      "'Messaging'",
+      "'Advertising'",
+      "'Payments'",
+      "'Media/Content'",
+      "'Social Networks'",
+      "'Consumer Health'",
+      "'E-commerce'",
+      "'Consumer Internet'",
+      "'San Francisco Bay Area']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T06:39:27.663731+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://www.katamagroup.com"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/joe-hurd"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "https://twitter.com/hurd3rd"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/joehurd/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Antengo']"
+  },
+  {
+    "id": 27,
+    "name": "Maarten Hooft",
+    "headline": "Investor at Quest Venture Partners",
+    "firm_name": "Quest Venture Partners",
+    "about": "Maarten Hooft is listed in the NFX Signal investor directory. See linked profile for the original public listing.",
+    "experience": "Investor associated with Quest Venture Partners.",
+    "education": "Not listed in the linked source.",
+    "location": "Palo Alto, California",
+    "website": "https://www.questvp.com/team/",
+    "linkedin": "https://www.linkedin.com/in/mthooft/",
+    "profileSource": "https://signal.nfx.com/investors/maarten-hooft",
+    "pastInvestments": "[{'year': 2015, 'company_name': 'AreaMetrics'}, {'year': 2013, 'company_name': 'App.io'}]",
+    "investmentStage": "['Series B', 'Series A', 'Seed', 'Other Lists', 'Pre-seed', 'Post-seed']",
+    "primaryDomain": "Advertising, ['Advertising', 'Security', 'E-commerce', 'Media/Content', 'Social Networks', 'Enterprise', 'Marketplaces', 'Seattle / Portland', 'SaaS', 'Los Angeles / Southern California', 'New York City', 'San Francisco Bay Area', 'Washington, D.C.']",
+    "investmentThesis": "I like for teams that I can work with and help out. I like businesses where there is a thesis that broadly makes sense. Save the financial projections for Series B.",
+    "totalInvestmentsCount": 2,
+    "isActive": false,
+    "tags": [
+      "['Advertising'",
+      "'Security'",
+      "'E-commerce'",
+      "'Media/Content'",
+      "'Social Networks'",
+      "'Enterprise'",
+      "'Marketplaces'",
+      "'Seattle / Portland'",
+      "'SaaS'",
+      "'Los Angeles / Southern California'",
+      "'New York City'",
+      "'San Francisco Bay Area'",
+      "'Washington",
+      "D.C.']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T06:40:32.162133+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://www.questvp.com/team/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/maarten-hooft"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "http://twitter.com/mthooft"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/mthooft/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['AreaMetrics', 'App.io']"
+  },
+  {
+    "id": 28,
+    "name": "Seth Berman",
+    "headline": "General Partner at Susa Ventures",
+    "firm_name": "Susa Ventures",
+    "about": "General Partner at Susa Ventures",
+    "experience": "General Partner at Susa Ventures",
+    "education": "Not listed in the linked source.",
+    "location": "San Francisco, California",
+    "website": "https://susaventures.com/",
+    "linkedin": "https://www.linkedin.com/in/sethgberman/",
+    "profileSource": "https://signal.nfx.com/investors/seth-berman",
+    "pastInvestments": "[{'year': 2025, 'company_name': 'HOPPR'}, {'year': 2022, 'company_name': 'Pulley'}, {'year': 2022, 'company_name': 'Viz'}, {'year': 2021, 'company_name': 'Viz'}, {'year': 2016, 'company_name': 'Viz'}, {'year': 2021, 'company_name': 'Human Interest'}, {'year': 2016, 'company_name': 'Human Interest'}, {'year': 2021, 'company_name': 'Okra'}, {'year': 2021, 'company_name': 'CrowdAI'}, {'year': 2017, 'company_name': 'CrowdAI'}, {'year': 2020, 'company_name': 'MycoWorks'}, {'year': 2018, 'company_name': 'MycoWorks'}, {'year': 2019, 'company_name': 'Tortuga AgTech'}, {'year': 2017, 'company_name': 'Tortuga AgTech'}]",
+    "investmentStage": "['Seed', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "Games, ['Games', 'Social Commerce', 'Advertising', 'Hardware', 'Media/Content', 'Cloud Infrastructure', 'AI', 'E-commerce', 'Los Angeles / Southern California', 'Marketplaces', 'SaaS', 'San Francisco Bay Area']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 30,
+    "isActive": true,
+    "tags": [
+      "['Games'",
+      "'Social Commerce'",
+      "'Advertising'",
+      "'Hardware'",
+      "'Media/Content'",
+      "'Cloud Infrastructure'",
+      "'AI'",
+      "'E-commerce'",
+      "'Los Angeles / Southern California'",
+      "'Marketplaces'",
+      "'SaaS'",
+      "'San Francisco Bay Area']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T06:42:34.407417+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://susaventures.com/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/seth-berman"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "https://www.twitter.com/sethgb?lang=en"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/sethgberman/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Human Interest', 'Viz', 'Viz', 'HOPPR', 'MycoWorks']"
+  },
+  {
+    "id": 29,
+    "name": "Andrea Zurek",
+    "headline": "Investor at XG Ventures",
+    "firm_name": "XG Ventures",
+    "about": "Andrea Zurek is listed in the NFX Signal investor directory. See linked profile for the original public listing.",
+    "experience": "Investor associated with XG Ventures.",
+    "education": "Not listed in the linked source.",
+    "location": "Menlo Park, California",
+    "website": "https://www.xg-ventures.com/",
+    "linkedin": "https://www.linkedin.com/pub/andrea-zurek/0/185/73/",
+    "profileSource": "https://signal.nfx.com/investors/andrea-zurek",
+    "pastInvestments": "[{'year': 2016, 'company_name': 'Keen'}, {'year': 2016, 'company_name': 'Poplar Homes'}, {'year': 2013, 'company_name': 'OLSET'}, {'year': 2013, 'company_name': 'Pogoseat'}]",
+    "investmentStage": "['Seed', 'Series A', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "Local Services, ['Local Services', 'Advertising', 'Games', 'Analytics', 'Payments', 'Cloud Infrastructure', 'Social Networks', 'E-commerce', 'Enterprise', 'San Francisco Bay Area', 'SaaS']",
+    "investmentThesis": "XG Ventures� is focused primarily on the consumer internet, including the mobile, video, gaming, social media, and online media sectors.",
+    "totalInvestmentsCount": 4,
+    "isActive": false,
+    "tags": [
+      "['Local Services'",
+      "'Advertising'",
+      "'Games'",
+      "'Analytics'",
+      "'Payments'",
+      "'Cloud Infrastructure'",
+      "'Social Networks'",
+      "'E-commerce'",
+      "'Enterprise'",
+      "'San Francisco Bay Area'",
+      "'SaaS']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T06:44:37.415334+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://www.xg-ventures.com/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/andrea-zurek"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/pub/andrea-zurek/0/185/73/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Keen', 'Poplar Homes', 'Pogoseat', 'OLSET']"
+  },
+  {
+    "id": 30,
+    "name": "Ajay Chopra",
+    "headline": "Investor at Trinity Ventures",
+    "firm_name": "Trinity Ventures",
+    "about": "Ajay Chopra is listed in the NFX Signal investor directory. See linked profile for the original public listing.",
+    "experience": "Investor associated with Trinity Ventures.",
+    "education": "Not listed in the linked source.",
+    "location": "",
+    "website": null,
+    "linkedin": "https://www.linkedin.com/in/ajaychopra/",
+    "profileSource": "https://signal.nfx.com/investors/ajay-chopra",
+    "pastInvestments": "[{'year': 2021, 'company_name': 'Arize AI'}, {'year': 2020, 'company_name': 'Arize AI'}, {'year': 2021, 'company_name': 'Harmonize'}, {'year': 2019, 'company_name': 'Harmonize'}, {'year': 2020, 'company_name': 'Bulletproof'}, {'year': 2018, 'company_name': 'Bulletproof'}, {'year': 2017, 'company_name': 'Bulletproof'}, {'year': 2020, 'company_name': 'Zero Longevity Science'}, {'year': 2019, 'company_name': 'Zero Longevity Science'}, {'year': 2018, 'company_name': 'Zero Longevity Science'}, {'year': 2018, 'company_name': 'Grin Scooters'}, {'year': 2018, 'company_name': 'Holberton School'}, {'year': 2018, 'company_name': 'Dynamic Signal'}, {'year': 2016, 'company_name': 'Dynamic Signal'}, {'year': 2015, 'company_name': 'Dynamic Signal'}, {'year': 2012, 'company_name': 'Dynamic Signal'}, {'year': 2011, 'company_name': 'Dynamic Signal'}, {'year': 2017, 'company_name': 'Gobble'}, {'year': 2015, 'company_name': 'Gobble'}]",
+    "investmentStage": "['Seed', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "Local Services, ['Local Services', 'Advertising', 'Security', 'Media/Content', 'Social Networks', 'E-commerce', 'Consumer Internet', 'FinTech', 'San Francisco Bay Area']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 20,
+    "isActive": false,
+    "tags": [
+      "['Local Services'",
+      "'Advertising'",
+      "'Security'",
+      "'Media/Content'",
+      "'Social Networks'",
+      "'E-commerce'",
+      "'Consumer Internet'",
+      "'FinTech'",
+      "'San Francisco Bay Area']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T06:45:40.68763+00:00.",
+    "otherLinks": [
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/ajay-chopra"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "http://twitter.com/AjayCHopra"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/ajaychopra/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Bulletproof', 'Dynamic Signal', 'Dynamic Signal', 'Dynamic Signal', 'Grin Scooters']"
+  },
+  {
+    "id": 31,
+    "name": "Dmitry Firskin",
+    "headline": "Chief Investment Officer at AltaIR Capital Management",
+    "firm_name": "Altair Capital Management",
+    "about": "Chief Investment Officer at AltaIR Capital Management",
+    "experience": "Chief Investment Officer at AltaIR Capital Management",
+    "education": "Not listed in the linked source.",
+    "location": "San Francisco, California",
+    "website": "https://altair.vc",
+    "linkedin": "https://www.linkedin.com/in/dmfirs/",
+    "profileSource": "https://signal.nfx.com/investors/dmitry-firskin",
+    "pastInvestments": "[]",
+    "investmentStage": "['Series A', 'Seed', 'Other Lists', 'Pre-seed', 'Post-seed']",
+    "primaryDomain": "Advertising, ['Advertising', 'Web3/Blockchain', 'Israel', 'San Francisco Bay Area', 'Boston / New England']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 0,
+    "isActive": false,
+    "tags": [
+      "['Advertising'",
+      "'Web3/Blockchain'",
+      "'Israel'",
+      "'San Francisco Bay Area'",
+      "'Boston / New England']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T06:49:08.190294+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://altair.vc"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/dmitry-firskin"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "https://www.twitter.com/Dm_Firs"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/dmfirs/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "[]"
+  },
+  {
+    "id": 32,
+    "name": "David Beisel",
+    "headline": "Co-Founder & Partner at NextView Ventures",
+    "firm_name": "NextView Ventures",
+    "about": "Co-Founder & Partner at NextView Ventures",
+    "experience": "Co-Founder & Partner at NextView Ventures",
+    "education": "Not listed in the linked source.",
+    "location": "New York, New York",
+    "website": "https://nextviewventures.com/",
+    "linkedin": "https://www.linkedin.com/in/davidbeisel/",
+    "profileSource": "https://signal.nfx.com/investors/david-beisel",
+    "pastInvestments": "[{'year': 2025, 'company_name': 'Poly'}, {'year': 2022, 'company_name': 'Poly'}, {'year': 2025, 'company_name': 'Evertune'}, {'year': 2024, 'company_name': 'Evertune'}, {'year': 2024, 'company_name': 'Tristar AI'}, {'year': 2023, 'company_name': 'Tristar AI'}, {'year': 2024, 'company_name': 'Schematic'}, {'year': 2024, 'company_name': 'Carewell'}, {'year': 2021, 'company_name': 'Carewell'}, {'year': 2020, 'company_name': 'Carewell'}, {'year': 2024, 'company_name': 'Anagram'}, {'year': 2023, 'company_name': 'Sincera'}, {'year': 2022, 'company_name': 'Spaceport Technologies'}]",
+    "investmentStage": "['Seed', 'Other Lists', 'Pre-seed', 'Post-seed']",
+    "primaryDomain": "Social Commerce, ['Social Commerce', 'Advertising', 'SMB Software', 'Entertainment & Sports', 'Real Estate/PropTech', 'Media/Content', 'Social Networks', 'E-commerce', 'New York City', 'Marketplaces', 'Boston / New England', 'Generative Tech/AI']",
+    "investmentThesis": "NextView Ventures is focused on entrepreneurs redesigning the Everyday Economy.  We're interested in technology-enabled services which have the potential to be either ubiquitous or habitual for end-users.  We primarily invest in both consumer and b2b services which fall into the largest markets of consumer spending: food, home, apparel, transportation, entertainment, health, and work & money.  See http://nextviewventures.com/approach/",
+    "totalInvestmentsCount": 33,
+    "isActive": true,
+    "tags": [
+      "['Social Commerce'",
+      "'Advertising'",
+      "'SMB Software'",
+      "'Entertainment & Sports'",
+      "'Real Estate/PropTech'",
+      "'Media/Content'",
+      "'Social Networks'",
+      "'E-commerce'",
+      "'New York City'",
+      "'Marketplaces'",
+      "'Boston / New England'",
+      "'Generative Tech/AI']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T06:50:08.453341+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://nextviewventures.com/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/david-beisel"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "http://twitter.com/davidbeisel"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/davidbeisel/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Carewell', 'Carewell', 'Evertune', 'Poly', 'Poly']"
+  },
+  {
+    "id": 33,
+    "name": "Arjun Sethi",
+    "headline": "Co-Founder at Tribe Capital",
+    "firm_name": "Tribe Capital",
+    "about": "Co-Founder at Tribe Capital",
+    "experience": "Co-Founder at Tribe Capital",
+    "education": "Not listed in the linked source.",
+    "location": "San Francisco, California",
+    "website": "https://arjset.com",
+    "linkedin": "https://www.linkedin.com/in/asethi/",
+    "profileSource": "https://signal.nfx.com/investors/arjun-sethi",
+    "pastInvestments": "[{'year': 2025, 'company_name': 'ego AI'}, {'year': 2025, 'company_name': 'Kraken'}, {'year': 2021, 'company_name': 'Kraken'}, {'year': 2014, 'company_name': 'Kraken'}, {'year': 2025, 'company_name': 'Circuit & Chisel'}, {'year': 2025, 'company_name': 'Kapital'}, {'year': 2023, 'company_name': 'Kapital'}, {'year': 2023, 'company_name': 'Kapital'}, {'year': 2022, 'company_name': 'Kapital'}, {'year': 2025, 'company_name': 'Keep'}, {'year': 2025, 'company_name': 'Ashvattha Therapeutics'}, {'year': 2022, 'company_name': 'Ashvattha Therapeutics'}, {'year': 2020, 'company_name': 'Ashvattha Therapeutics'}, {'year': 2019, 'company_name': 'Ashvattha Therapeutics'}, {'year': 2024, 'company_name': 'Foundation Future Industries'}, {'year': 2024, 'company_name': 'Slingshot AI'}]",
+    "investmentStage": "['Series B', 'Series A', 'Seed', 'Other Lists', 'Pre-seed', 'Series D', 'Series C']",
+    "primaryDomain": "Advertising, ['Advertising', 'Analytics', 'Social Commerce', 'Hardware', 'AI', 'Payments', 'Cloud Infrastructure', 'Social Networks', 'Enterprise', 'Investors who were founders', 'San Francisco Bay Area', 'Angel, Scout, and Solo-Capitalists']",
+    "investmentThesis": "Agnostic. Always open to new ideas.",
+    "totalInvestmentsCount": 142,
+    "isActive": true,
+    "tags": [
+      "['Advertising'",
+      "'Analytics'",
+      "'Social Commerce'",
+      "'Hardware'",
+      "'AI'",
+      "'Payments'",
+      "'Cloud Infrastructure'",
+      "'Social Networks'",
+      "'Enterprise'",
+      "'Investors who were founders'",
+      "'San Francisco Bay Area'",
+      "'Angel",
+      "Scout",
+      "and Solo-Capitalists']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T06:52:12.375892+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://arjset.com"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/arjun-sethi"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "https://www.twitter.com/arjunsethi"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/asethi/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Kraken', 'Kapital', 'Ashvattha Therapeutics', 'Ashvattha Therapeutics', 'Kapital']"
+  },
+  {
+    "id": 34,
+    "name": "Jay Levy",
+    "headline": "Early Stage SaaS VC",
+    "firm_name": "Zelkova Ventures",
+    "about": "Early Stage SaaS VC",
+    "experience": "Early Stage SaaS VC",
+    "education": "Not listed in the linked source.",
+    "location": "Miami, Florida",
+    "website": "Http://www.Zelkovavc.com",
+    "linkedin": "https://www.linkedin.com/in/jaylevy/",
+    "profileSource": "https://signal.nfx.com/investors/jay-levy",
+    "pastInvestments": "[{'year': 2020, 'company_name': 'MarketMuse'}, {'year': 2015, 'company_name': 'Confirm.io'}, {'year': 2014, 'company_name': 'Superhuman'}, {'year': 2012, 'company_name': 'BlackJet'}, {'year': 2011, 'company_name': 'Fab'}, {'year': 2010, 'company_name': 'Fab'}, {'year': 2011, 'company_name': 'Green Goose'}, {'year': 2011, 'company_name': 'The Shared Web'}, {'year': None, 'company_name': 'Crimson Hexagon'}]",
+    "investmentStage": "['Series A', 'Seed', 'Other Lists', 'Pre-seed', 'Post-seed']",
+    "primaryDomain": "Advertising, ['Advertising', 'Messaging', 'SMB Software', 'Payments', 'Developer Tools', 'Cloud Infrastructure', 'Data Services', 'Investors who were founders', 'Investors who invested in female founders', 'Investors who invested in diverse founders', 'Los Angeles / Southern California', 'Enterprise', 'New York City', 'SaaS', 'San Francisco Bay Area', 'Future of Work', 'Colorado / Utah', 'Austin', 'Raleigh-Durham / Southeast US', 'Boston / New England']",
+    "investmentThesis": "We invest in early stage B2B SaaS.  Areas we focus on include Marketing, Communications, Security, FinTech, Customer Service.",
+    "totalInvestmentsCount": 9,
+    "isActive": false,
+    "tags": [
+      "['Advertising'",
+      "'Messaging'",
+      "'SMB Software'",
+      "'Payments'",
+      "'Developer Tools'",
+      "'Cloud Infrastructure'",
+      "'Data Services'",
+      "'Investors who were founders'",
+      "'Investors who invested in female founders'",
+      "'Investors who invested in diverse founders'",
+      "'Los Angeles / Southern California'",
+      "'Enterprise'",
+      "'New York City'",
+      "'SaaS'",
+      "'San Francisco Bay Area'",
+      "'Future of Work'",
+      "'Colorado / Utah'",
+      "'Austin'",
+      "'Raleigh-Durham / Southeast US'",
+      "'Boston / New England']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T06:53:10.713713+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "Http://www.Zelkovavc.com"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/jay-levy"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "http://twitter.com/ZelkovaVC"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/jaylevy/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Fab', 'MarketMuse', 'Confirm.io', 'BlackJet', 'Fab']"
+  },
+  {
+    "id": 35,
+    "name": "Rob Hayes",
+    "headline": "Partner at First Round Capital",
+    "firm_name": "First Round Capital",
+    "about": "Partner at First Round Capital",
+    "experience": "Partner at First Round Capital",
+    "education": "Not listed in the linked source.",
+    "location": "Philadelphia, Pennsylvania",
+    "website": "https://firstround.com/person/rob-hayes/#mystory",
+    "linkedin": "https://www.linkedin.com/in/robhayes/",
+    "profileSource": "https://signal.nfx.com/investors/rob-hayes",
+    "pastInvestments": "[{'year': 2025, 'company_name': 'Scorbit'}, {'year': 2025, 'company_name': 'Barndoor AI'}, {'year': 2023, 'company_name': 'ShareWell'}, {'year': 2022, 'company_name': 'Mad Realities'}, {'year': 2021, 'company_name': 'Ark Biotech'}, {'year': 2021, 'company_name': 'Solo Technologies'}, {'year': 2021, 'company_name': 'Happs'}, {'year': 2019, 'company_name': 'Happs'}, {'year': 2021, 'company_name': 'Kinema'}]",
+    "investmentStage": "['Seed', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "Advertising, ['Advertising', 'Hardware', 'Food and Beverage', 'Social Networks', 'Cloud Infrastructure', 'FinTech', 'New York City', 'Enterprise', 'San Francisco Bay Area']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 26,
+    "isActive": true,
+    "tags": [
+      "['Advertising'",
+      "'Hardware'",
+      "'Food and Beverage'",
+      "'Social Networks'",
+      "'Cloud Infrastructure'",
+      "'FinTech'",
+      "'New York City'",
+      "'Enterprise'",
+      "'San Francisco Bay Area']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T06:56:01.935073+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://firstround.com/person/rob-hayes/#mystory"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/rob-hayes"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "http://www.twitter.com/robhayes"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/robhayes/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Barndoor AI', 'Mad Realities', 'Scorbit', 'Solo Technologies', 'Happs']"
+  },
+  {
+    "id": 36,
+    "name": "Eva Ho",
+    "headline": "General Partner at Fika Ventures",
+    "firm_name": "Fika Ventures",
+    "about": "General Partner at Fika Ventures",
+    "experience": "General Partner at Fika Ventures",
+    "education": "Not listed in the linked source.",
+    "location": "Los Angeles, California",
+    "website": "https://www.fika.vc",
+    "linkedin": "https://www.linkedin.com/in/evaho1/",
+    "profileSource": "https://signal.nfx.com/investors/eva-ho",
+    "pastInvestments": "[{'year': 2024, 'company_name': 'Upwards'}, {'year': 2018, 'company_name': 'Upwards'}, {'year': 2017, 'company_name': 'Upwards'}, {'year': 2024, 'company_name': 'Reken'}, {'year': 2022, 'company_name': 'Together by Renee'}, {'year': 2021, 'company_name': 'Elementary'}, {'year': 2020, 'company_name': 'Elementary'}, {'year': 2018, 'company_name': 'Elementary'}, {'year': 2020, 'company_name': 'BackboneAI'}, {'year': 2018, 'company_name': 'WeeCare'}, {'year': 2015, 'company_name': 'Turvo'}]",
+    "investmentStage": "['Seed', 'Other Lists', 'Pre-seed', 'Post-seed']",
+    "primaryDomain": "Advertising, ['Advertising', 'Social Networks', 'AI', 'Seattle / Portland', 'Diverse Investors', 'Female Investors', 'Investors who invested in female founders', 'Los Angeles / Southern California', 'New York City', 'Marketplaces', 'SaaS', 'San Francisco Bay Area', 'Austin', 'Midwest', 'Boston / New England']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 7,
+    "isActive": true,
+    "tags": [
+      "['Advertising'",
+      "'Social Networks'",
+      "'AI'",
+      "'Seattle / Portland'",
+      "'Diverse Investors'",
+      "'Female Investors'",
+      "'Investors who invested in female founders'",
+      "'Los Angeles / Southern California'",
+      "'New York City'",
+      "'Marketplaces'",
+      "'SaaS'",
+      "'San Francisco Bay Area'",
+      "'Austin'",
+      "'Midwest'",
+      "'Boston / New England']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T06:57:00.815852+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://www.fika.vc"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/eva-ho"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "http://twitter.com/eva_ho"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/evaho1/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Elementary', 'Upwards', 'Elementary', 'Reken', 'Turvo']"
+  },
+  {
+    "id": 37,
+    "name": "Dylan Boyd",
+    "headline": "Investor at R/GA Ventures",
+    "firm_name": "R/GA Ventures",
+    "about": "Dylan Boyd is listed in the NFX Signal investor directory. See linked profile for the original public listing.",
+    "experience": "Investor associated with R/GA Ventures.",
+    "education": "Not listed in the linked source.",
+    "location": "Portland, Oregon",
+    "website": "https://ventures.rga.com/",
+    "linkedin": "https://www.linkedin.com/in/dtboyd/",
+    "profileSource": "https://signal.nfx.com/investors/dylan-boyd",
+    "pastInvestments": "[]",
+    "investmentStage": "['Series B', 'Series A', 'Seed', 'Other Lists', 'Pre-seed', 'Post-seed']",
+    "primaryDomain": "Advertising, ['Advertising', 'AR/VR', 'Web3/Blockchain', 'Retail', 'Hardware', 'MarketingTech', 'Gaming/eSports', 'Entertainment & Sports', 'E-commerce', 'Seattle / Portland', 'Los Angeles / Southern California', 'New York City', 'San Francisco Bay Area', 'London']",
+    "investmentThesis": "Sports Tech � Marketing Tech � Connected Commerce � IoT � Hospitality � Digital Media - Blockchain (non crypto/fintech)",
+    "totalInvestmentsCount": 0,
+    "isActive": false,
+    "tags": [
+      "['Advertising'",
+      "'AR/VR'",
+      "'Web3/Blockchain'",
+      "'Retail'",
+      "'Hardware'",
+      "'MarketingTech'",
+      "'Gaming/eSports'",
+      "'Entertainment & Sports'",
+      "'E-commerce'",
+      "'Seattle / Portland'",
+      "'Los Angeles / Southern California'",
+      "'New York City'",
+      "'San Francisco Bay Area'",
+      "'London']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T06:58:17.451727+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://ventures.rga.com/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/dylan-boyd"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/dtboyd/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "[]"
+  },
+  {
+    "id": 38,
+    "name": "Zach Bratun-Glennon",
+    "headline": "Angel Investor; VC; Data Guy",
+    "firm_name": "Gradient Ventures",
+    "about": "Angel Investor; VC; Data Guy",
+    "experience": "Angel Investor; VC; Data Guy",
+    "education": "Not listed in the linked source.",
+    "location": "San Francisco, California",
+    "website": "https://gradient.com/profile/zach-bratun-glennon",
+    "linkedin": "https://www.linkedin.com/in/zachary-bratun-glennon-b4a16026/",
+    "profileSource": "https://signal.nfx.com/investors/zach-bratun-glennon",
+    "pastInvestments": "[{'year': 2025, 'company_name': 'BackOps AI'}, {'year': 2024, 'company_name': 'BackOps AI'}, {'year': 2025, 'company_name': 'Toku'}, {'year': 2024, 'company_name': 'Toku'}, {'year': 2025, 'company_name': 'Springtail'}, {'year': 2025, 'company_name': 'Venn (formerly Vault)'}, {'year': 2023, 'company_name': 'Venn (formerly Vault)'}, {'year': 2024, 'company_name': 'Outgo Inc'}, {'year': 2024, 'company_name': 'Roe AI'}, {'year': 2024, 'company_name': 'Rad AI'}, {'year': 2021, 'company_name': 'Rad AI'}, {'year': 2018, 'company_name': 'Rad AI'}, {'year': 2023, 'company_name': 'Redactable'}]",
+    "investmentStage": "['Series A', 'Seed', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "Advertising, ['Advertising', 'Payments', 'Insurance', 'Cloud Infrastructure', 'E-commerce', 'AI', 'Marketplaces', 'Investors who were founders', 'Investors who invested in female founders', 'Investors who invested in diverse founders', 'Enterprise', 'Consumer Internet', 'San Francisco Bay Area', 'Angel, Scout, and Solo-Capitalists', 'SaaS']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 31,
+    "isActive": true,
+    "tags": [
+      "['Advertising'",
+      "'Payments'",
+      "'Insurance'",
+      "'Cloud Infrastructure'",
+      "'E-commerce'",
+      "'AI'",
+      "'Marketplaces'",
+      "'Investors who were founders'",
+      "'Investors who invested in female founders'",
+      "'Investors who invested in diverse founders'",
+      "'Enterprise'",
+      "'Consumer Internet'",
+      "'San Francisco Bay Area'",
+      "'Angel",
+      "Scout",
+      "and Solo-Capitalists'",
+      "'SaaS']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:00:41.335431+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://gradient.com/profile/zach-bratun-glennon"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/zach-bratun-glennon"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/zachary-bratun-glennon-b4a16026/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Rad AI', 'Toku', 'Rad AI', 'Venn (formerly Vault)', 'Outgo Inc']"
+  },
+  {
+    "id": 39,
+    "name": "Seth Bannon",
+    "headline": "Founding Partner at Fifty Years",
+    "firm_name": "Fifty Years",
+    "about": "Founding Partner at Fifty Years",
+    "experience": "Founding Partner at Fifty Years",
+    "education": "Not listed in the linked source.",
+    "location": "San Francisco, California",
+    "website": "https://sethbannon.com/",
+    "linkedin": "https://www.linkedin.com/in/sethbannon/",
+    "profileSource": "https://signal.nfx.com/investors/seth-bannon",
+    "pastInvestments": "[{'year': 2025, 'company_name': 'Gridware'}, {'year': 2023, 'company_name': 'Gridware'}, {'year': 2025, 'company_name': 'Blueprint'}, {'year': 2023, 'company_name': 'Tangible'}, {'year': 2022, 'company_name': 'Farcast'}, {'year': 2020, 'company_name': 'Farcast'}, {'year': 2019, 'company_name': 'Farcast'}, {'year': 2021, 'company_name': 'Valence Discovery'}, {'year': 2021, 'company_name': 'Flux'}, {'year': 2019, 'company_name': 'Solugen'}, {'year': 2017, 'company_name': 'Solugen'}, {'year': 2017, 'company_name': 'Advano'}]",
+    "investmentStage": "['Seed', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "Impact, ['Impact', 'AgTech', 'Food and Beverage', 'ClimateTech/CleanTech', 'BioTech', 'Chemicals', 'Space', 'Investors who were founders', 'Investors who invested in female founders', 'Investors who invested in diverse founders', 'Health IT', 'San Francisco Bay Area', 'Diagnostics', 'DeepTech']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 9,
+    "isActive": true,
+    "tags": [
+      "['Impact'",
+      "'AgTech'",
+      "'Food and Beverage'",
+      "'ClimateTech/CleanTech'",
+      "'BioTech'",
+      "'Chemicals'",
+      "'Space'",
+      "'Investors who were founders'",
+      "'Investors who invested in female founders'",
+      "'Investors who invested in diverse founders'",
+      "'Health IT'",
+      "'San Francisco Bay Area'",
+      "'Diagnostics'",
+      "'DeepTech']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:05:16.098692+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://sethbannon.com/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/seth-bannon"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "http://www.twitter.com/sethbannon"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/sethbannon/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Blueprint', 'Gridware', 'Solugen', 'Flux', 'Gridware']"
+  },
+  {
+    "id": 40,
+    "name": "Harsh Patel",
+    "headline": "Managing Partner & Co-Founder at Wireframe Ventures",
+    "firm_name": "Wireframe Ventures",
+    "about": "Managing Partner & Co-Founder at Wireframe Ventures",
+    "experience": "Managing Partner & Co-Founder at Wireframe Ventures",
+    "education": "Not listed in the linked source.",
+    "location": "San Francisco, California",
+    "website": "https://wireframevc.com/",
+    "linkedin": "https://www.linkedin.com/in/harshcv/",
+    "profileSource": "https://signal.nfx.com/investors/harsh-patel",
+    "pastInvestments": "[]",
+    "investmentStage": "['Seed', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "Robotics, ['Robotics', 'AgTech', 'TransportationTech', 'Data Services', 'BioTech', 'Investors who were founders', 'Investors who invested in female founders', 'Investors who invested in diverse founders', 'Health IT', 'Marketplaces', 'SaaS', 'San Francisco Bay Area', 'Future of Work']",
+    "investmentThesis": "We look for founders using advanced technology or unique market insight to attack high impact problems in the real world, across themes like human health, climate & sustainability, manufacturing and food & agriculture. Our investments include Full Harvest, Mammoth Biosciences, Misty Robotics, Renew Financial, Palantir and Assurex Health.",
+    "totalInvestmentsCount": 0,
+    "isActive": false,
+    "tags": [
+      "['Robotics'",
+      "'AgTech'",
+      "'TransportationTech'",
+      "'Data Services'",
+      "'BioTech'",
+      "'Investors who were founders'",
+      "'Investors who invested in female founders'",
+      "'Investors who invested in diverse founders'",
+      "'Health IT'",
+      "'Marketplaces'",
+      "'SaaS'",
+      "'San Francisco Bay Area'",
+      "'Future of Work']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:07:14.646606+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://wireframevc.com/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/harsh-patel"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "https://www.twitter.com/harsh1"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/harshcv/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "[]"
+  },
+  {
+    "id": 41,
+    "name": "Brian Frank",
+    "headline": "Early-Stage investor in Science & Technology for a more sustainable Food System",
+    "firm_name": "FTW Ventures",
+    "about": "Early-Stage investor in Science & Technology for a more sustainable Food System",
+    "experience": "Early-Stage investor in Science & Technology for a more sustainable Food System",
+    "education": "Not listed in the linked source.",
+    "location": "San Francisco, California",
+    "website": "https://ftw.vc",
+    "linkedin": "https://www.linkedin.com/in/bfrank/",
+    "profileSource": "https://signal.nfx.com/investors/brian-frank",
+    "pastInvestments": "[{'year': 2025, 'company_name': 'Heritable Agriculture'}, {'year': 2021, 'company_name': 'Nfinite Nanotech'}, {'year': 2021, 'company_name': 'Phytoform Labs'}, {'year': 2020, 'company_name': 'Debut Biotechnology'}, {'year': 2019, 'company_name': 'Galley Solutions'}, {'year': 2018, 'company_name': 'Galley Solutions'}, {'year': 2018, 'company_name': 'Plantible'}, {'year': 2016, 'company_name': 'Spoiler Alert'}, {'year': 2016, 'company_name': 'Geltor'}]",
+    "investmentStage": "['Seed', 'Pre-seed', 'Other Lists']",
+    "primaryDomain": "Hardware, ['Hardware', 'Robotics', 'AgTech', 'TransportationTech', 'ClimateTech/CleanTech', 'BioTech', 'Enterprise Applications', 'San Francisco Bay Area', 'Canada', 'Material Science', 'Food and Beverage', 'Supply Chain Tech', 'Investors who invested in diverse founders', 'Investors who invested in female founders', 'Investors who were founders']",
+    "investmentThesis": "FTW Ventures invests in innovations for the Food System, including Ag, Food, Consumer & Heath Tech.\r\n\r\nWe look for great teams doing something revolutionary.",
+    "totalInvestmentsCount": 11,
+    "isActive": true,
+    "tags": [
+      "['Hardware'",
+      "'Robotics'",
+      "'AgTech'",
+      "'TransportationTech'",
+      "'ClimateTech/CleanTech'",
+      "'BioTech'",
+      "'Enterprise Applications'",
+      "'San Francisco Bay Area'",
+      "'Canada'",
+      "'Material Science'",
+      "'Food and Beverage'",
+      "'Supply Chain Tech'",
+      "'Investors who invested in diverse founders'",
+      "'Investors who invested in female founders'",
+      "'Investors who were founders']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:08:25.637369+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://ftw.vc"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/brian-frank"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "http://twitter.com/bfrank"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/bfrank/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Geltor', 'Nfinite Nanotech', 'Galley Solutions', 'Phytoform Labs', 'Heritable Agriculture']"
+  },
+  {
+    "id": 42,
+    "name": "Ryan Gembala",
+    "headline": "Pre-Seed & Seed, Deep Tech or Deep People",
+    "firm_name": "Pathbreaker Ventures",
+    "about": "Pre-Seed & Seed, Deep Tech or Deep People",
+    "experience": "Pre-Seed & Seed, Deep Tech or Deep People",
+    "education": "Not listed in the linked source.",
+    "location": "San Francisco, California",
+    "website": "https://www.pathbreakervc.com/companies",
+    "linkedin": "https://www.linkedin.com/in/ryangembala/",
+    "profileSource": "https://signal.nfx.com/investors/ryan-gembala",
+    "pastInvestments": "[{'year': 2018, 'company_name': 'Spiketrap'}, {'year': 2017, 'company_name': 'Safely You'}, {'year': 2016, 'company_name': 'Iron Ox'}, {'year': 2016, 'company_name': 'Simbe Robotics'}, {'year': 2015, 'company_name': 'Mux'}]",
+    "investmentStage": "['Seed', 'Other Lists', 'Pre-seed', 'Post-seed']",
+    "primaryDomain": "AR/VR, ['AR/VR', 'Hardware', 'Robotics', 'AgTech', 'Food and Beverage', 'Data Services', 'AI', 'Space', 'Seattle / Portland', 'Investors who were founders', 'Investors who invested in female founders', 'Investors who invested in diverse founders', 'Los Angeles / Southern California', 'Enterprise', 'New York City', 'San Francisco Bay Area', 'Austin', 'Midwest', 'Raleigh-Durham / Southeast US', 'Boston / New England']",
+    "investmentThesis": "--- Robotics \r\n--- Applied AI / Machine Learning\r\n--- Food technologies\r\n--- Hyper-differentiated products\r\n\r\nPathbreaker invests in specialized teams solving hard technical problems in pursuit of generational impact.",
+    "totalInvestmentsCount": 5,
+    "isActive": false,
+    "tags": [
+      "['AR/VR'",
+      "'Hardware'",
+      "'Robotics'",
+      "'AgTech'",
+      "'Food and Beverage'",
+      "'Data Services'",
+      "'AI'",
+      "'Space'",
+      "'Seattle / Portland'",
+      "'Investors who were founders'",
+      "'Investors who invested in female founders'",
+      "'Investors who invested in diverse founders'",
+      "'Los Angeles / Southern California'",
+      "'Enterprise'",
+      "'New York City'",
+      "'San Francisco Bay Area'",
+      "'Austin'",
+      "'Midwest'",
+      "'Raleigh-Durham / Southeast US'",
+      "'Boston / New England']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:09:06.832852+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://www.pathbreakervc.com/companies"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/ryan-gembala"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "https://www.twitter.com/ryangembala"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/ryangembala/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Iron Ox', 'Simbe Robotics', 'Spiketrap', 'Safely You', 'Mux']"
+  },
+  {
+    "id": 43,
+    "name": "Jacob Shea",
+    "headline": "Mascot of Life",
+    "firm_name": "Structure Capital",
+    "about": "Mascot of Life",
+    "experience": "Mascot of Life",
+    "education": "Not listed in the linked source.",
+    "location": "San Francisco, California",
+    "website": "https://structure.vc/",
+    "linkedin": "https://www.linkedin.com/in/jacobshea/",
+    "profileSource": "https://signal.nfx.com/investors/jacob-shea",
+    "pastInvestments": "[{'year': 2022, 'company_name': 'Biofire'}, {'year': 2019, 'company_name': 'Copia'}, {'year': 2016, 'company_name': 'Copia'}, {'year': 2018, 'company_name': 'CareGuide'}]",
+    "investmentStage": "['Series A', 'Seed', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "AgTech, ['AgTech', 'Analytics', 'Real Estate/PropTech', 'Consumer Health', 'E-commerce', 'BioTech', 'Marketplaces', 'Diverse Investors', 'Investors who were founders', 'Investors who invested in female founders', 'Investors who invested in diverse founders', 'Los Angeles / Southern California', 'Consumer Internet', 'New York City', 'SaaS', 'San Francisco Bay Area', 'Austin', 'Digital Health']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 3,
+    "isActive": true,
+    "tags": [
+      "['AgTech'",
+      "'Analytics'",
+      "'Real Estate/PropTech'",
+      "'Consumer Health'",
+      "'E-commerce'",
+      "'BioTech'",
+      "'Marketplaces'",
+      "'Diverse Investors'",
+      "'Investors who were founders'",
+      "'Investors who invested in female founders'",
+      "'Investors who invested in diverse founders'",
+      "'Los Angeles / Southern California'",
+      "'Consumer Internet'",
+      "'New York City'",
+      "'SaaS'",
+      "'San Francisco Bay Area'",
+      "'Austin'",
+      "'Digital Health']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:09:47.504684+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://structure.vc/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/jacob-shea"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "https://twitter.com/jacobshea"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/jacobshea/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Biofire', 'CareGuide', 'Copia', 'Copia']"
+  },
+  {
+    "id": 44,
+    "name": "Sunil Rajaraman",
+    "headline": "Founder, Investor, Writer.",
+    "firm_name": "Sequoia Capital",
+    "about": "Founder, Investor, Writer.",
+    "experience": "Founder, Investor, Writer.",
+    "education": "Not listed in the linked source.",
+    "location": "California",
+    "website": "https://www.sequoiacap.com/sea/",
+    "linkedin": "https://www.linkedin.com/in/sunilrajaraman/",
+    "profileSource": "https://signal.nfx.com/investors/sunil-rajaraman",
+    "pastInvestments": "[{'year': 2023, 'company_name': 'Azteco'}, {'year': 2021, 'company_name': 'Practice'}, {'year': 2021, 'company_name': 'Maven'}, {'year': 2020, 'company_name': 'Turing'}, {'year': 2019, 'company_name': 'Aalto'}, {'year': 2016, 'company_name': 'Iron Ox'}]",
+    "investmentStage": "['Seed', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "Advertising, ['Advertising', 'MarketingTech', 'AgTech', 'Analytics', 'Media/Content', 'Diverse Investors', 'Investors who were founders', 'Investors who invested in female founders', 'Investors who invested in diverse founders', 'Enterprise', 'Marketplaces', 'San Francisco Bay Area', 'Future of Work', 'Angel, Scout, and Solo-Capitalists']",
+    "investmentThesis": "Labor marketplaces, AI, marketing technology.",
+    "totalInvestmentsCount": 6,
+    "isActive": true,
+    "tags": [
+      "['Advertising'",
+      "'MarketingTech'",
+      "'AgTech'",
+      "'Analytics'",
+      "'Media/Content'",
+      "'Diverse Investors'",
+      "'Investors who were founders'",
+      "'Investors who invested in female founders'",
+      "'Investors who invested in diverse founders'",
+      "'Enterprise'",
+      "'Marketplaces'",
+      "'San Francisco Bay Area'",
+      "'Future of Work'",
+      "'Angel",
+      "Scout",
+      "and Solo-Capitalists']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:10:46.095498+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://www.sequoiacap.com/sea/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/sunil-rajaraman"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "http://twitter.com/subes01"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/sunilrajaraman/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Turing', 'Practice', 'Aalto', 'Azteco', 'Maven']"
+  },
+  {
+    "id": 45,
+    "name": "Parikshit Sharma",
+    "headline": "Partner at SOSV",
+    "firm_name": "SOSV",
+    "about": "Partner at SOSV",
+    "experience": "Partner at SOSV",
+    "education": "Not listed in the linked source.",
+    "location": "San Francisco Bay Area",
+    "website": "https://sosv.com/team/parikshit-sharma",
+    "linkedin": "https://www.linkedin.com/in/parikshit-sharma-a3b41b91/",
+    "profileSource": "https://signal.nfx.com/investors/parikshit-sharma",
+    "pastInvestments": "[]",
+    "investmentStage": "['Series B', 'Seed', 'Series A', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "AgTech, ['AgTech', 'Material Science', 'Medical Devices', 'Consumer Health', 'Impact', 'Pharmaceuticals', 'Food and Beverage', 'BioTech', 'EnergyTech', 'Diverse Investors', 'Health & Hospital Services', 'Investors who invested in female founders', 'Investors who invested in diverse founders', 'San Francisco Bay Area']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 0,
+    "isActive": false,
+    "tags": [
+      "['AgTech'",
+      "'Material Science'",
+      "'Medical Devices'",
+      "'Consumer Health'",
+      "'Impact'",
+      "'Pharmaceuticals'",
+      "'Food and Beverage'",
+      "'BioTech'",
+      "'EnergyTech'",
+      "'Diverse Investors'",
+      "'Health & Hospital Services'",
+      "'Investors who invested in female founders'",
+      "'Investors who invested in diverse founders'",
+      "'San Francisco Bay Area']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:11:37.412552+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://sosv.com/team/parikshit-sharma"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/parikshit-sharma"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "https://twitter.com/ParikshitS_"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/parikshit-sharma-a3b41b91/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "[]"
+  },
+  {
+    "id": 46,
+    "name": "Alex Kopelyan",
+    "headline": "Senior Director & Partner at SOSV�s IndieBio",
+    "firm_name": "SOSV",
+    "about": "Senior Director & Partner at SOSV�s IndieBio",
+    "experience": "Senior Director & Partner at SOSV�s IndieBio",
+    "education": "Not listed in the linked source.",
+    "location": "United States",
+    "website": "https://sosv.com/team/alex-kopelyan",
+    "linkedin": "https://www.linkedin.com/in/alex-kopelyan-66b16726/",
+    "profileSource": "https://signal.nfx.com/investors/alex-kopelyan",
+    "pastInvestments": "[]",
+    "investmentStage": "['Seed', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "Material Science, ['Material Science', 'Pharmaceuticals', 'AgTech', 'Food and Beverage', 'ClimateTech/CleanTech', 'BioTech', 'Consumer Health', 'Health IT', 'San Francisco Bay Area', 'Health & Hospital Services']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 0,
+    "isActive": false,
+    "tags": [
+      "['Material Science'",
+      "'Pharmaceuticals'",
+      "'AgTech'",
+      "'Food and Beverage'",
+      "'ClimateTech/CleanTech'",
+      "'BioTech'",
+      "'Consumer Health'",
+      "'Health IT'",
+      "'San Francisco Bay Area'",
+      "'Health & Hospital Services']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:12:25.47295+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://sosv.com/team/alex-kopelyan"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/alex-kopelyan"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "https://twitter.com/alexkopelyan"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/alex-kopelyan-66b16726/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "[]"
+  },
+  {
+    "id": 47,
+    "name": "AJ Solimine",
+    "headline": "Founder and Managing Partner at Script Capital",
+    "firm_name": "Script Capital",
+    "about": "Founder and Managing Partner at Script Capital",
+    "experience": "Founder and Managing Partner at Script Capital",
+    "education": "Not listed in the linked source.",
+    "location": "San Francisco Bay Area",
+    "website": "https://script.capital/",
+    "linkedin": "https://www.linkedin.com/in/ajsolimine/",
+    "profileSource": "https://signal.nfx.com/investors/andrew-solimine",
+    "pastInvestments": "[{'year': 2024, 'company_name': 'Butler'}, {'year': 2020, 'company_name': 'Anvil Foundry'}, {'year': 2018, 'company_name': 'Scatter'}, {'year': 2017, 'company_name': 'Ludus'}, {'year': 2016, 'company_name': 'Sqreen'}, {'year': 2015, 'company_name': 'Tech in Asia'}]",
+    "investmentStage": "['Seed', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "Social Commerce, ['Social Commerce', 'SMB Software', 'AgTech', 'Web3/Blockchain', 'Investors who invested in female founders', 'Investors who were founders', 'Web3/Crypto', 'Investors who invested in diverse founders', 'FinTech', 'San Francisco Bay Area', 'SaaS']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 6,
+    "isActive": true,
+    "tags": [
+      "['Social Commerce'",
+      "'SMB Software'",
+      "'AgTech'",
+      "'Web3/Blockchain'",
+      "'Investors who invested in female founders'",
+      "'Investors who were founders'",
+      "'Web3/Crypto'",
+      "'Investors who invested in diverse founders'",
+      "'FinTech'",
+      "'San Francisco Bay Area'",
+      "'SaaS']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:13:52.864931+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://script.capital/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/andrew-solimine"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "http://www.twitter.com/ajhit406"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/ajsolimine/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Scatter', 'Tech in Asia', 'Butler', 'Ludus', 'Anvil Foundry']"
+  },
+  {
+    "id": 48,
+    "name": "Michael Rose",
+    "headline": "Investor at Better Food Ventures",
+    "firm_name": "Better Food Ventures",
+    "about": "Michael Rose is listed in the NFX Signal investor directory. See linked profile for the original public listing.",
+    "experience": "Investor associated with Better Food Ventures.",
+    "education": "Not listed in the linked source.",
+    "location": "San Francisco Bay Area",
+    "website": "https://www.betterfoodventures.com/",
+    "linkedin": "https://www.linkedin.com/in/jmichaelrose/",
+    "profileSource": "https://signal.nfx.com/investors/michael-rose",
+    "pastInvestments": "[]",
+    "investmentStage": "['Series B', 'Series A', 'Seed', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "Analytics, ['Analytics', 'AgTech', 'Robotics', 'Food and Beverage', 'San Francisco Bay Area']",
+    "investmentThesis": "Funding IT Innovators for Positive Impact in Food & Agriculture",
+    "totalInvestmentsCount": 0,
+    "isActive": false,
+    "tags": [
+      "['Analytics'",
+      "'AgTech'",
+      "'Robotics'",
+      "'Food and Beverage'",
+      "'San Francisco Bay Area']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:16:14.999891+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://www.betterfoodventures.com/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/michael-rose"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/jmichaelrose/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "[]"
+  },
+  {
+    "id": 49,
+    "name": "Anand Chandrasekaran",
+    "headline": "Venture Advisor (former Partner) at General Catalyst",
+    "firm_name": "General Catalyst",
+    "about": "Venture Advisor (former Partner) at General Catalyst",
+    "experience": "Venture Advisor (former Partner) at General Catalyst",
+    "education": "Not listed in the linked source.",
+    "location": "Palo Alto, California",
+    "website": "https://www.generalcatalyst.com/team/anand-chandrasekaran",
+    "linkedin": "https://www.linkedin.com/in/anandc/",
+    "profileSource": "https://signal.nfx.com/investors/anand-chandrasekaran",
+    "pastInvestments": "[{'year': 2025, 'company_name': 'HiOctave'}, {'year': 2025, 'company_name': 'JEH Aerospace'}, {'year': 2024, 'company_name': 'JEH Aerospace'}, {'year': 2025, 'company_name': 'Stance Health'}, {'year': 2024, 'company_name': 'Orange Health Labs'}, {'year': 2022, 'company_name': 'Orange Health Labs'}, {'year': 2024, 'company_name': 'Crescendo'}, {'year': 2024, 'company_name': 'Stan'}, {'year': 2022, 'company_name': 'Stan'}, {'year': 2023, 'company_name': 'QuriousBit'}, {'year': 2023, 'company_name': 'Magma'}]",
+    "investmentStage": "['Series B', 'Series A', 'Seed', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "AgTech, ['AgTech', 'AI', 'Web3/Crypto', 'ClimateTech/CleanTech', 'Consumer Internet', 'Marketplaces', 'FinTech', 'Health IT', 'SaaS', 'San Francisco Bay Area', 'Angel, Scout, and Solo-Capitalists', 'Digital Health']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 60,
+    "isActive": true,
+    "tags": [
+      "['AgTech'",
+      "'AI'",
+      "'Web3/Crypto'",
+      "'ClimateTech/CleanTech'",
+      "'Consumer Internet'",
+      "'Marketplaces'",
+      "'FinTech'",
+      "'Health IT'",
+      "'SaaS'",
+      "'San Francisco Bay Area'",
+      "'Angel",
+      "Scout",
+      "and Solo-Capitalists'",
+      "'Digital Health']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:20:09.894294+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://www.generalcatalyst.com/team/anand-chandrasekaran"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/anand-chandrasekaran"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "http://twitter.com/anandc"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/anandc/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Crescendo', 'Orange Health Labs', 'HiOctave', 'Orange Health Labs', 'JEH Aerospace']"
+  },
+  {
+    "id": 50,
+    "name": "Lorenzo Thione",
+    "headline": "Managing Director at Gaingels, Investor in 500+ companies",
+    "firm_name": "Gaingels",
+    "about": "Managing Director at Gaingels, Investor in 500+ companies",
+    "experience": "Managing Director at Gaingels, Investor in 500+ companies",
+    "education": "Not listed in the linked source.",
+    "location": "Chicago, Illinois",
+    "website": "https://gaingels.com/team",
+    "linkedin": "https://www.linkedin.com/in/lorenzothione/",
+    "profileSource": "https://signal.nfx.com/investors/lorenzo-thione",
+    "pastInvestments": "[{'year': 2025, 'company_name': 'Ashby'}, {'year': 2025, 'company_name': 'Turing'}, {'year': 2020, 'company_name': 'Turing'}, {'year': 2024, 'company_name': 'Openmart'}, {'year': 2024, 'company_name': 'Ceemo'}, {'year': 2024, 'company_name': 'Limbic'}, {'year': 2024, 'company_name': 'Leap AI'}, {'year': 2023, 'company_name': 'SpecCheck'}, {'year': 2023, 'company_name': 'Paxton'}]",
+    "investmentStage": "['Series B', 'Series A', 'Seed', 'Other Lists', 'Pre-seed', 'Series C', 'Post-seed']",
+    "primaryDomain": "AgTech, ['AgTech', 'AI', 'Robotics', 'ClimateTech/CleanTech', 'Enterprise', 'Diverse Investors', 'SaaS', 'Investors who were founders', 'Investors who invested in female founders', 'Investors who invested in diverse founders', 'New York City', 'Midwest', 'Digital Health', 'Wellness & Fitness', 'DeepTech', 'Generative Tech/AI']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 38,
+    "isActive": true,
+    "tags": [
+      "['AgTech'",
+      "'AI'",
+      "'Robotics'",
+      "'ClimateTech/CleanTech'",
+      "'Enterprise'",
+      "'Diverse Investors'",
+      "'SaaS'",
+      "'Investors who were founders'",
+      "'Investors who invested in female founders'",
+      "'Investors who invested in diverse founders'",
+      "'New York City'",
+      "'Midwest'",
+      "'Digital Health'",
+      "'Wellness & Fitness'",
+      "'DeepTech'",
+      "'Generative Tech/AI']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:29:45.888287+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://gaingels.com/team"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/lorenzo-thione"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "https://www.twitter.com/thione"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/lorenzothione/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Turing', 'Ashby', 'Turing', 'Limbic', 'Paxton']"
+  },
+  {
+    "id": 51,
+    "name": "Cain McClary",
+    "headline": "Founder and Managing Partner at KdT Ventures",
+    "firm_name": "KdT Ventures",
+    "about": "Founder and Managing Partner at KdT Ventures",
+    "experience": "Founder and Managing Partner at KdT Ventures",
+    "education": "Not listed in the linked source.",
+    "location": "Austin, Texas",
+    "website": "https://www.kdtvc.com/",
+    "linkedin": "https://www.linkedin.com/in/cainmcclary/",
+    "profileSource": "https://signal.nfx.com/investors/cain-mcclary",
+    "pastInvestments": "[{'year': 2025, 'company_name': 'Character Biosciences'}, {'year': 2020, 'company_name': 'Character Biosciences'}, {'year': 2024, 'company_name': 'Elegen'}, {'year': 2019, 'company_name': 'Checkerspot'}, {'year': 2018, 'company_name': 'Checkerspot'}, {'year': 2018, 'company_name': 'Tierra Biosciences'}]",
+    "investmentStage": "['Seed', 'Other Lists', 'Pre-seed', 'Post-seed']",
+    "primaryDomain": "Material Science, ['Material Science', 'Pharmaceuticals', 'AgTech', 'Analytics', 'EnergyTech', 'BioTech', 'AI', 'Health IT', 'San Francisco Bay Area', 'Austin', 'Raleigh-Durham / Southeast US', 'Boston / New England']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 4,
+    "isActive": true,
+    "tags": [
+      "['Material Science'",
+      "'Pharmaceuticals'",
+      "'AgTech'",
+      "'Analytics'",
+      "'EnergyTech'",
+      "'BioTech'",
+      "'AI'",
+      "'Health IT'",
+      "'San Francisco Bay Area'",
+      "'Austin'",
+      "'Raleigh-Durham / Southeast US'",
+      "'Boston / New England']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:30:47.135657+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://www.kdtvc.com/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/cain-mcclary"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/cainmcclary/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Character Biosciences', 'Elegen', 'Checkerspot', 'Character Biosciences', 'Checkerspot']"
+  },
+  {
+    "id": 52,
+    "name": "Binh Tran",
+    "headline": "General Partner at AVV",
+    "firm_name": "Ascend Vietnam Ventures",
+    "about": "General Partner at AVV",
+    "experience": "General Partner at AVV",
+    "education": "Not listed in the linked source.",
+    "location": "San Francisco Bay Area",
+    "website": "https://avv.co/",
+    "linkedin": "https://www.linkedin.com/in/binhqtran/",
+    "profileSource": "https://signal.nfx.com/investors/binh-tran",
+    "pastInvestments": "[{'year': 2025, 'company_name': 'Vaudit (Formerly BlokID)'}, {'year': 2024, 'company_name': 'Vaudit (Formerly BlokID)'}, {'year': 2021, 'company_name': 'Finblox'}, {'year': 2021, 'company_name': 'CatalyzeX'}, {'year': 2021, 'company_name': 'POC Pharma'}, {'year': 2020, 'company_name': 'Retrocausal'}, {'year': 2019, 'company_name': 'Nearside'}, {'year': 2018, 'company_name': 'Bunch'}, {'year': 2018, 'company_name': 'Turing'}]",
+    "investmentStage": "['Seed', 'Other Lists', 'Pre-seed', 'Post-seed']",
+    "primaryDomain": "Social Commerce, ['Social Commerce', 'AgTech', 'Real Estate/PropTech', 'Education', 'AI', 'Logistics', 'Diverse Investors', 'Investors who invested in female founders', 'Investors who invested in diverse founders', 'E-commerce', 'FinTech', 'Marketplaces', 'San Francisco Bay Area', 'SaaS', 'Angel, Scout, and Solo-Capitalists']",
+    "investmentThesis": "Tech companies solving emerging market problems",
+    "totalInvestmentsCount": 21,
+    "isActive": true,
+    "tags": [
+      "['Social Commerce'",
+      "'AgTech'",
+      "'Real Estate/PropTech'",
+      "'Education'",
+      "'AI'",
+      "'Logistics'",
+      "'Diverse Investors'",
+      "'Investors who invested in female founders'",
+      "'Investors who invested in diverse founders'",
+      "'E-commerce'",
+      "'FinTech'",
+      "'Marketplaces'",
+      "'San Francisco Bay Area'",
+      "'SaaS'",
+      "'Angel",
+      "Scout",
+      "and Solo-Capitalists']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:31:43.499311+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://avv.co/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/binh-tran"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "https://www.twitter.com/binhtran"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/binhqtran/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Vaudit (Formerly BlokID)', 'POC Pharma', 'Nearside', 'Bunch', 'Turing']"
+  },
+  {
+    "id": 53,
+    "name": "Ludovic Cop�r�",
+    "headline": "Senior Investment Director, Sony Ventures",
+    "firm_name": "Sony Innovation Fund",
+    "about": "Senior Investment Director, Sony Ventures",
+    "experience": "Senior Investment Director, Sony Ventures",
+    "education": "Not listed in the linked source.",
+    "location": "San Jose, California",
+    "website": "https://angel.co/lcopere",
+    "linkedin": "https://www.linkedin.com/in/ludovic/",
+    "profileSource": "https://signal.nfx.com/investors/ludovic-copere",
+    "pastInvestments": "[{'year': 2023, 'company_name': 'SiLC Technologies'}, {'year': 2022, 'company_name': 'Covr Financial Technologies'}, {'year': 2021, 'company_name': 'Truepic'}, {'year': 2020, 'company_name': 'Arkose Labs'}, {'year': 2019, 'company_name': 'PreAct Technologies'}, {'year': 2018, 'company_name': 'Ridecell'}, {'year': 2018, 'company_name': 'Matternet'}, {'year': 2016, 'company_name': 'Gastrograph'}]",
+    "investmentStage": "['Series B', 'Series A', 'Seed', 'Other Lists', 'Pre-seed', 'Series C', 'Post-seed']",
+    "primaryDomain": "AgTech, ['AgTech', 'AI', 'Robotics', 'FinTech', 'San Francisco Bay Area', 'Canada', 'Impact', 'Web3/Blockchain', 'Web3/Crypto', 'Enterprise Infrastructure', 'Investors who invested in diverse founders', 'Cybersecurity']",
+    "investmentThesis": "web3, FinTech, Cybersecurity, Autonomous Mobility/Transportation, Drones, FoodTech, AgTech, Robotics, InsurTech, AI, IoT... start-ups where Sony can bring in strategic value",
+    "totalInvestmentsCount": 9,
+    "isActive": true,
+    "tags": [
+      "['AgTech'",
+      "'AI'",
+      "'Robotics'",
+      "'FinTech'",
+      "'San Francisco Bay Area'",
+      "'Canada'",
+      "'Impact'",
+      "'Web3/Blockchain'",
+      "'Web3/Crypto'",
+      "'Enterprise Infrastructure'",
+      "'Investors who invested in diverse founders'",
+      "'Cybersecurity']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:33:07.532195+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://angel.co/lcopere"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/ludovic-copere"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "https://twitter.com/lcopere/"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/ludovic/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Ridecell', 'Truepic', 'SiLC Technologies', 'Arkose Labs', 'Covr Financial Technologies']"
+  },
+  {
+    "id": 54,
+    "name": "Shuo Yang",
+    "headline": "Partner at Lowercarbon Capital",
+    "firm_name": "Lowercarbon Capital",
+    "about": "Partner at Lowercarbon Capital",
+    "experience": "Partner at Lowercarbon Capital",
+    "education": "Not listed in the linked source.",
+    "location": "San Francisco Bay Area",
+    "website": "https://lowercarboncapital.com/team/shuo-yang/",
+    "linkedin": "https://www.linkedin.com/in/shuo/",
+    "profileSource": "https://signal.nfx.com/investors/shuo-yang",
+    "pastInvestments": "[{'year': 2024, 'company_name': 'unspun'}, {'year': 2023, 'company_name': 'unspun'}]",
+    "investmentStage": "['Seed', 'Other Lists', 'Pre-seed', 'Post-seed']",
+    "primaryDomain": "Material Science, ['Material Science', 'Fashion', 'Impact', 'AgTech', 'Food and Beverage', 'EnergyTech', 'ClimateTech/CleanTech', 'Education', 'Chemicals', 'Manufacturing', 'Diverse Investors', 'Investors who invested in female founders', 'Investors who were founders', 'Investors who invested in diverse founders', 'San Francisco Bay Area']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 1,
+    "isActive": true,
+    "tags": [
+      "['Material Science'",
+      "'Fashion'",
+      "'Impact'",
+      "'AgTech'",
+      "'Food and Beverage'",
+      "'EnergyTech'",
+      "'ClimateTech/CleanTech'",
+      "'Education'",
+      "'Chemicals'",
+      "'Manufacturing'",
+      "'Diverse Investors'",
+      "'Investors who invested in female founders'",
+      "'Investors who were founders'",
+      "'Investors who invested in diverse founders'",
+      "'San Francisco Bay Area']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:36:42.130818+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://lowercarboncapital.com/team/shuo-yang/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/shuo-yang"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "https://www.twitter.com/shuofucious"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/shuo/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['unspun', 'unspun']"
+  },
+  {
+    "id": 55,
+    "name": "Greg Bennett",
+    "headline": "Principal at Kapor Capital",
+    "firm_name": "Kapor Capital",
+    "about": "Principal at Kapor Capital",
+    "experience": "Principal at Kapor Capital",
+    "education": "Not listed in the linked source.",
+    "location": "San Francisco, California",
+    "website": "https://kaporcapital.com/who-we-are/greg-bennett/",
+    "linkedin": "https://www.linkedin.com/in/greg-bennett-277451a/",
+    "profileSource": "https://signal.nfx.com/investors/greg-bennett_1",
+    "pastInvestments": "[]",
+    "investmentStage": "['Series A', 'Seed', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "AgTech, ['AgTech', 'Food and Beverage', 'EnergyTech', 'San Francisco Bay Area', 'Enterprise Infrastructure']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 0,
+    "isActive": false,
+    "tags": [
+      "['AgTech'",
+      "'Food and Beverage'",
+      "'EnergyTech'",
+      "'San Francisco Bay Area'",
+      "'Enterprise Infrastructure']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:37:31.714298+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://kaporcapital.com/who-we-are/greg-bennett/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/greg-bennett_1"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "https://www.twitter.com/gbennett41"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/greg-bennett-277451a/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "[]"
+  },
+  {
+    "id": 56,
+    "name": "Shilpi Kumar",
+    "headline": "Partner at Third Sphere",
+    "firm_name": "Third Sphere",
+    "about": "Partner at Third Sphere",
+    "experience": "Partner at Third Sphere",
+    "education": "Not listed in the linked source.",
+    "location": "Oakland, California",
+    "website": "https://thirdsphere.com/",
+    "linkedin": "https://www.linkedin.com/in/shilpikumar/",
+    "profileSource": "https://signal.nfx.com/investors/shilpi-kumar",
+    "pastInvestments": "[{'year': 2022, 'company_name': 'Earth Force Technologies'}]",
+    "investmentStage": "['Seed', 'Other Lists', 'Pre-seed', 'Post-seed']",
+    "primaryDomain": "Hardware, ['Hardware', 'Robotics', 'AgTech', 'TransportationTech', 'EnergyTech', 'IoT', 'ClimateTech/CleanTech', 'Logistics', 'Manufacturing', 'Diverse Investors', 'Investors who invested in female founders', 'Female Investors', 'Investors who invested in diverse founders', 'San Francisco Bay Area']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 1,
+    "isActive": true,
+    "tags": [
+      "['Hardware'",
+      "'Robotics'",
+      "'AgTech'",
+      "'TransportationTech'",
+      "'EnergyTech'",
+      "'IoT'",
+      "'ClimateTech/CleanTech'",
+      "'Logistics'",
+      "'Manufacturing'",
+      "'Diverse Investors'",
+      "'Investors who invested in female founders'",
+      "'Female Investors'",
+      "'Investors who invested in diverse founders'",
+      "'San Francisco Bay Area']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:41:28.235753+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://thirdsphere.com/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/shilpi-kumar"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/shilpikumar/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Earth Force Technologies']"
+  },
+  {
+    "id": 57,
+    "name": "Mack Healy",
+    "headline": "Managing Partner at KdT Ventures",
+    "firm_name": "KdT Ventures",
+    "about": "Managing Partner at KdT Ventures",
+    "experience": "Managing Partner at KdT Ventures",
+    "education": "Not listed in the linked source.",
+    "location": "Austin, Texas",
+    "website": "https://www.kdtvc.com/",
+    "linkedin": "https://www.linkedin.com/in/mackjhealy/",
+    "profileSource": "https://signal.nfx.com/investors/mack-healy",
+    "pastInvestments": "[{'year': 2020, 'company_name': 'Circularis Biotechnologies'}, {'year': 2016, 'company_name': 'PathAI'}]",
+    "investmentStage": "['Seed', 'Other Lists', 'Pre-seed', 'Post-seed']",
+    "primaryDomain": "Material Science, ['Material Science', 'Pharmaceuticals', 'AgTech', 'Analytics', 'EnergyTech', 'BioTech', 'Los Angeles / Southern California', 'Health IT', 'San Francisco Bay Area', 'Austin', 'Boston / New England']",
+    "investmentThesis": "Entrepreneurs reprogramming chemistry and biology using creative technology platforms.",
+    "totalInvestmentsCount": 2,
+    "isActive": false,
+    "tags": [
+      "['Material Science'",
+      "'Pharmaceuticals'",
+      "'AgTech'",
+      "'Analytics'",
+      "'EnergyTech'",
+      "'BioTech'",
+      "'Los Angeles / Southern California'",
+      "'Health IT'",
+      "'San Francisco Bay Area'",
+      "'Austin'",
+      "'Boston / New England']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:41:48.072308+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://www.kdtvc.com/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/mack-healy"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/mackjhealy/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['PathAI', 'Circularis Biotechnologies']"
+  },
+  {
+    "id": 58,
+    "name": "Eyal Gura",
+    "headline": "Entrepreneur & Venture Investor",
+    "firm_name": "Webtalk Ltd",
+    "about": "Entrepreneur & Venture Investor",
+    "experience": "Entrepreneur & Venture Investor",
+    "education": "Not listed in the linked source.",
+    "location": "Israel",
+    "website": null,
+    "linkedin": "https://www.linkedin.com/in/eyalgura/",
+    "profileSource": "https://signal.nfx.com/investors/eyal-gura",
+    "pastInvestments": "[{'year': 2022, 'company_name': 'Taranis'}, {'year': 2018, 'company_name': 'Taranis'}, {'year': 2017, 'company_name': 'Taranis'}, {'year': 2016, 'company_name': 'Taranis'}, {'year': 2015, 'company_name': 'Taranis'}, {'year': 2022, 'company_name': 'Imagene AI'}, {'year': 2021, 'company_name': 'Theator'}, {'year': 2019, 'company_name': 'Theator'}, {'year': 2020, 'company_name': 'TechSee'}, {'year': 2020, 'company_name': 'Dataloop AI'}, {'year': 2020, 'company_name': 'Awell Health'}, {'year': 2019, 'company_name': 'venn'}, {'year': 2019, 'company_name': 'Wi Charge'}]",
+    "investmentStage": "['Series B', 'Series A', 'Seed', 'Other Lists', 'Pre-seed', 'Post-seed']",
+    "primaryDomain": "Advertising, ['Advertising', 'AgTech', 'Consumer Health', 'AI', 'Payments', 'Developer Tools', 'Enterprise', 'Diverse Investors', 'Investors who were founders', 'Investors who invested in female founders', 'SaaS', 'Israel', 'Investors who invested in diverse founders', 'Boston / New England', 'Angel, Scout, and Solo-Capitalists', 'Digital Health', 'DeepTech']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 25,
+    "isActive": true,
+    "tags": [
+      "['Advertising'",
+      "'AgTech'",
+      "'Consumer Health'",
+      "'AI'",
+      "'Payments'",
+      "'Developer Tools'",
+      "'Enterprise'",
+      "'Diverse Investors'",
+      "'Investors who were founders'",
+      "'Investors who invested in female founders'",
+      "'SaaS'",
+      "'Israel'",
+      "'Investors who invested in diverse founders'",
+      "'Boston / New England'",
+      "'Angel",
+      "Scout",
+      "and Solo-Capitalists'",
+      "'Digital Health'",
+      "'DeepTech']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:43:02.801624+00:00.",
+    "otherLinks": [
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/eyal-gura"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "http://twitter.com/eyalg"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/eyalgura/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Taranis', 'venn', 'TechSee', 'Taranis', 'Imagene AI']"
+  },
+  {
+    "id": 59,
+    "name": "Paul Straub",
+    "headline": "Managing Partner & Co-Founder at Wireframe Ventures",
+    "firm_name": "Wireframe Ventures",
+    "about": "Managing Partner & Co-Founder at Wireframe Ventures",
+    "experience": "Managing Partner & Co-Founder at Wireframe Ventures",
+    "education": "Not listed in the linked source.",
+    "location": "California",
+    "website": "https://www.wireframevc.com/",
+    "linkedin": "https://www.linkedin.com/in/paulstraub/",
+    "profileSource": "https://signal.nfx.com/investors/paul-straub",
+    "pastInvestments": "[{'year': 2025, 'company_name': 'C.Scale'}, {'year': 2025, 'company_name': 'Bedrock Energy'}, {'year': 2023, 'company_name': 'Bedrock Energy'}, {'year': 2020, 'company_name': 'Electriphi'}, {'year': 2017, 'company_name': 'Blue Pillar'}, {'year': 2012, 'company_name': 'Blue Pillar'}, {'year': 2016, 'company_name': 'Alphabet Energy'}, {'year': 2013, 'company_name': 'Alphabet Energy'}, {'year': 2011, 'company_name': 'Alphabet Energy'}, {'year': 2010, 'company_name': 'Alphabet Energy'}, {'year': 2012, 'company_name': 'Adura Technologies'}, {'year': 2010, 'company_name': 'Adura Technologies'}, {'year': 2008, 'company_name': 'Adura Technologies'}, {'year': 2011, 'company_name': 'Project Frog'}, {'year': 2011, 'company_name': 'Clean Power Finance'}, {'year': 2010, 'company_name': 'Clean Power Finance'}]",
+    "investmentStage": "['Series A', 'Seed', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "AgTech, ['AgTech', 'Impact', 'TransportationTech', 'ClimateTech/CleanTech', 'EnergyTech', 'IoT', 'Logistics', 'Marketplaces', 'Health IT', 'FinTech', 'Canada']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 9,
+    "isActive": true,
+    "tags": [
+      "['AgTech'",
+      "'Impact'",
+      "'TransportationTech'",
+      "'ClimateTech/CleanTech'",
+      "'EnergyTech'",
+      "'IoT'",
+      "'Logistics'",
+      "'Marketplaces'",
+      "'Health IT'",
+      "'FinTech'",
+      "'Canada']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:43:59.091375+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://www.wireframevc.com/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/paul-straub"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "https://www.twitter.com/pstraub"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/paulstraub/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Clean Power Finance', 'Alphabet Energy', 'Project Frog', 'Alphabet Energy', 'Bedrock Energy']"
+  },
+  {
+    "id": 60,
+    "name": "Yipeng Zhao",
+    "headline": "Investor at Embark Ventures",
+    "firm_name": "Embark Ventures",
+    "about": "Yipeng Zhao is listed in the NFX Signal investor directory. See linked profile for the original public listing.",
+    "experience": "Investor associated with Embark Ventures.",
+    "education": "Not listed in the linked source.",
+    "location": "Los Angeles / Southern California",
+    "website": "https://www.embark.vc/",
+    "linkedin": "https://www.linkedin.com/in/yipengzhao/",
+    "profileSource": "https://signal.nfx.com/investors/yipeng-zhao",
+    "pastInvestments": "[]",
+    "investmentStage": "['Seed', 'Series A', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "Material Science, ['Material Science', 'Medical Devices', 'AgTech', 'Robotics', 'BioTech', 'AI', 'Los Angeles / Southern California']",
+    "investmentThesis": "Automation (AI/ML, Robotics), Advanced Materials and Biotech",
+    "totalInvestmentsCount": 0,
+    "isActive": false,
+    "tags": [
+      "['Material Science'",
+      "'Medical Devices'",
+      "'AgTech'",
+      "'Robotics'",
+      "'BioTech'",
+      "'AI'",
+      "'Los Angeles / Southern California']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:45:01.776732+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://www.embark.vc/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/yipeng-zhao"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/yipengzhao/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "[]"
+  },
+  {
+    "id": 61,
+    "name": "Nat Friedman",
+    "headline": "Investor, entrepreneur",
+    "firm_name": "C2 Investment",
+    "about": "Investor, entrepreneur",
+    "experience": "Investor, entrepreneur",
+    "education": "Not listed in the linked source.",
+    "location": "San Francisco, California",
+    "website": null,
+    "linkedin": "https://www.linkedin.com/in/natfriedman/",
+    "profileSource": "https://signal.nfx.com/investors/nat-friedman",
+    "pastInvestments": "[{'year': 2025, 'company_name': 'Sumble'}, {'year': 2025, 'company_name': 'Composite'}, {'year': 2025, 'company_name': 'Medra AI'}, {'year': 2025, 'company_name': 'Julius AI'}, {'year': 2025, 'company_name': 'Artificial Intelligence Underwriting Company'}, {'year': 2025, 'company_name': 'XBOW'}, {'year': 2025, 'company_name': 'XBOW'}, {'year': 2025, 'company_name': 'Traversal'}, {'year': 2025, 'company_name': 'Antimetal'}]",
+    "investmentStage": "['Series B', 'Series A', 'Seed', 'Other Lists', 'Pre-seed', 'Series C']",
+    "primaryDomain": "AI, ['AI', 'Cloud Infrastructure', 'SaaS', 'San Francisco Bay Area', 'Angel, Scout, and Solo-Capitalists', 'Generative Tech/AI']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 93,
+    "isActive": true,
+    "tags": [
+      "['AI'",
+      "'Cloud Infrastructure'",
+      "'SaaS'",
+      "'San Francisco Bay Area'",
+      "'Angel",
+      "Scout",
+      "and Solo-Capitalists'",
+      "'Generative Tech/AI']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:47:40.333778+00:00.",
+    "otherLinks": [
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/nat-friedman"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "https://twitter.com/natfriedman"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/natfriedman/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['XBOW', 'Traversal', 'Sumble', 'XBOW', 'Antimetal']"
+  },
+  {
+    "id": 62,
+    "name": "James Currier",
+    "headline": "General Partner at NFX",
+    "firm_name": "NFX",
+    "about": "General Partner at NFX",
+    "experience": "General Partner at NFX",
+    "education": "Not listed in the linked source.",
+    "location": "Palo Alto, California",
+    "website": "https://nfx.com/team/james-currier/",
+    "linkedin": "https://www.linkedin.com/in/jamescurrier/",
+    "profileSource": "https://signal.nfx.com/investors/james-currier",
+    "pastInvestments": "[{'year': 2025, 'company_name': 'Rec Technologies'}, {'year': 2024, 'company_name': 'Rec Technologies'}, {'year': 2025, 'company_name': 'Warmly'}, {'year': 2023, 'company_name': 'Warmly'}, {'year': 2020, 'company_name': 'Warmly'}, {'year': 2024, 'company_name': 'Smashing'}, {'year': 2024, 'company_name': 'Sagetap'}, {'year': 2023, 'company_name': 'Candex'}, {'year': 2022, 'company_name': 'Candex'}, {'year': 2021, 'company_name': 'Candex'}, {'year': 2019, 'company_name': 'Candex'}, {'year': 2019, 'company_name': 'Candex'}, {'year': 2023, 'company_name': 'Nuvocargo'}, {'year': 2022, 'company_name': 'Nuvocargo'}, {'year': 2021, 'company_name': 'Nuvocargo'}, {'year': 2021, 'company_name': 'Nuvocargo'}, {'year': 2020, 'company_name': 'Nuvocargo'}, {'year': 2022, 'company_name': 'Cherry'}, {'year': 2022, 'company_name': 'fidu'}]",
+    "investmentStage": "['Seed', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "Messaging, ['Messaging', 'Games', 'SMB Software', 'Payments', 'Gaming/eSports', 'Web3/Blockchain', 'AI', 'Investors who were founders', 'Investors who invested in female founders', 'Israel', 'Investors who invested in diverse founders', 'Marketplaces', 'SaaS', 'San Francisco Bay Area', 'Angel, Scout, and Solo-Capitalists', 'Generative Tech/AI']",
+    "investmentThesis": "Companies in the SF Bay Area. Anything with network effects: networks, marketplaces, synthetic biology, urban tech, fintech, B2B, B2C, consumer products, AR, IOT, connected devices.",
+    "totalInvestmentsCount": 98,
+    "isActive": true,
+    "tags": [
+      "['Messaging'",
+      "'Games'",
+      "'SMB Software'",
+      "'Payments'",
+      "'Gaming/eSports'",
+      "'Web3/Blockchain'",
+      "'AI'",
+      "'Investors who were founders'",
+      "'Investors who invested in female founders'",
+      "'Israel'",
+      "'Investors who invested in diverse founders'",
+      "'Marketplaces'",
+      "'SaaS'",
+      "'San Francisco Bay Area'",
+      "'Angel",
+      "Scout",
+      "and Solo-Capitalists'",
+      "'Generative Tech/AI']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:48:46.64627+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://nfx.com/team/james-currier/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/james-currier"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "http://www.twitter.com/JamesCurrier"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/jamescurrier/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Candex', 'Nuvocargo', 'Nuvocargo', 'Candex', 'Candex']"
+  },
+  {
+    "id": 63,
+    "name": "Jason Calacanis",
+    "headline": "Founder & CEO at LAUNCH",
+    "firm_name": "LAUNCH",
+    "about": "Founder & CEO at LAUNCH",
+    "experience": "Founder & CEO at LAUNCH",
+    "education": "Not listed in the linked source.",
+    "location": "San Francisco, California",
+    "website": "https://calacanis.com/",
+    "linkedin": "https://www.linkedin.com/in/jasoncalacanis/",
+    "profileSource": "https://signal.nfx.com/investors/jason-calacanis",
+    "pastInvestments": "[{'year': 2025, 'company_name': 'Tenax ai'}, {'year': 2025, 'company_name': 'howie'}, {'year': 2025, 'company_name': 'Yorby AI'}, {'year': 2025, 'company_name': 'Ithy'}, {'year': 2025, 'company_name': 'Videogo'}, {'year': 2025, 'company_name': 'Guestlist'}, {'year': 2025, 'company_name': 'Viva Care'}, {'year': 2025, 'company_name': 'Millet AI'}]",
+    "investmentStage": "['Seed', 'Series B', 'Series A', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "Fashion, ['Fashion', 'Sales & CRM', 'Consumer Health', 'Retail', 'AI', 'Gaming/eSports', 'Entertainment & Sports', 'Cloud Infrastructure', 'Food and Beverage', 'Health & Hospital Services', 'San Francisco Bay Area', 'Angel, Scout, and Solo-Capitalists']",
+    "investmentThesis": "Founders with traction for the LAUNCH Accelerator\r\nFounders with $1m+ ARR for jasonssyndicate.com",
+    "totalInvestmentsCount": 407,
+    "isActive": true,
+    "tags": [
+      "['Fashion'",
+      "'Sales & CRM'",
+      "'Consumer Health'",
+      "'Retail'",
+      "'AI'",
+      "'Gaming/eSports'",
+      "'Entertainment & Sports'",
+      "'Cloud Infrastructure'",
+      "'Food and Beverage'",
+      "'Health & Hospital Services'",
+      "'San Francisco Bay Area'",
+      "'Angel",
+      "Scout",
+      "and Solo-Capitalists']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:49:39.757124+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://calacanis.com/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/jason-calacanis"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "https://twitter.com/Jason"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/jasoncalacanis/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['howie', 'Tenax ai', 'Yorby AI', 'Ithy', 'Videogo']"
+  },
+  {
+    "id": 64,
+    "name": "Sarai Bronfeld",
+    "headline": "Investment Team at NFX",
+    "firm_name": "NFX",
+    "about": "Investment Team at NFX",
+    "experience": "Investment Team at NFX",
+    "education": "Not listed in the linked source.",
+    "location": "Tel Aviv, Israel",
+    "website": "https://www.nfx.com/",
+    "linkedin": "https://www.linkedin.com/in/sarai-bronfeld-743602211/?originalSubdomain=il",
+    "profileSource": "https://signal.nfx.com/investors/sarai-bronfeld",
+    "pastInvestments": "[{'year': 2025, 'company_name': 'Impala AI'}]",
+    "investmentStage": "['Seed', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "Games, ['Games', 'AR/VR', 'AgTech', 'Food and Beverage', 'AI', 'Female Investors', 'Investors who were founders', 'Investors who invested in female founders', 'E-commerce', 'Israel', 'Investors who invested in diverse founders', 'SaaS', 'Cybersecurity', 'Generative Tech/AI']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 1,
+    "isActive": true,
+    "tags": [
+      "['Games'",
+      "'AR/VR'",
+      "'AgTech'",
+      "'Food and Beverage'",
+      "'AI'",
+      "'Female Investors'",
+      "'Investors who were founders'",
+      "'Investors who invested in female founders'",
+      "'E-commerce'",
+      "'Israel'",
+      "'Investors who invested in diverse founders'",
+      "'SaaS'",
+      "'Cybersecurity'",
+      "'Generative Tech/AI']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:50:21.485624+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://www.nfx.com/"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/sarai-bronfeld"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/sarai-bronfeld-743602211/?originalSubdomain=il"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Impala AI']"
+  },
+  {
+    "id": 65,
+    "name": "Ullas Naik",
+    "headline": "Founder and General Partner at Streamlined Ventures",
+    "firm_name": "Streamlined Ventures",
+    "about": "Founder and General Partner at Streamlined Ventures",
+    "experience": "Founder and General Partner at Streamlined Ventures",
+    "education": "Not listed in the linked source.",
+    "location": "Palo Alto, California",
+    "website": "https://www.streamlined.vc/our-team",
+    "linkedin": "https://www.linkedin.com/in/ullasnaik/",
+    "profileSource": "https://signal.nfx.com/investors/ullas-naik",
+    "pastInvestments": "[{'year': 2025, 'company_name': 'Matey'}, {'year': 2024, 'company_name': 'Matey'}, {'year': 2025, 'company_name': 'TwinMind'}, {'year': 2025, 'company_name': 'Precog Data'}, {'year': 2023, 'company_name': 'Precog Data'}, {'year': 2021, 'company_name': 'Precog Data'}, {'year': 2025, 'company_name': 'Hoot'}, {'year': 2024, 'company_name': 'FLYR'}, {'year': 2021, 'company_name': 'FLYR'}, {'year': 2019, 'company_name': 'FLYR'}, {'year': 2017, 'company_name': 'FLYR'}, {'year': 2016, 'company_name': 'FLYR'}, {'year': 2015, 'company_name': 'FLYR'}, {'year': 2014, 'company_name': 'FLYR'}, {'year': 2024, 'company_name': 'KYC Hospitality'}, {'year': 2024, 'company_name': 'Findigs'}, {'year': 2021, 'company_name': 'Findigs'}, {'year': 2020, 'company_name': 'Findigs'}, {'year': 2024, 'company_name': 'Flip'}, {'year': 2022, 'company_name': 'Flip'}, {'year': 2021, 'company_name': 'Flip'}, {'year': 2020, 'company_name': 'Flip'}]",
+    "investmentStage": "['Seed', 'Series B', 'Series A', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "Parenting/Families, ['Parenting/Families', 'Sales & CRM', 'Games', 'AI', 'Developer Tools', 'ClimateTech/CleanTech', 'Security', 'Cloud Infrastructure', 'IoT', 'Investors who invested in female founders', 'San Francisco Bay Area', 'Angel, Scout, and Solo-Capitalists']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 193,
+    "isActive": true,
+    "tags": [
+      "['Parenting/Families'",
+      "'Sales & CRM'",
+      "'Games'",
+      "'AI'",
+      "'Developer Tools'",
+      "'ClimateTech/CleanTech'",
+      "'Security'",
+      "'Cloud Infrastructure'",
+      "'IoT'",
+      "'Investors who invested in female founders'",
+      "'San Francisco Bay Area'",
+      "'Angel",
+      "Scout",
+      "and Solo-Capitalists']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:51:16.188254+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://www.streamlined.vc/our-team"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/ullas-naik"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "http://twitter.com/ullastweets"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/ullasnaik/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['FLYR', 'FLYR', 'Flip', 'Flip', 'Flip']"
+  },
+  {
+    "id": 66,
+    "name": "Scott Belsky",
+    "headline": "Product/Design Obsessive, Founder, Author, Investor",
+    "firm_name": "",
+    "about": "Product/Design Obsessive, Founder, Author, Investor",
+    "experience": "Product/Design Obsessive, Founder, Author, Investor",
+    "education": "Not listed in the linked source.",
+    "location": "New York, New York",
+    "website": "https://www.scottbelsky.com",
+    "linkedin": "https://www.linkedin.com/in/scottbelsky/",
+    "profileSource": "https://signal.nfx.com/investors/scott-belsky",
+    "pastInvestments": "[{'year': 2025, 'company_name': 'Mem0'}, {'year': 2025, 'company_name': 'Waldo'}, {'year': 2025, 'company_name': 'Doctronic'}, {'year': 2025, 'company_name': 'Hero Assistant'}, {'year': 2025, 'company_name': 'Extend'}, {'year': 2025, 'company_name': 'Lemni'}, {'year': 2025, 'company_name': 'Eudia'}, {'year': 2024, 'company_name': 'Mainframe'}]",
+    "investmentStage": "['Seed', 'Series A', 'Other Lists', 'Pre-seed']",
+    "primaryDomain": "Social Commerce, ['Social Commerce', 'Developer Tools', 'ClimateTech/CleanTech', 'AI', 'Web3/Crypto', 'Marketplaces', 'Female Investors', 'Investors who were founders', 'Consumer Internet', 'Enterprise', 'FinTech', 'New York City', 'Angel, Scout, and Solo-Capitalists', 'Direct-to-Consumer (DTC)']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 238,
+    "isActive": true,
+    "tags": [
+      "['Social Commerce'",
+      "'Developer Tools'",
+      "'ClimateTech/CleanTech'",
+      "'AI'",
+      "'Web3/Crypto'",
+      "'Marketplaces'",
+      "'Female Investors'",
+      "'Investors who were founders'",
+      "'Consumer Internet'",
+      "'Enterprise'",
+      "'FinTech'",
+      "'New York City'",
+      "'Angel",
+      "Scout",
+      "and Solo-Capitalists'",
+      "'Direct-to-Consumer (DTC)']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:52:52.75276+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://www.scottbelsky.com"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/scott-belsky"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "http://twitter.com/scottbelsky"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/scottbelsky/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Eudia', 'Mem0', 'Doctronic', 'Extend', 'Waldo']"
+  },
+  {
+    "id": 67,
+    "name": "Or Offer",
+    "headline": "Co-Founder & CEO at SimilarWeb | NFX Scout",
+    "firm_name": "NFX",
+    "about": "Co-Founder & CEO at SimilarWeb | NFX Scout",
+    "experience": "Co-Founder & CEO at SimilarWeb | NFX Scout",
+    "education": "Not listed in the linked source.",
+    "location": "Israel",
+    "website": "https://similarweb.com",
+    "linkedin": "https://www.linkedin.com/in/oroffer/",
+    "profileSource": "https://signal.nfx.com/investors/or-offer",
+    "pastInvestments": "[{'year': 2023, 'company_name': 'Firmbase'}, {'year': 2021, 'company_name': 'InfiniGrow'}]",
+    "investmentStage": "['Other Lists', 'Pre-seed']",
+    "primaryDomain": "Israel, ['Israel', 'San Francisco Bay Area', 'AI', 'Consumer Internet', 'Enterprise']",
+    "investmentThesis": null,
+    "totalInvestmentsCount": 2,
+    "isActive": true,
+    "tags": [
+      "['Israel'",
+      "'San Francisco Bay Area'",
+      "'AI'",
+      "'Consumer Internet'",
+      "'Enterprise']"
+    ],
+    "dataStatus": "Imported from the project's NFX Signal investor dataset (confidence 0.9). Check linked profile for current role and mandate; snapshot date 2025-12-10T07:55:02.80954+00:00.",
+    "otherLinks": [
+      {
+        "label": "Firm website",
+        "url": "https://similarweb.com"
+      },
+      {
+        "label": "Profile source",
+        "url": "https://signal.nfx.com/investors/or-offer"
+      },
+      {
+        "label": "X / Twitter",
+        "url": "https://www.twitter.com/oroffer"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/oroffer/"
+      }
+    ],
+    "publicConnections": [],
+    "sourceConfidence": "0.9",
+    "notableInvestments": "['Firmbase', 'InfiniGrow']"
   }
 ]
