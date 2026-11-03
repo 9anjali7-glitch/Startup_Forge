@@ -78,8 +78,8 @@ services:
     environment:
       AI_PROVIDER: "${AI_PROVIDER:-gemini}"
       GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
-      GEMINI_MODEL: "${GEMINI_MODEL:-gemini-3.6-flash}"
-      GEMINI_FALLBACK_MODEL: "${GEMINI_FALLBACK_MODEL:-gemini-3.8-flash}"
+      GEMINI_MODEL: "${GEMINI_MODEL:-gemini-3.5-flash-lite}"
+      GEMINI_FALLBACK_MODEL: "${GEMINI_FALLBACK_MODEL:-gemini-3.6-flash}"
       OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
       OPENAI_MODEL: "${OPENAI_MODEL:-chat-latest}"
       MISTRAL_API_KEY: "${MISTRAL_API_KEY:-}"

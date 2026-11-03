@@ -6,7 +6,7 @@ StartupForge is a startup and investor matching application. The local stack con
 
 Prerequisites: Docker Desktop with Docker Compose enabled.
 
-1. In the project root, copy `.env.example` to `.env`. The local compose stack allows browser requests from `localhost:5173` by default. If you want to call the protected setup endpoints, set a private `ADMIN_API_KEY`. The Inbox AI helper uses Gemini (`GEMINI_API_KEY`, default model `gemini-3.6-flash` with `gemini-3.8-flash` fallback) or OpenAI (`OPENAI_API_KEY`, default model `chat-latest`) for conversational answers. Set `AI_PROVIDER=gemini` or `AI_PROVIDER=openai` to choose when both keys are configured. The Inbox does not fall back to the small local model; it tells the user when no hosted model is connected. Other RAG profile/search features can use local Ollama. Paid Mistral calls are disabled unless `ENABLE_MISTRAL_API=true` is explicitly set.
+1. In the project root, copy `.env.example` to `.env`. The local compose stack allows browser requests from `localhost:5173` by default. If you want to call the protected setup endpoints, set a private `ADMIN_API_KEY`. The Inbox AI helper uses Gemini (`GEMINI_API_KEY`, default model `gemini-3.5-flash-lite` with `gemini-3.6-flash` fallback) or OpenAI (`OPENAI_API_KEY`, default model `chat-latest`) for conversational answers. Set `AI_PROVIDER=gemini` or `AI_PROVIDER=openai` to choose when both keys are configured. The Inbox does not fall back to the small local model; it tells the user when no hosted model is connected. Other RAG profile/search features can use local Ollama. Paid Mistral calls are disabled unless `ENABLE_MISTRAL_API=true` is explicitly set.
 2. Start the services in the background:
 
    ```powershell

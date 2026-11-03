@@ -21,8 +21,8 @@ MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY") if os.getenv("ENABLE_MISTRAL_API"
 MISTRAL_CLIENT = MistralClient(api_key=MISTRAL_API_KEY) if MISTRAL_API_KEY else None
 MISTRAL_MODEL = "mistral-small-latest"
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
-GEMINI_FALLBACK_MODEL = os.getenv("GEMINI_FALLBACK_MODEL", "gemini-3.8-flash")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
+GEMINI_FALLBACK_MODEL = os.getenv("GEMINI_FALLBACK_MODEL", "gemini-3.6-flash")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "chat-latest")
 AI_PROVIDER = os.getenv("AI_PROVIDER", "gemini").strip().lower()

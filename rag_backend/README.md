@@ -15,7 +15,7 @@ The local model is downloaded once into the persistent `ollama_data` volume (abo
 
 ## Optional Gemini free tier
 
-Docker Compose reads `GEMINI_API_KEY`, `GEMINI_MODEL`, and optional `GEMINI_FALLBACK_MODEL` from the repository-root `.env` file. Gemini 3.6 Flash is the default, with Gemini 3.8 Flash as a fallback for temporary model failures. Keep keys out of source control. The free tier has rate limits and may use prompts to improve Google products. Docker Compose mounts the two curated JSON profile files read-only into `/app/data`; rebuilding/recreating the RAG service refreshes its in-memory search index from those files and SQL.
+Docker Compose reads `GEMINI_API_KEY`, `GEMINI_MODEL`, and optional `GEMINI_FALLBACK_MODEL` from the repository-root `.env` file. Gemini 3.5 Flash-Lite is the default, with Gemini 3.6 Flash as a fallback for temporary model failures. Keep keys out of source control. The free tier has rate limits and may use prompts to improve Google products. Docker Compose mounts the two curated JSON profile files read-only into `/app/data`; rebuilding/recreating the RAG service refreshes its in-memory search index from those files and SQL.
 
 The assistant explains where to find Home, Network / Find Investors, profiles, Deep Analysis / Conflict, Alerts, and Inbox; it distinguishes recorded facts from general education and inference. Conflict paths are screening leads, not legal conclusions. Investor matches do not imply current interest or available capital. Transaction-specific legal, tax, and investment questions should be checked with qualified professionals.
 
