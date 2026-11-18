@@ -132,8 +132,8 @@ export const LandingPage = ({ onLogin }: LandingPageProps) => {
                         </div>
 
                         <div className="mb-8">
-                            <h2 className="text-2xl font-bold text-slate-900">{productionAuth ? 'Welcome to StartupForge' : 'Welcome Back'}</h2>
-                            <p className="text-slate-500 mt-1">{productionAuth ? 'Enter a name to explore the read-only demo.' : 'Access your deal flow dashboard.'}</p>
+                            <h2 className="text-2xl font-bold text-slate-900">Welcome Back</h2>
+                            <p className="text-slate-500 mt-1">{productionAuth ? 'Sign in to your StartupForge dashboard.' : 'Access your deal flow dashboard.'}</p>
                         </div>
 
                         <form onSubmit={handleLogin} className="space-y-5">
@@ -176,7 +176,7 @@ export const LandingPage = ({ onLogin }: LandingPageProps) => {
                                 disabled={loading}
                                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-xl shadow-indigo-200 transition-all flex items-center justify-center gap-2"
                             >
-                                {loading ? 'Please wait...' : productionAuth ? 'Enter Demo Dashboard' : 'Enter Dashboard'}
+                                {loading ? 'Please wait...' : 'Enter Dashboard'}
                                 {!loading && <ArrowRight className="w-5 h-5" />}
                             </button>
                         </form>
@@ -184,7 +184,6 @@ export const LandingPage = ({ onLogin }: LandingPageProps) => {
                         <div className="mt-6 text-center text-sm text-slate-500">
                             Try a sample: <button type="button" className="font-bold text-indigo-600 hover:underline" onClick={() => { setName('Mark Suster'); setRole('investor'); }}>Mark Suster</button> or <button type="button" className="font-bold text-emerald-600 hover:underline" onClick={() => { setName('1upHealth'); setRole('founder'); }}>1upHealth</button>
                         </div>
-                        {productionAuth && <p className="mt-3 text-center text-xs text-slate-500">Read-only demo. Changes are temporary and are not saved.</p>}
                     </div>
                 </div>
             </header>

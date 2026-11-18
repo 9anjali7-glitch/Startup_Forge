@@ -825,7 +825,6 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Toaster />
-      {currentUser.isDemo && <div className="fixed top-0 inset-x-0 z-[80] bg-amber-100 px-4 py-2 text-center text-sm font-semibold text-amber-950">Read-only demo · sample data only; changes are temporary and are not saved to an account.</div>}
       <button
         type="button"
         onClick={handleAppLogout}
