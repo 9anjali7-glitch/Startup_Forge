@@ -113,7 +113,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
 
   // Investment Flow State
   const [showInvModal, setShowInvModal] = useState(false);
-  const [invStatus, setInvStatus] = useState<'NONE' | 'PENDING' | 'MATCHED' | 'MISMATCH'>('NONE');
+  const [invStatus, setInvStatus] = useState<'NONE' | 'REPORTED' | 'PENDING_FOUNDER' | 'ACCEPTED' | 'REJECTED'>('NONE');
   const [invFormData, setInvFormData] = useState({ round: 'Seed', year: new Date().getFullYear().toString(), amount: '' });
   const [submissionFeedback, setSubmissionFeedback] = useState<string | null>(null);
   const [isAiComposerOpen, setIsAiComposerOpen] = useState(false);
@@ -308,14 +308,8 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
         if (!res.ok) throw new Error(`Investment status failed (${res.status})`);
         const data = await res.json();
 
-        if (data.status === 'PENDING') {
-          setInvStatus('PENDING');
-        } else if (data.status === 'MATCHED') {
-          setInvStatus('MATCHED');
-          if (data.deal) setInvFormData({ round: String(data.deal.round), year: String(data.deal.year), amount: String(data.deal.amount) });
-        } else {
-          setInvStatus('NONE');
-        }
+        setInvStatus(data.status || 'NONE');
+        if (data.deal) setInvFormData({ round: String(data.deal.round), year: String(data.deal.year), amount: String(data.deal.amount) });
       } catch (e) { console.error(e); }
     };
 
@@ -325,7 +319,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
   }, [currentConnectionId, currentUser.id]);
 
   const downloadInvestmentAgreement = () => {
-    if (invStatus !== 'MATCHED') return;
+    if (invStatus !== 'ACCEPTED') return;
     const founder = currentUser.role === 'founder' ? currentUser : selectedUser;
     const investor = currentUser.role === 'investor' ? currentUser : selectedUser;
     const organizationOf = (person: User | Conversation | undefined) => {
@@ -362,8 +356,8 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
     add('STARTUPFORGE', 10, true);
     add('Agreed Investment Details', 20, true);
     add(`Record date: ${new Date().toLocaleDateString()}    Record ID: ${currentConnectionId || 'N/A'}`, 9);
-    add('MATCHED BY BOTH PARTIES', 10, true, true);
-    wrap('This record summarizes the investment details submitted by the founder and investor and matched on StartupForge. It records the fields below as entered; it does not add terms that were not submitted.', 10);
+    add('ACCEPTED BY THE FOUNDER', 10, true, true);
+    wrap('The investor submitted these details and the founder accepted them in StartupForge. This record reflects only the terms entered below.', 10);
     add('FOUNDER', 12, true, true);
     add(`Name: ${founder?.name || founder?.userName || 'Not provided'}`);
     add(`Company: ${organizationOf(founder) || 'Organization not listed in profile'}`);
@@ -372,12 +366,11 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
     add(`Name: ${investor?.name || investor?.userName || 'Not provided'}`);
     add(`Company / firm: ${organizationOf(investor) || 'Organization not listed in profile'}`);
     add(`Profile: ${investor?.headline || 'Investor'}`);
-    add('MATCHED INVESTMENT DETAILS', 12, true, true);
+    add('FOUNDER ACCEPTED INVESTMENT DETAILS', 12, true, true);
     add(`Funding round: ${invFormData.round}`);
     add(`Investment amount: ${formattedAmount}${Number.isFinite(amount) && amount > 0 ? ' USD' : ''}`);
     add(`Investment year: ${invFormData.year}`);
-    add('Agreement status: Both parties submitted matching investment details.');
-    add('Acknowledged in StartupForge by: Founder and investor');
+    add('Agreement status: Investor submitted; founder accepted.');
     add('');
     wrap('This is a platform record of the matched details above. Any additional investment terms must be agreed and documented separately by the parties.', 9);
     const pageLines: typeof lines[] = [];
@@ -459,8 +452,8 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
         const body = await response.json().catch(() => ({}));
         throw new Error(body.error || `Report failed (${response.status})`);
       }
-      setInvStatus('PENDING');
-      setSubmissionFeedback(null);
+      setInvStatus('REPORTED');
+      setShowInvModal(true);
     } catch (e) {
       console.error('Investment report failed:', e);
       window.alert(e instanceof Error ? e.message : 'Could not report this investment. Please try again.');
@@ -487,27 +480,26 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `Confirmation failed (${res.status})`);
 
-      if (data.status === 'MATCHED') {
-        setInvStatus('MATCHED');
-        if (data.deal) setInvFormData({ round: String(data.deal.round), year: String(data.deal.year), amount: String(data.deal.amount) });
-        setSubmissionFeedback("Investment Confirmed!");
-        setTimeout(() => {
-          setShowInvModal(false);
-          setSubmissionFeedback(null);
-        }, 1500);
-      } else if (data.mismatch) {
-        setSubmissionFeedback("Mismatch! details do not match partner's submission.");
-      } else {
-        setSubmissionFeedback("Submitted! Waiting for partner to confirm.");
-        setTimeout(() => {
-          setShowInvModal(false);
-          setSubmissionFeedback(null);
-        }, 1500);
-      }
+      setInvStatus(data.status || 'PENDING_FOUNDER');
+      setSubmissionFeedback(data.status === 'PENDING_FOUNDER' ? 'Investment details sent to the founder for review.' : 'Investment details saved.');
+      setShowInvModal(false);
     } catch (e) {
       console.error('Investment confirmation failed:', e);
       setSubmissionFeedback(e instanceof Error ? e.message : 'Could not confirm investment details.');
     }
+  };
+
+  const respondToInvestment = async (decision: 'ACCEPTED' | 'REJECTED') => {
+    if (!currentConnectionId) return;
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const route = currentUser.isDemo ? '/api/demo-investments' : '/api/investments';
+      const res = await apiFetch(`${apiUrl}${route}/respond`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id }, body: JSON.stringify({ connectionId: currentConnectionId, decision }) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Could not record your decision.');
+      setInvStatus(data.status);
+      if (data.deal) setInvFormData({ round: String(data.deal.round), year: String(data.deal.year), amount: String(data.deal.amount) });
+    } catch (error) { window.alert(error instanceof Error ? error.message : 'Could not record your decision.'); }
   };
 
   const processIncomingMessage = async (node: any, id: string) => {
@@ -828,17 +820,17 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
 
                 {/* Center: Report Button (Hidden on small mobile if needed, or compact) */}
                 <div className="justify-self-center hidden sm:block">
-                  <button
+                  {currentUser.role === 'investor' && <button
                     onClick={handleReportInvestment}
                     className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-full shadow-lg shadow-indigo-200 transition-all font-bold text-xs uppercase tracking-wider animate-pulse ring-4 ring-indigo-50"
                   >
                     <Briefcase className="w-4 h-4" />
                     Report Investment
-                  </button>
+                  </button>}
                 </div>
                 {/* Mobile Report Icon only */}
                 <div className="justify-self-center sm:hidden">
-                  <button onClick={handleReportInvestment} className="p-2 bg-indigo-600 text-white rounded-full shadow-md"><Briefcase className="w-4 h-4" /></button>
+                  {currentUser.role === 'investor' && <button onClick={handleReportInvestment} className="p-2 bg-indigo-600 text-white rounded-full shadow-md"><Briefcase className="w-4 h-4" /></button>}
                 </div>
 
 
@@ -860,13 +852,25 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
               </div>
 
               {/* NEW: Persistent Notification Bar */}
-              {invStatus === 'PENDING' && (
+              {invStatus === 'REPORTED' && currentUser.role === 'investor' && (
+                <div className="bg-blue-50 border-b border-blue-100 px-4 py-3 flex items-center justify-between">
+                  <span className="text-sm font-medium text-blue-900">Enter the investment details to send them to the founder for approval.</span>
+                  <button onClick={() => setShowInvModal(true)} className="bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold">Enter details</button>
+                </div>
+              )}
+              {invStatus === 'PENDING_FOUNDER' && currentUser.role === 'founder' && (
+                <div className="bg-amber-50 border-b border-amber-200 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+                  <span className="text-sm font-semibold text-amber-950">The investor reported {invFormData.round} {invFormData.year} for ${invFormData.amount}. Accept or reject these details.</span>
+                  <div className="flex gap-2"><button onClick={() => respondToInvestment('REJECTED')} className="rounded-lg border border-red-300 bg-white px-4 py-2 text-xs font-bold text-red-700">Reject</button><button onClick={() => respondToInvestment('ACCEPTED')} className="rounded-lg bg-emerald-700 px-4 py-2 text-xs font-bold text-white">Accept details</button></div>
+                </div>
+              )}
+              {invStatus === 'PENDING_FOUNDER' && currentUser.role === 'investor' && (
                 <div className="bg-blue-50/80 backdrop-blur-sm border-b border-blue-100 px-4 py-3 flex items-center justify-between animate-in slide-in-from-top-2 z-0">
                   <div className="flex items-center gap-3">
                     <div className="p-1.5 bg-blue-100 rounded-full">
                       <AlertTriangle className="w-4 h-4 text-blue-600" />
                     </div>
-                    <span className="font-medium text-sm text-blue-800">Investment reported. Confirm details to record this deal.</span>
+                    <span className="font-medium text-sm text-blue-800">Investment details sent to the founder. Waiting for their decision.</span>
                   </div>
                   <button
                     onClick={() => setShowInvModal(true)}
@@ -876,10 +880,11 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
                   </button>
                 </div>
               )}
-              {invStatus === 'MATCHED' && (
+              {invStatus === 'REJECTED' && <div className="bg-red-50 border-b border-red-200 px-4 py-3 text-sm font-semibold text-red-800">The founder rejected this investment report. Contact them to resolve the details before resubmitting.</div>}
+              {invStatus === 'ACCEPTED' && (
                 <div className="bg-emerald-50/80 backdrop-blur-sm border-b border-emerald-100 px-4 py-3 flex items-center justify-center animate-in slide-in-from-top-2 z-0">
                   <CheckCircle2 className="w-5 h-5 mr-2 text-emerald-600" />
-                  <span className="font-bold text-emerald-800 text-sm">Investment details matched by both parties.</span>
+                  <span className="font-bold text-emerald-800 text-sm">The founder accepted the investor’s reported details. Both parties can download the agreed record.</span>
                   <button onClick={downloadInvestmentAgreement} className="ml-3 bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold">Download matched details PDF</button>
                 </div>
               )}
@@ -1074,10 +1079,10 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
                   <Briefcase className="w-6 h-6 text-blue-600" />
                 </div>
                 <h2 className="text-xl font-bold text-slate-900 mb-1">
-                  Confirm Investment
+                  Submit Investment Details
                 </h2>
-                <p className="text-sm text-slate-500 leading-relaxed">
-                  Both parties must submit identical details (Round, Year, Amount) to verify this transaction on the ledger.
+                  <p className="text-sm text-slate-500 leading-relaxed">
+                  Submit the round, year, and amount you invested. The founder will review these details and accept or reject them.
                 </p>
               </div>
 
@@ -1165,7 +1170,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
                   onClick={submitInvestment}
                   className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-sm shadow-lg shadow-slate-200 hover:shadow-xl hover:shadow-slate-200 transition-all transform active:scale-95"
                 >
-                  Confirm & Record
+                  Send to Founder for Review
                 </button>
               </div>
             </div>
