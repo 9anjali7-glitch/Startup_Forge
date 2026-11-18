@@ -41,12 +41,17 @@ export function useUnreadBadges(userId: string, demoActivity?: { incoming: any[]
     if (!userId) { setUnreadAlerts(0); setUnreadInbox(0); return; }
     if (demoActivity || userId.startsWith('demo-')) {
       const read = new Set(readArray(alertReadKey(userId)));
+      let activity = demoActivity;
+      if (!activity) {
+        try { activity = JSON.parse(localStorage.getItem(`startupforge:demo-connections:${userId}`) || '{"incoming":[],"accepted":[]}'); }
+        catch { activity = { incoming: [], accepted: [] }; }
+      }
       const eventIds = [
-        ...(demoActivity?.incoming || []).map(item => `req-${item.id}`),
-        ...(demoActivity?.accepted || []).map(item => `conn-${item.id}`)
+        ...(activity?.incoming || []).filter((item: any) => !item.status || item.status === 'PENDING').map(item => `req-${item.id}`),
+        ...(activity?.accepted || []).map(item => `conn-${item.id}`)
       ];
       setUnreadAlerts(eventIds.filter(id => !read.has(id)).length);
-      setUnreadInbox(0);
+      setUnreadInbox(readArray(inboxUnreadKey(userId)).length);
       return;
     }
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
