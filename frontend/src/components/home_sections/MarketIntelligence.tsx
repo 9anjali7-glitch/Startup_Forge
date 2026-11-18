@@ -56,8 +56,8 @@ export function MarketIntelligence({ compact = false }: { compact?: boolean }) {
   const refreshFilings = useCallback(async () => {
     setRefreshing(true);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const response = await apiFetch(`${apiUrl}/api/market/updates`);
+      const ragUrl = import.meta.env.VITE_RAG_API_URL || 'http://localhost:8000';
+      const response = await apiFetch(`${ragUrl}/market/updates`, { signal: AbortSignal.timeout(12000) });
       const data = await response.json();
       if (!response.ok && !data.entries?.length) throw new Error(data.error || 'Live SEC filings are temporarily unavailable.');
       setLive(data);
@@ -113,3 +113,4 @@ export function MarketIntelligence({ compact = false }: { compact?: boolean }) {
     </section>
   );
 }
+
