@@ -74,27 +74,27 @@ async function requireAuthenticatedSessions(req, res, next) {
 // Anonymous demo sessions have no account token, but the conflict-screening
 // page still needs to run its published sample cases. Keep that access limited
 // to the fixed, synthetic/public examples; all other COI checks require login.
-const publicDemoCoiCases = new Set([
-  'jordan lee|northstar care systems',
-  'jordan lee|cedarline health',
-  'jordan lee|bluewater patient systems',
-  'berkshire hathaway inc.|samsung electronics co., ltd.',
-  'berkshire hathaway inc.|bose corporation',
-]);
-
 function requireCoiSessionOrDemo(req, res, next) {
   const token = req.get('authorization')?.replace(/^Bearer\s+/i, '');
   if (token) return requireAuthenticatedSessions(req, res, next);
   if (process.env.NODE_ENV !== 'production') return next();
-
-  const normalizeDemoName = value => String(value || '').trim().toLowerCase().replace(/\s+\((?:demo investor|public example)\)$/i, '');
-  const investor = normalizeDemoName(req.body?.investorName);
-  const target = normalizeDemoName(req.body?.targetCompany);
-  if (req.method === 'POST' && req.path === '/check' && publicDemoCoiCases.has(`${investor}|${target}`)) {
+  // Production currently offers anonymous demo profiles. Conflict screening is
+  // read-only and uses only names supplied by the caller, so keep this one
+  // endpoint available to those profiles. Limit traffic per IP; other COI
+  // routes still require a real account session.
+  if (req.method === 'POST' && req.path === '/check') {
+    const now = Date.now();
+    const key = req.ip || req.socket.remoteAddress || 'unknown';
+    const prior = coiDemoAttempts.get(key);
+    if (!prior || now - prior.startedAt > 60_000) coiDemoAttempts.set(key, { startedAt: now, count: 1 });
+    else if (prior.count >= 30) return res.status(429).json({ error: 'Too many conflict checks. Please try again shortly.' });
+    else prior.count += 1;
     return next();
   }
-  return res.status(401).json({ error: 'Sign in to run a conflict check.' });
+  return res.status(401).json({ error: 'Sign in to run this conflict action.' });
 }
+
+const coiDemoAttempts = new Map();
 
 app.post('/setup-db', requireAdmin, (req, res) => {
   setupDatabase(res);
@@ -108,6 +108,7 @@ app.post('/seed-full', requireAdmin, (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/demo-connections', require('./demoConnections.routes'));
+app.use('/api/demo-investments', require('./demoInvestments.routes'));
 
 /* ---------------- HEALTH CHECK ---------------- */
 /**
