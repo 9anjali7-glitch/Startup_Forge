@@ -28,6 +28,15 @@ interface ConnectionRequest {
   mutualConnections: number;
 }
 
+interface DemoConnectionRequest {
+  id: string;
+  senderId: string;
+  senderName: string;
+  senderHeadline: string;
+  senderAvatar: string;
+  status: string;
+}
+
 interface NetworkPageProps {
   currentUser: User;
   suggestedUsers: User[]; // Kept for backward compat or other sections
@@ -36,6 +45,9 @@ interface NetworkPageProps {
   followedUsers: Set<string>;
   connectedUsers: Set<string>;
   onRejectRequest: (id: string) => Promise<void>;
+  demoConnectionRequests?: DemoConnectionRequest[];
+  demoAcceptedConnections?: DemoConnectionRequest[];
+  onRespondToDemoConnectionRequest?: (id: string, status: 'ACCEPTED' | 'REJECTED') => Promise<void>;
   onFollowUser: (userId: string, role?: string, name?: string, headline?: string, company?: string) => Promise<boolean>;
   onViewProfile: (userId: string) => void;
   onNavigate: (page: string) => void;
@@ -53,6 +65,9 @@ export function NetworkPage({
   followedUsers,
   connectedUsers,
   onRejectRequest,
+  demoConnectionRequests = [],
+  demoAcceptedConnections = [],
+  onRespondToDemoConnectionRequest,
   onFollowUser,
   onViewProfile,
   onNavigate,
@@ -62,7 +77,7 @@ export function NetworkPage({
   ragResults,
   isSearching
 }: NetworkPageProps) {
-  const { unreadAlerts, unreadInbox } = useUnreadBadges(String(currentUser?.id || ''));
+  const { unreadAlerts, unreadInbox } = useUnreadBadges(String(currentUser?.id || ''), currentUser.isDemo ? { incoming: demoConnectionRequests, accepted: demoAcceptedConnections } : undefined);
   // State
   const [searchQuery, setSearchQuery] = useState('');
   const [requests, setRequests] = useState<ConnectionRequest[]>([]);
@@ -74,6 +89,17 @@ export function NetworkPage({
   const fetchRequests = async () => {
     try {
       if (!currentUser.id) return;
+      if (currentUser.isDemo) {
+        setRequests(demoConnectionRequests.map(request => ({
+          id: request.id,
+          userId: request.senderId,
+          userName: request.senderName,
+          userHeadline: request.senderHeadline || 'StartupForge member',
+          userAvatar: request.senderAvatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+          mutualConnections: 0
+        })));
+        return;
+      }
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       const res = await apiFetch(`${apiUrl}/connections/requests/incoming`, {
         headers: { 'x-user-id': currentUser.id }
@@ -99,7 +125,7 @@ export function NetworkPage({
     if (currentUser.id) {
       fetchRequests();
     }
-  }, [currentUser.id]);
+  }, [currentUser.id, currentUser.isDemo, demoConnectionRequests]);
 
   // Close search when clicking outside
   useEffect(() => {
@@ -121,6 +147,10 @@ export function NetworkPage({
 
   const handleAcceptInternal = async (reqId: string) => {
     try {
+      if (currentUser.isDemo) {
+        await onRespondToDemoConnectionRequest?.(reqId, 'ACCEPTED');
+        return;
+      }
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       const response = await apiFetch(`${apiUrl}/connections/accept/${reqId}`, {
         method: 'POST',
@@ -482,3 +512,4 @@ function ProfileModal({ currentUser, onClose, onNavigate }: { currentUser: User,
     </div>
   );
 }
+
