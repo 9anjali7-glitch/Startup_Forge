@@ -22,6 +22,8 @@ import { alertReadKey, investmentAlertId, saveReadIds, useUnreadBadges } from '.
 
 type NotificationsPageProps = {
     currentUser: any;
+    demoConnectionRequests?: any[];
+    demoAcceptedConnections?: any[];
     onViewJob: (jobId: string) => void;
     onNavigateToChat: (userId: string) => void;
     onNavigate: (page: string) => void;
@@ -50,7 +52,7 @@ const ActionItem = ({ icon, label, onClick, badge, active }: { icon: any, label:
     </button>
 );
 
-export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, onNavigate, onSearch, onQueryChange, ragResults, isSearching }: NotificationsPageProps) {
+export function NotificationsPage({ currentUser, demoConnectionRequests = [], demoAcceptedConnections = [], onViewJob, onNavigateToChat, onNavigate, onSearch, onQueryChange, ragResults, isSearching }: NotificationsPageProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [notifications, setNotifications] = useState<any[]>([]);
     const [companyUpdates, setCompanyUpdates] = useState<any[]>([]);
@@ -66,7 +68,7 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
     const [activeTab, setActiveTab] = useState<'notifications' | 'updates'>('notifications');
     const readKey = alertReadKey(String(currentUser?.id || 'guest'));
     const readIds = () => { try { return new Set<string>(JSON.parse(localStorage.getItem(readKey) || '[]')); } catch { return new Set<string>(); } };
-    const { unreadAlerts, unreadInbox } = useUnreadBadges(String(currentUser?.id || ''));
+    const { unreadAlerts, unreadInbox } = useUnreadBadges(String(currentUser?.id || ''), currentUser?.isDemo ? { incoming: demoConnectionRequests, accepted: demoAcceptedConnections } : undefined);
     const markRead = (ids: string[]) => { saveReadIds(readKey, ids); setNotifications(items => items.map(item => ids.includes(item.id) ? { ...item, unread: false } : item)); setCompanyUpdates(items => items.map((item, index) => ids.includes(investmentAlertId(item, index)) ? { ...item, unread: false } : item)); };
     const formatMoney = (value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: value >= 1_000_000 ? 'compact' : 'standard', maximumFractionDigits: 1 }).format(value);
     const updateDate = (update: any) => update.time && Number.isFinite(Date.parse(update.time)) ? new Date(update.time).toLocaleDateString() : Number(update.year) > 2000 ? String(update.year) : 'Date not recorded';
@@ -123,6 +125,26 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
             inFlight = true;
             setRefreshing(true);
             try {
+                if (currentUser.isDemo) {
+                    const requestNotifications = demoConnectionRequests.map((request: any) => ({
+                        id: `req-${request.id}`, type: 'request', avatar: request.senderAvatar,
+                        message: `${request.senderName || 'Someone'} sent you a connection request${request.senderHeadline ? ` · ${request.senderHeadline}` : ''}`,
+                        timestamp: request.createdAt && Number.isFinite(Date.parse(request.createdAt)) ? new Date(request.createdAt).toLocaleString() : 'Recently',
+                        unread: !readIds().has(`req-${request.id}`), metadata: { page: 'network' }
+                    }));
+                    const acceptedNotifications = demoAcceptedConnections.map((request: any) => ({
+                        id: `conn-${request.id}`, type: 'connection', avatar: request.receiverAvatar || request.senderAvatar,
+                        message: `${request.receiverName || 'Someone'} accepted your connection request`,
+                        timestamp: request.respondedAt && Number.isFinite(Date.parse(request.respondedAt)) ? new Date(request.respondedAt).toLocaleString() : 'Recently',
+                        unread: !readIds().has(`conn-${request.id}`), metadata: { page: 'network' }
+                    }));
+                    if (!active) return;
+                    setNotifications([...requestNotifications, ...acceptedNotifications]);
+                    setCompanyUpdates([]);
+                    setLastUpdated(new Date());
+                    setFeedError(null);
+                    return;
+                }
                 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
                 const res = await apiFetch(`${apiUrl}/connections/notifications`, {
                     headers: { 'x-user-id': currentUser.id }, signal: controller.signal
@@ -184,7 +206,7 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
         const onVisibilityChange = () => { if (document.visibilityState === 'visible') fetchNotifications(); };
         document.addEventListener('visibilitychange', onVisibilityChange);
         return () => { active = false; controller.abort(); window.clearInterval(intervalId); document.removeEventListener('visibilitychange', onVisibilityChange); };
-    }, [currentUser?.id, refreshToken]);
+    }, [currentUser?.id, currentUser?.isDemo, demoConnectionRequests, demoAcceptedConnections, refreshToken]);
 
     useEffect(() => {
         const controller = new AbortController();
@@ -518,3 +540,4 @@ export function NotificationsPage({ currentUser, onViewJob, onNavigateToChat, on
         </div>
     );
 }
+
