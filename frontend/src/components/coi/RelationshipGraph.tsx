@@ -35,6 +35,7 @@ const RelationshipGraph = ({ investorName, targetCompany, conflictLevel = 0, con
   // Dynamic Graph Generation
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
+  const [graphHeight, setGraphHeight] = useState(400);
 
   useEffect(() => {
     const newNodes: Node[] = [];
@@ -49,15 +50,20 @@ const RelationshipGraph = ({ investorName, targetCompany, conflictLevel = 0, con
     if (graph?.nodes?.length) {
       const apiNodes = graph.nodes;
       const apiEdges = graph.edges || [];
-      const layerFor = (type: string) => type === "investor" ? 0 : type === "target" ? 3 : type === "sector" ? 2 : conflictLevel === 2 ? 1 + Math.max(0, apiNodes.filter(n => n.type === "company").findIndex(n => n.type === type)) : 1;
-      // Place nodes by path order and spread branches vertically.
       const companyNodes = apiNodes.filter(n => n.type === "company");
+      const rowCount = Math.max(companyNodes.length, apiNodes.filter(n => n.type === "sector").length, 1);
+      const height = Math.max(400, rowCount * 92 + 100);
+      const top = 52;
+      const rowY = (index: number, count: number) => count <= 1 ? height / 2 : top + index * ((height - top * 2) / (count - 1));
+      const seenEdgeLabels = new Set<string>();
       const positioned = apiNodes.map((node) => {
-        const layer = node.type === "investor" ? 0 : node.type === "target" ? 3 : node.type === "sector" ? 2 : (conflictLevel === 2 ? Math.max(1, companyNodes.findIndex(n => n.id === node.id) + 1) : 1);
-        const x = 90 + layer * 205;
-        const siblings = apiNodes.filter(n => n.type === node.type && (n.type === "company" || n.type === "sector"));
-        const index = siblings.findIndex(n => n.id === node.id);
-        const y = siblings.length > 1 ? 120 + index * (220 / (siblings.length - 1)) : 200;
+        const pathIndex = node.type === "sector"
+          ? Math.max(0, apiNodes.filter(n => n.type === "sector").findIndex(n => n.id === node.id))
+          : Math.max(0, companyNodes.findIndex(n => n.id === node.id));
+        const layer = node.type === "investor" ? 0 : node.type === "target" ? 3 : node.type === "sector" ? 2 : (conflictLevel === 2 ? Math.min(2, pathIndex + 1) : 1);
+        const x = 88 + layer * 205;
+        const count = node.type === "company" ? companyNodes.length : node.type === "sector" ? rowCount : 1;
+        const y = node.type === "investor" || node.type === "target" || node.type === "sector" ? height / 2 : rowY(pathIndex, count);
         return { id: node.id, label: node.label, type: (node.type === "investor" || node.type === "target" || node.type === "sector" ? node.type : "company") as Node["type"], x, y };
       });
       newNodes.push(...positioned);
@@ -65,8 +71,9 @@ const RelationshipGraph = ({ investorName, targetCompany, conflictLevel = 0, con
         from: edge.from,
         to: edge.to,
         type: edge.relation === "OPERATES_IN" ? "indirect" as const : "direct" as const,
-        label: (edge.relation || "Relationship").replaceAll("_", " ").toLowerCase(),
+        label: edge.relation === "OPERATES_IN" || seenEdgeLabels.has(edge.relation || "Relationship") ? undefined : (seenEdgeLabels.add(edge.relation || "Relationship"), (edge.relation || "Relationship").replaceAll("_", " ").toLowerCase()),
       })));
+      setGraphHeight(height);
     } else {
     // Fallback for older API responses without an explicit graph.
     newNodes.push({ id: "inv", label: investorName || "Investor", type: "investor", x: 90, y: 200 });
@@ -101,6 +108,7 @@ const RelationshipGraph = ({ investorName, targetCompany, conflictLevel = 0, con
     }
     }
 
+    if (!graph?.nodes?.length) setGraphHeight(400);
     setNodes(newNodes);
     setEdges(newEdges);
 
@@ -180,12 +188,12 @@ const RelationshipGraph = ({ investorName, targetCompany, conflictLevel = 0, con
           {conflictLevel === 2 ? <span className="font-semibold text-amber-700">Indirect conflict path detected through recorded ownership.</span> : conflictLevel === 1 ? <span className="font-semibold text-rose-700">Direct portfolio conflict path detected.</span> : <span className="font-medium text-slate-600">No direct or indirect conflict path found in the recorded graph.</span>}
           <span className="ml-2 text-slate-500">Each arrow shows a recorded relationship; demo fixtures are synthetic.</span>
         </div>
-        <div className="relative border-t border-border/50 bg-[#F8FAFC] overflow-hidden" style={{ height: 400 }}>
+        <div className="relative border-t border-border/50 bg-[#F8FAFC] overflow-auto" style={{ height: Math.min(graphHeight, 900) }}>
           <svg
             id="coi-relationship-graph-svg"
             width="100%"
-            height="100%"
-            viewBox="0 0 800 400"
+            height={graphHeight}
+            viewBox={`0 0 800 ${graphHeight}`}
             style={{ transform: `scale(${zoom})`, transformOrigin: "center" }}
             className="transition-transform duration-200"
           >
@@ -291,3 +299,4 @@ const RelationshipGraph = ({ investorName, targetCompany, conflictLevel = 0, con
 };
 
 export default RelationshipGraph;
+
