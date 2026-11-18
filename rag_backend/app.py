@@ -120,7 +120,7 @@ def market_updates():
             summary = " ".join("".join(item.findtext(f"{atom}summary") or "").split())
             link = item.find(f"{atom}link")
             href = link.attrib.get("href", "") if link is not None else ""
-            if title and href:
+            if title and href and title.startswith(("D -", "D/A -")):
                 entries.append({"title": title, "url": href, "filedAt": updated or None, "summary": summary[:600], "form": "D"})
         if not entries:
             raise ValueError("SEC filing feed contained no entries")
