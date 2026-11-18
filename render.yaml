@@ -10,7 +10,9 @@ services:
     healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: startupforge-postgres-free
+          property: connectionString
       - key: NODE_ENV
         value: production
       - key: ALLOW_INSECURE_DEMO_LOGIN
@@ -73,4 +75,5 @@ services:
     dockerfilePath: ./gun_server/Dockerfile
     plan: free
     numInstances: 1
+
 
