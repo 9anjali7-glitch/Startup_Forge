@@ -33,6 +33,7 @@ type MessagesPageProps = {
   currentUser: User;
   onViewProfile: (userId: string) => void;
   targetUserId?: string | null;
+  demoConnections?: any[];
   onNavigate: (page: string) => void;
   onSearch: (query: string) => void;
   onQueryChange?: (query: string) => void;
@@ -82,7 +83,7 @@ const ActionItem = ({ icon, label, onClick, badge, active }: { icon: any, label:
   </button>
 );
 
-export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetUserId, onNavigate, onSearch, onQueryChange, ragResults, isSearching }: MessagesPageProps) {
+export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetUserId, demoConnections = [], onNavigate, onSearch, onQueryChange, ragResults, isSearching }: MessagesPageProps) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<string | null>(targetUserId || null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -91,7 +92,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
   const [headerSearchQuery, setHeaderSearchQuery] = useState('');
   const [isSearchExpanded, setIsSearchExpanded] = useState(false); // Mobile search
   const [clearRequestPending, setClearRequestPending] = useState(false);
-  const { unreadAlerts, unreadInbox } = useUnreadBadges(String(currentUser?.id || ''));
+  const { unreadAlerts, unreadInbox } = useUnreadBadges(String(currentUser?.id || ''), currentUser.isDemo ? { incoming: [], accepted: [] } : undefined);
 
   // Close search when clicking outside
   useEffect(() => {
@@ -130,19 +131,43 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
 
   // 1. Fetch Conversations (Accepted Connections)
   useEffect(() => {
-    fetchConnections();
-  }, []);
+    void fetchConnections();
+  }, [currentUser.id, currentUser.isDemo, demoConnections]);
 
   useEffect(() => {
-    if (targetUserId) {
+    if (targetUserId && (!currentUser.isDemo || conversations.some(conversation => conversation.userId === targetUserId))) {
       setSelectedConversation(targetUserId);
       saveSeenConversation(String(currentUser.id), String(targetUserId));
     }
-  }, [targetUserId, currentUser.id]);
+  }, [targetUserId, currentUser.id, currentUser.isDemo, conversations]);
 
   const fetchConnections = async () => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      if (currentUser.isDemo) {
+        let seenIds: string[] = [];
+        let unreadIds: string[] = [];
+        try { seenIds = JSON.parse(localStorage.getItem(inboxSeenKey(String(currentUser.id))) || '[]'); } catch { /* use empty seen list */ }
+        try { unreadIds = JSON.parse(localStorage.getItem(inboxUnreadKey(String(currentUser.id))) || '[]'); } catch { /* use empty unread list */ }
+        const mapped = demoConnections.filter(request => request.status === 'ACCEPTED').map((request: any) => {
+          const isSender = String(request.senderId) === String(currentUser.id);
+          const peerId = String(isSender ? request.receiverId : request.senderId);
+          return {
+            userId: peerId,
+            userName: isSender ? request.receiverName : request.senderName,
+            userAvatar: (isSender ? request.receiverAvatar : request.senderAvatar) || 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+            role: String(isSender ? request.receiverRole : request.senderRole || '').toUpperCase() as 'INVESTOR' | 'FOUNDER',
+            company: null,
+            firm: null,
+            headline: isSender ? request.receiverHeadline : request.senderHeadline,
+            lastMessage: 'Start a conversation',
+            timestamp: '',
+            unread: !seenIds.includes(peerId) || unreadIds.includes(peerId)
+          };
+        }).filter((item: Conversation, index: number, all: Conversation[]) => all.findIndex(peer => peer.userId === item.userId) === index);
+        setConversations(mapped);
+        return;
+      }
       const res = await apiFetch(`${apiUrl}/inbox`, {
         headers: { 'x-user-id': currentUser.id }
       });
@@ -187,6 +212,16 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
       setMessages([]); // Clear previous
       console.log("initChat starting", { targetUserId, currentUser: currentUser.id });
       try {
+        if (currentUser.isDemo) {
+          const roomKey = `demo-${[String(currentUser.id), String(targetUserId)].sort().join('--')}`;
+          setCurrentRoomKey(roomKey);
+          setCurrentConnectionId(null);
+          chatNode = gun.get('startupforge-demo-v1').get('messages').get(roomKey);
+          chatNode.map().on((node: any, msgId: string) => {
+            if (node && typeof node === 'object' && typeof node.text === 'string') processIncomingMessage(node, msgId);
+          });
+          return;
+        }
         // Get Room Key from Backend
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
         const res = await apiFetch(`${apiUrl}/chat`, {
@@ -225,7 +260,36 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
     return () => {
       if (chatNode) chatNode.off();
     };
-  }, [selectedConversation, gun, currentUser.id]);
+  }, [selectedConversation, gun, currentUser.id, currentUser.isDemo]);
+
+  const demoConversationIds = currentUser.isDemo ? conversations.map(conversation => conversation.userId).join('|') : '';
+  useEffect(() => {
+    if (!currentUser.isDemo || !gun || !demoConversationIds) return;
+    const nodes = conversations.map(conversation => ({
+      conversation,
+      node: gun.get('startupforge-demo-v1').get('messages').get(`demo-${[String(currentUser.id), String(conversation.userId)].sort().join('--')}`)
+    }));
+    nodes.forEach(({ conversation, node }) => node.map().on((message: any) => {
+      if (!message || typeof message.text !== 'string' || message.type === 'request_clear' || message.type === 'accept_clear') return;
+      const preview = message.type === 'image' ? 'Image' : message.type === 'file' ? (message.fileName || 'File') : message.text;
+      setConversations(previous => previous.map(item => item.userId === conversation.userId ? {
+        ...item,
+        lastMessage: preview,
+        timestamp: new Date(Number(message.ts) || Date.now()).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
+        unread: String(message.sender) !== String(currentUser.id) && selectedConversation !== conversation.userId
+      } : item));
+      if (String(message.sender) !== String(currentUser.id) && selectedConversation !== conversation.userId) {
+        const key = inboxUnreadKey(String(currentUser.id));
+        try {
+          const ids = new Set<string>((JSON.parse(localStorage.getItem(key) || '[]') as string[]).map(String));
+          ids.add(conversation.userId);
+          localStorage.setItem(key, JSON.stringify([...ids]));
+          window.dispatchEvent(new Event('startupforge:unread-changed'));
+        } catch { /* Keep the inbox usable if local storage is blocked. */ }
+      }
+    }));
+    return () => nodes.forEach(({ node }) => node.off());
+  }, [currentUser.id, currentUser.isDemo, demoConversationIds, gun, selectedConversation]);
 
   // 3. Poll Investment Status (when chat is open)
   useEffect(() => {
@@ -343,233 +407,148 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
       const stream = commands.join('\n');
       const pageId = pageIds[pageIndex];
       const contentId = pageId + 1;
-      objects[pageId] = `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${contentId} 0 R >>`;
-      objects[contentId] = `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`;
-    });
-
-    let pdf = '%PDF-1.4\n';
-    const offsets = [0];
-    for (let id = 1; id < objects.length; id++) {
-      offsets[id] = pdf.length;
-      pdf += `${id} 0 obj\n${objects[id]}\nendobj\n`;
-    }
-    const xrefOffset = pdf.length;
-    pdf += `xref\n0 ${objects.length}\n0000000000 65535 f \n`;
-    for (let id = 1; id < objects.length; id++) pdf += `${String(offsets[id]).padStart(10, '0')} 00000 n \n`;
-    pdf += `trailer\n<< /Size ${objects.length} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
-
-    const blob = new Blob([pdf], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    const companySlug = ascii(founder?.company || founder?.userName || 'startup').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '');
-    link.href = url;
-    link.download = `StartupForge_Agreed_Investment_Details_${companySlug || 'startup'}.pdf`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    window.setTimeout(() => URL.revokeObjectURL(url), 30_000);
-  };
-
-  const handleReportInvestment = async () => {
-    if (!currentConnectionId) return;
-    try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      await apiFetch(`${apiUrl}/api/investments/report`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-user-id': currentUser.id
-        },
-        body: JSON.stringify({ connectionId: currentConnectionId })
-      });
-      setInvStatus('PENDING'); // Optimistic update
-    } catch (e) { console.error(e); }
-  };
-
-  const submitInvestment = async () => {
-    if (!currentConnectionId) return;
-    try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const res = await apiFetch(`${apiUrl}/api/investments/confirm`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-user-id': currentUser.id
-        },
-        body: JSON.stringify({
-          connectionId: currentConnectionId,
-          role: currentUser.role, // 'founder' | 'investor'
-          data: invFormData
-        })
-      });
-      const data = await res.json();
-
-      if (data.status === 'MATCHED') {
-        setInvStatus('MATCHED');
-        if (data.deal) setInvFormData({ round: String(data.deal.round), year: String(data.deal.year), amount: String(data.deal.amount) });
-        setSubmissionFeedback("Investment Confirmed!");
-        setTimeout(() => {
-          setShowInvModal(false);
-          setSubmissionFeedback(null);
-        }, 1500);
-      } else if (data.mismatch) {
-        setSubmissionFeedback("Mismatch! details do not match partner's submission.");
-      } else {
-        setSubmissionFeedback("Submitted! Waiting for partner to confirm.");
-        setTimeout(() => {
-          setShowInvModal(false);
-          setSubmissionFeedback(null);
-        }, 1500);
+      objects[pageId] = `<< /Type /Page /Parent 2 0 R /MediaBox [0 0…11446 tokens truncated…rName: r.sender_name || `User ${r.sender_id}`,
+          userHeadline: r.sender_headline || r.sender_role || 'Founder',
+          userAvatar: r.sender_avatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+          mutualConnections: 0
+        }));
+        setRequests(mapped);
       }
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error("Failed to fetch requests", e);
+    }
   };
 
-  const processIncomingMessage = async (node: any, id: string) => {
-    // 1. Handle Clear Requests
-    if (node.type === 'request_clear') {
-      if (node.sender !== currentUser.id) {
-        setClearRequestPending(true);
+  useEffect(() => {
+    if (currentUser.id) {
+      fetchRequests();
+    }
+  }, [currentUser.id, currentUser.isDemo, demoConnectionRequests]);
+
+  // Close search when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (isSearchExpanded && !target.closest('.search-container')) {
+        setIsSearchExpanded(false);
       }
-      return;
-    }
-
-    // 2. Handle Clear Confirmation (Actual Delete)
-    if (node.type === 'accept_clear') {
-          setMessages([]);
-      setClearRequestPending(false);
-      return;
-    }
-
-    // Check if message already exists
-    if (String(node.sender) !== String(currentUser.id) && selectedConversation) {
-      saveSeenConversation(String(currentUser.id), String(selectedConversation));
-    }
-
-    setMessages(prev => {
-      if (prev.find(m => m.id === id)) return prev;
-
-      const content = typeof node.text === 'string' && node.text.startsWith('SEA') ? 'Encrypted Message' : node.text;
-
-      return [...prev, {
-        id,
-        senderId: String(node.sender),
-        content: content,
-        timestamp: node.ts,
-        type: node.type || 'text',
-        fileName: node.fileName
-      }].sort((a, b) => a.timestamp - b.timestamp);
-    });
-
-    // Scroll to bottom
-    setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
-  };
-
-  const requestClearChat = () => {
-    if (!currentRoomKey || !gun) return;
-    const payload = {
-      sender: currentUser.id,
-      text: "REQUEST_CLEAR",
-      type: 'request_clear',
-      ts: Date.now()
     };
-    gun.get('chats').get(currentRoomKey).set(payload);
-    // Optimistically show pending state or just wait? 
-    // Usually only receiver needs to know. 
-    // But we should maybe show "Waiting for confirmation"
-    alert("Clear request sent. Waiting for other user to accept.");
-  };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isSearchExpanded]);
 
-  const confirmClearChat = () => {
-    if (!currentRoomKey || !gun) return;
-
-    // 1. Send Accept Message (Trigger for both clients to wipe)
-    const payload = {
-      sender: currentUser.id,
-      text: "ACCEPT_CLEAR",
-      type: 'accept_clear',
-      ts: Date.now()
-    };
-    gun.get('chats').get(currentRoomKey).set(payload);
-
-    // 2. Actually Nullify Data (Best Effort)
-    gun.get('chats').get(currentRoomKey).map().once((msg: any, key: string) => {
-      gun.get('chats').get(currentRoomKey).get(key).put(null);
-    });
-
-    setClearRequestPending(false);
-  };
-
-  const cancelClearRequest = () => {
-    setClearRequestPending(false);
-  };
-
-  const sendMessage = async (content?: string) => {
-    console.log('CLICK SEND', {
-      currentRoomKey,
-      content,
-      previewAttachment,
-      gun: !!gun
-    });
-    if (!currentRoomKey || !gun) {
-      console.error("Missing RoomKey or Gun instance", { currentRoomKey, gun: !!gun });
-      return;
-    }
-
-    // Determine payload based on whether we have an attachment or text
-    let finalContent = content;
-    let finalType = 'text';
-    let finalFileName = undefined;
-
-    if (previewAttachment) {
-      finalContent = previewAttachment.content;
-      finalType = previewAttachment.type;
-      finalFileName = previewAttachment.name;
-    } else if (!content || !content.trim()) {
-      return; // Nothing to send
-    }
-
-    const payload = {
-      sender: currentUser.id,
-      text: finalContent,
-      type: finalType,
-      ts: Date.now(),
-      fileName: finalFileName || null // Gun doesn't like undefined
-    };
-
-    console.log('SENT PAYLOAD', payload);
-    gun.get('chats').get(currentRoomKey).set(payload);
-    setMessageText('');
-    setPreviewAttachment(null);
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'file') => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const b64 = reader.result as string;
-      setPreviewAttachment({
-        type,
-        content: b64,
-        name: file.name
-      });
-      // Reset input so same file can be selected again if needed (after cancel)
-      e.target.value = '';
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const cancelAttachment = () => {
-    setPreviewAttachment(null);
-  };
-
-  const handleHeaderSearchSubmit = (e: React.FormEvent) => {
+  const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (onSearch) onSearch(headerSearchQuery);
+    if (onSearch) onSearch(searchQuery);
+    setIsSearchExpanded(false);
   };
 
-  const selectedUser = conversations.find(c => c.userId === selectedConversation);
+  const handleAcceptInternal = async (reqId: string) => {
+    try {
+      if (currentUser.isDemo) {
+        await onRespondToDemoConnectionRequest?.(reqId, 'ACCEPTED');
+        return;
+      }
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const response = await apiFetch(`${apiUrl}/connections/accept/${reqId}`, {
+        method: 'POST',
+        headers: { 'x-user-id': currentUser.id }
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.error || `Accept request failed (${response.status})`);
+      }
+      await fetchRequests();
+    } catch (e) {
+      window.alert(e instanceof Error ? e.message : 'Could not accept the connection request.');
+    }
+  };
+
+  const handleRejectInternal = async (reqId: string) => {
+    try {
+      await onRejectRequest(reqId);
+      await fetchRequests();
+    } catch (e) {
+      window.alert(e instanceof Error ? e.message : 'Could not reject the connection request.');
+    }
+  };
+
+
+  // --- Render Helpers ---
+
+  const renderTopProfiles = (users: User[]) => (
+    <div className="flex flex-row gap-4 overflow-x-auto pb-6 pt-2 custom-scrollbar px-1">
+      {users.slice(0, 5).map((user) => (
+        <div key={`${user.role || activeTab}-${user.id}`} className="flex flex-col items-center min-w-[100px] p-3 rounded-2xl hover:bg-white hover:shadow-lg transition-all duration-300 cursor-pointer group border border-transparent hover:border-slate-100 relative" onClick={() => onViewProfile(user.id)}>
+          <div className="relative mb-3 transform group-hover:scale-105 transition-transform duration-300">
+            <div className="absolute inset-0 bg-indigo-500 rounded-full blur-md opacity-0 group-hover:opacity-20 transition-opacity"></div>
+            <img
+              src={user.avatar}
+              alt={user.name}
+              className="w-16 h-16 rounded-full border-[3px] border-white shadow-md object-cover relative z-10"
+            />
+            {isConnectedTo(user) && (
+              <div className="absolute bottom-1 right-0 bg-emerald-500 border-[3px] border-white rounded-full p-0.5 z-20 shadow-sm">
+                <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
+              </div>
+            )}
+          </div>
+          <span className="text-sm font-bold text-slate-800 text-center leading-tight line-clamp-1 w-full group-hover:text-indigo-600 transition-colors">{user.name}</span>
+          <span className="text-[10px] font-semibold text-slate-400 text-center truncate w-full mt-1 bg-slate-50 px-2 py-0.5 rounded-full">{user.headline}</span>
+        </div>
+      ))}
+    </div>
+  );
+
+  const renderUserCard = (user: User) => (
+    <div key={`${user.role || activeTab}-${user.id}`} className="bg-white border border-slate-200/60 rounded-2xl p-4 hover:shadow-lg hover:shadow-slate-200/50 transition-all duration-300 hover:border-indigo-100 group hover:-translate-y-1">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-4 flex-1 min-w-0" onClick={() => onViewProfile(user.id)}>
+          <div className="relative">
+            <img src={user.avatar} alt={user.name} className="w-14 h-14 rounded-2xl object-cover border border-slate-100 shadow-sm group-hover:shadow-md transition-all cursor-pointer" />
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow-sm">
+              <div className={`w-2.5 h-2.5 rounded-full ${isConnectedTo(user) ? 'bg-emerald-500' : 'bg-slate-300'}`}></div>
+            </div>
+          </div>
+          <div className="flex-1 min-w-0 py-0.5">
+            <h4 className="font-bold text-slate-800 text-[15px] truncate group-hover:text-indigo-600 transition-colors cursor-pointer tracking-tight">{user.name}</h4>
+            <div className="flex items-center gap-1.5 mt-1">
+              <span className="text-xs font-medium text-slate-500 line-clamp-1 bg-slate-50 px-1.5 py-0.5 rounded-md border border-slate-100">{user.headline}</span>
+            </div>
+            <div className="flex items-center gap-1 mt-2">
+              <Users className="w-3 h-3 text-slate-400" />
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{user.connections} connections</p>
+            </div>
+          </div>
+        </div>
+        <button
+          onClick={() => {
+            if (user.id === currentUser.id || (user.role === currentUser.role && user.name.trim().toLowerCase() === currentUser.name.trim().toLowerCase())) return;
+            if (!isConnectedTo(user)) {
+              void onFollowUser(
+                user.id,
+                user.role || (activeTab === 'investors' ? 'investor' : 'founder'),
+                user.name,
+                user.headline,
+                user.company || ''
+              ).then(sent => {
+                if (sent && !currentUser.isDemo) (user as any).isConnected = true;
+              });
+            }
+          }}
+          disabled={user.id === currentUser.id || (user.role === currentUser.role && user.name.trim().toLowerCase() === currentUser.name.trim().toLowerCase()) || isConnectedTo(user)}
+          className={`h-10 w-10 flex items-center justify-center rounded-xl transition-all shadow-sm flex-shrink-0 ${isConnectedTo(user)
+            ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+            : followedUsers.has(user.id)
+              ? 'bg-slate-50 text-slate-400 border border-slate-200'
+              : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-900 hover:text-white hover:border-slate-900 hover:shadow-md'
+            }`}
+        >
+          {isConnectedTo(user) ? <UserCheck className="w-5 h-5" /> : followedUsers.has(user.id) ? <Check className="w-5 h-5" /> : <UserPlus className="w-5 h-5" />}
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="h-screen bg-slate-50 flex flex-col font-sans overflow-hidden">
@@ -579,7 +558,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
 
           {/* Desktop Profile */}
           <button
-            onClick={() => onNavigate('profile')}
+            onClick={() => setShowProfileModal(true)}
             className="hidden md:flex items-center gap-4 hover:bg-slate-50 p-2 rounded-xl transition-all group flex-shrink-0 min-w-52"
           >
             <div className="relative">
@@ -591,13 +570,13 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
               <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></div>
             </div>
             <div className="flex flex-col items-start">
-              <span className="text-lg font-bold text-slate-900 leading-tight group-hover:text-slate-700 transition-colors">{currentUser.name}</span>
-              <span className="text-xs text-slate-500 font-medium">View Profile</span>
+              <span className="text-lg font-bold text-gray-900 leading-tight group-hover:text-slate-800"><b>{currentUser.name}</b></span>
+              <span className="text-xs text-gray-500 font-medium"><b>View Profile</b></span>
             </div>
           </button>
 
           <button
-            onClick={() => onNavigate('profile')}
+            onClick={() => setShowProfileModal(true)}
             className="md:hidden flex-shrink-0"
           >
             <img src={currentUser.avatar} className="w-8 h-8 rounded-full border border-gray-200" />
@@ -605,9 +584,16 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
 
           {/* Search */}
           <div className="flex-1 flex justify-center max-w-3xl px-0 md:px-8 relative">
-            <form onSubmit={(e) => { handleHeaderSearchSubmit(e); setIsSearchExpanded(false); }} className="relative w-full group search-container">
-              {/* Search Input */}
-              <div className="relative w-full">
+            <form onSubmit={handleSearchSubmit} className="relative w-full group search-container">
+              {/* Mobile Search Icon Trigger */}
+              <div className={`md:hidden ${isSearchExpanded ? 'hidden' : 'flex'} justify-end w-full`} >
+                <button type="button" onClick={() => setIsSearchExpanded(true)} className="p-2.5 bg-slate-100 rounded-full text-slate-600">
+                  <Sparkles className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Input field */}
+              <div className={`${isSearchExpanded ? 'flex' : 'hidden md:block'} relative w-full`}>
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
                   <div className="bg-slate-800 p-1.5 md:p-2 rounded-xl">
                     <Sparkles className="h-3 w-3 md:h-5 md:w-5 text-white animate-pulse" />
@@ -616,25 +602,38 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
                 <input
                   type="text"
                   className="w-full pl-10 pr-4 md:pl-20 md:pr-20 py-2.5 md:py-4 bg-slate-900 border border-slate-700 focus:border-slate-500 focus:ring-4 focus:ring-slate-800 rounded-xl md:rounded-2xl text-xs md:text-base transition-all placeholder-white font-medium outline-none shadow-sm text-white hover:shadow-md hover:border-slate-600 relative z-50"
-                  placeholder="Search messages..."
-                  value={headerSearchQuery}
+                  placeholder="Search people..."
+                  value={searchQuery}
+
                   onChange={(e) => {
-                    setHeaderSearchQuery(e.target.value);
+                    setSearchQuery(e.target.value);
                     if (onQueryChange) onQueryChange(e.target.value);
                   }}
+                  autoFocus={isSearchExpanded}
                 />
+                {/* Close Button Mobile */}
+                {isSearchExpanded && (
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); setIsSearchExpanded(false); }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-slate-700 rounded-full text-white md:hidden z-50"
+                  >
+                    <span className="text-xs">✕</span>
+                  </button>
+                )}
+
                 <div className="hidden md:flex absolute inset-y-0 right-4 items-center pointer-events-none z-50">
                   <div className="flex items-center gap-2">
-                    <span className="text-slate-400 text-xs">|</span>
+                    <span className="text-gray-300 text-xs">|</span>
                     <kbd className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-800 border border-slate-600 border-b-2 rounded-lg text-[10px] font-bold text-slate-300 tracking-wider">
-                      âŒ˜ K
+                      ⌘ K
                     </kbd>
                   </div>
                 </div>
               </div>
             </form>
             {/* RAG Search Results Dropdown */}
-            {headerSearchQuery.length >= 2 && ragResults && (
+            {searchQuery.length >= 2 && ragResults && (
               <div className="absolute top-full left-0 right-0 mt-2 z-[100] shadow-2xl rounded-2xl border border-slate-100 overflow-hidden bg-white">
                 <SearchResultsDropdown
                   results={ragResults}
@@ -649,455 +648,166 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
           {/* Desktop Nav Icons */}
           <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
             <ActionItem icon={<Home />} label="Home" onClick={() => onNavigate('home')} />
-            <ActionItem icon={<Users />} label="Network" onClick={() => onNavigate('network')} />
+            <ActionItem icon={<Users />} label="Network" onClick={() => onNavigate('network')} active={true} />
             <ActionItem icon={<Bell />} label="Alerts" badge={unreadAlerts > 0} onClick={() => onNavigate('notifications')} />
-            <ActionItem icon={<MessageSquare />} label="Inbox" badge={unreadInbox > 0} onClick={() => onNavigate('messages')} active={true} />
+            <ActionItem icon={<MessageSquare />} label="Inbox" badge={unreadInbox > 0} onClick={() => onNavigate('messages')} />
             <ActionItem icon={<BrainCircuit />} label="Deep Analysis" onClick={() => onNavigate('conflict-report')} />
           </div>
         </div>
       </div>
 
-      {/* --- Main Content (Messages Layout) --- */}
-      <div className="flex-1 max-w-6xl mx-auto w-full px-0 md:px-4 py-0 md:py-4 pb-20 md:pb-4 overflow-hidden h-full">
-        <div className="bg-white md:rounded-[2rem] border-x-0 md:border border-slate-200 h-full flex overflow-hidden shadow-none md:shadow-xl ring-0 md:ring-1 ring-slate-100/50">
+      {/* --- Main Network Content --- */}
+      <div className="flex-1 overflow-y-auto w-full max-w-[1700px] mx-auto p-4 md:p-8 pb-24 md:pb-8 custom-scrollbar">
 
-          {/* Sidebar */}
-          <div className={`w-full md:w-80 border-r border-slate-100 flex-col bg-slate-50/50 ${selectedConversation ? 'hidden md:flex' : 'flex'}`}>
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-3 px-1">
-                <h2 className="text-lg font-bold text-slate-900 tracking-tight">Messages</h2>
-                <div className="flex items-center gap-1 px-2 py-0.5 bg-white rounded-full border border-emerald-100 shadow-sm" title="End-to-End Encrypted">
-                  <Lock className="w-2.5 h-2.5 text-emerald-600" />
-                  <span className="text-[9px] font-bold text-emerald-700 tracking-wide">SECURE</span>
+        {/* Invitations Section (If any) */}
+        {requests.length > 0 && (
+          <div className="bg-white rounded-3xl shadow-sm border border-slate-200/60 p-4 md:p-6 mb-8 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50/50 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+            <div className="flex justify-between items-center mb-6 border-b border-slate-100 pb-4 relative z-10">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-slate-900 rounded-xl text-white"><UserPlus className="w-5 h-5" /></div>
+                <h2 className="text-lg md:text-xl font-bold text-slate-900">Connections Pending</h2>
+              </div>
+              <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border border-indigo-200">{requests.length} New</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 relative z-10">
+              {requests.map((request) => (
+                <div key={request.id} className="flex items-center justify-between p-4 bg-slate-50/80 border border-slate-100 rounded-2xl hover:shadow-md transition-all hover:bg-white group">
+                  <div className="flex items-center gap-4">
+                    <img src={request.userAvatar} className="w-14 h-14 rounded-2xl object-cover shadow-sm" />
+                    <div>
+                      <h4 className="font-bold text-slate-900 text-base">{request.userName}</h4>
+                      <p className="text-xs text-slate-500 font-medium bg-white px-2 py-0.5 rounded-md inline-block shadow-sm mt-1">{request.userHeadline}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => handleRejectInternal(request.id)} className="w-9 h-9 flex items-center justify-center bg-white border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-100 hover:bg-red-50 rounded-xl transition-colors shadow-sm"><X className="w-4 h-4" /></button>
+                    <button onClick={() => handleAcceptInternal(request.id)} className="w-9 h-9 flex items-center justify-center bg-slate-900 text-white hover:bg-indigo-600 rounded-xl transition-all shadow-md hover:scale-105"><Check className="w-4 h-4" /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Unified Tabbed Content (Compact & Inner Scroll) */}
+        <div className="flex-1 bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col min-h-0 h-full">
+          {/* Header with Tabs */}
+          <div className="px-4 md:px-6 py-3 md:py-4 border-b border-slate-100 flex justify-between items-center bg-white/50 backdrop-blur-sm z-20">
+            <div className="flex items-center gap-4">
+              <div className="flex bg-slate-100/80 p-1 rounded-xl">
+                <button
+                  onClick={() => setActiveTab('founders')}
+                  className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'founders' ? 'bg-white text-indigo-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                >
+                  Founders
+                </button>
+                <button
+                  onClick={() => setActiveTab('investors')}
+                  className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'investors' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                >
+                  Investors
+                </button>
+              </div>
+              <div className="hidden sm:flex items-center gap-2 pl-4 border-l border-slate-200">
+                {activeTab === 'founders' ? <Users className="w-4 h-4 text-indigo-600" /> : <TrendingUp className="w-4 h-4 text-emerald-600" />}
+                <div>
+                  <h3 className="text-sm font-black tracking-tight text-slate-800 leading-none">{activeTab === 'founders' ? 'Founder Network' : 'Investor Network'}</h3>
+                  <p className="text-[10px] text-slate-400 font-medium leading-none mt-0.5">{activeTab === 'founders' ? 'Connect with fellow visionaries' : 'Find your next round'}</p>
                 </div>
               </div>
-              <div className="relative group">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 group-focus-within:text-slate-600 transition-colors" />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-slate-100 focus:border-slate-300 text-sm transition-all placeholder-slate-400 font-medium shadow-sm"
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="flex-1 overflow-y-auto px-2 pb-2 space-y-1 custom-scrollbar">
-              {conversations.length === 0 ? (
-                <div className="p-5 text-center text-sm text-slate-500"><p>No accepted connections yet.</p><p className="mt-1">When someone accepts your connection request, you can message them here.</p><button onClick={() => onNavigate('network')} className="mt-3 font-bold text-indigo-600 hover:text-indigo-800">Explore Network →</button></div>
-              ) : conversations.filter(c => c.userName.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 ? (
-                <div className="p-5 text-center text-sm text-slate-500">No conversations match “{searchQuery}”.</div>
-              ) : conversations
-                .filter(c => c.userName.toLowerCase().includes(searchQuery.toLowerCase()))
-                .map(conversation => (
-                  <button
-                    key={conversation.userId}
-                    onClick={() => { setSelectedConversation(conversation.userId); saveSeenConversation(String(currentUser.id), conversation.userId); setConversations(items => items.map(item => item.userId === conversation.userId ? { ...item, unread: false } : item)); }}
-                    className={`w-full flex items-center gap-3 p-3 rounded-2xl text-left transition-all duration-200 border border-transparent ${selectedConversation === conversation.userId
-                      ? 'bg-white shadow-md border-slate-100 ring-1 ring-slate-50 scale-[1.02]'
-                      : 'hover:bg-white hover:shadow-sm hover:border-slate-100 text-slate-600'
-                      } `}
-                  >
-                    <img src={conversation.userAvatar} alt="" className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <h3 className={`text-sm font-bold truncate ${selectedConversation === conversation.userId ? 'text-slate-900' : 'text-slate-700'}`}>{conversation.userName}</h3>
-                        {conversation.unread && <span className="w-2.5 h-2.5 bg-rose-600 rounded-full ring-2 ring-rose-100"></span>}
-                      </div>
-                      <p className={`text-xs truncate mt-0.5 ${selectedConversation === conversation.userId ? 'text-slate-500 font-medium' : 'text-slate-400 opacity-80'}`}>{conversation.lastMessage}</p>
-                    </div>
-                  </button>
-                ))}
             </div>
           </div>
 
-          {/* Chat Area */}
-          {selectedConversation && selectedUser ? (
-            <div className={`flex-1 flex-col bg-white ${selectedConversation ? 'flex' : 'hidden md:flex'}`}>
-              {/* Header */}
-              <div className="grid grid-cols-[auto_1fr_auto] items-center z-10 sticky top-0 px-4 md:px-6 py-3 bg-white/80 backdrop-blur-sm border-b border-slate-100">
-
-                {/* Left: User Info */}
-                <div className="justify-self-start flex items-center gap-3">
-                  {/* Back Button for Mobile */}
-                  <button
-                    onClick={() => setSelectedConversation(null)}
-                    className="md:hidden p-1.5 -ml-2 text-slate-500 hover:bg-slate-100 rounded-full"
-                  >
-                    <ArrowLeft className="w-5 h-5" />
-                  </button>
-
-                  <div className="relative group cursor-pointer">
-                    <img src={selectedUser.userAvatar} alt="" className="w-9 h-9 rounded-full object-cover border border-slate-200 shadow-sm" />
-                    <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></div>
-                  </div>
-                  <div>
-                    <h3 className="text-slate-900 font-bold text-sm leading-tight">{selectedUser.userName}</h3>
-                    <div className="flex items-center gap-1">
-                      <span className="w-1 h-1 bg-green-500 rounded-full"></span>
-                      <span className="text-slate-400 text-[10px] font-medium">Encrypted</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Center: Report Button (Hidden on small mobile if needed, or compact) */}
-                <div className="justify-self-center hidden sm:block">
-                  <button
-                    onClick={handleReportInvestment}
-                    className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-full shadow-lg shadow-indigo-200 transition-all font-bold text-xs uppercase tracking-wider animate-pulse ring-4 ring-indigo-50"
-                  >
-                    <Briefcase className="w-4 h-4" />
-                    Report Investment
-                  </button>
-                </div>
-                {/* Mobile Report Icon only */}
-                <div className="justify-self-center sm:hidden">
-                  <button onClick={handleReportInvestment} className="p-2 bg-indigo-600 text-white rounded-full shadow-md"><Briefcase className="w-4 h-4" /></button>
-                </div>
-
-
-                {/* Right: Actions */}
-                <div className="justify-self-end flex flex-col items-end gap-2">
-                  <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 rounded-full border border-slate-100 group cursor-help hover:border-slate-200 transition-colors">
-                    <Shield className="w-4 h-4 text-emerald-500 fill-emerald-50" />
-                    <span className="text-xs font-bold text-slate-600 group-hover:text-emerald-700 transition-colors uppercase tracking-wide">Decentralized Chat</span>
-                  </div>
-                  <button
-                    onClick={requestClearChat}
-                    className="text-xs font-bold flex items-center gap-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 px-3 py-1.5 rounded-full transition-colors"
-                    title="Request to Clear Chat"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    <span className="hidden sm:inline">Clear Chat</span>
-                  </button>
-                </div>
+          {/* Scrollable List Area */}
+          <div className="p-4 md:p-6 overflow-y-auto flex-1 bg-slate-50/30 custom-scrollbar">
+            {/* Top Profiles Section */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-4 px-1">
+                <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{activeTab === 'founders' ? 'Recently Active' : 'Top VCs & Angels'}</h4>
+                <span className="h-px flex-1 bg-slate-200 ml-4"></span>
               </div>
-
-              {/* NEW: Persistent Notification Bar */}
-              {invStatus === 'PENDING' && (
-                <div className="bg-blue-50/80 backdrop-blur-sm border-b border-blue-100 px-4 py-3 flex items-center justify-between animate-in slide-in-from-top-2 z-0">
-                  <div className="flex items-center gap-3">
-                    <div className="p-1.5 bg-blue-100 rounded-full">
-                      <AlertTriangle className="w-4 h-4 text-blue-600" />
-                    </div>
-                    <span className="font-medium text-sm text-blue-800">Investment reported. Confirm details to record this deal.</span>
-                  </div>
-                  <button
-                    onClick={() => setShowInvModal(true)}
-                    className="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-700 transition-colors shadow-sm"
-                  >
-                    Confirm Details
-                  </button>
-                </div>
-              )}
-              {invStatus === 'MATCHED' && (
-                <div className="bg-emerald-50/80 backdrop-blur-sm border-b border-emerald-100 px-4 py-3 flex items-center justify-center animate-in slide-in-from-top-2 z-0">
-                  <CheckCircle2 className="w-5 h-5 mr-2 text-emerald-600" />
-                  <span className="font-bold text-emerald-800 text-sm">Investment details matched by both parties.</span>
-                  <button onClick={downloadInvestmentAgreement} className="ml-3 bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold">Download matched details PDF</button>
-                </div>
-              )}
-
-              {/* Clear Request Banner */}
-              {clearRequestPending && (
-                <div className="px-4 py-3 bg-red-50 border-b border-red-100 flex items-center justify-between animate-in slide-in-from-top-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
-                      <Trash2 className="w-4 h-4 text-red-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-red-900">Clear Chat Request</p>
-                      <p className="text-xs text-red-700">Other user wants to permanently erase this chat.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={cancelClearRequest}
-                      className="p-2 bg-white border border-red-200 text-slate-600 rounded-lg hover:bg-slate-50 text-xs font-bold transition-colors"
-                    >
-                      Decline
-                    </button>
-                    <button
-                      onClick={confirmClearChat}
-                      className="flex items-center gap-1.5 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 shadow-sm text-xs font-bold transition-colors"
-                    >
-                      <Check className="w-3 h-3" />
-                      Accept & Erase
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Messages List */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/30 scroll-smooth">
-                {messages.map(msg => {
-                  const isMe = msg.senderId === currentUser.id;
-                  return (
-                    <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} group`}>
-                      <div className={`
-                        max-w-[85%] md:max-w-[70%] rounded-3xl px-4 md:px-5 py-2.5 text-sm relative shadow-sm transition-all
-                        ${isMe
-                          ? 'bg-slate-900 text-white rounded-br-sm'
-                          : 'bg-white text-slate-700 border border-slate-100 rounded-bl-sm shadow-sm'
-                        }
-                      `}>
-                        {msg.type === 'text' && <p className="leading-relaxed break-words">{msg.content}</p>}
-                        {msg.type === 'image' && <img src={msg.content} alt="Shared" className="rounded-lg max-w-full hover:opacity-95 transition-opacity cursor-pointer" />}
-                        {msg.type === 'file' && (
-                          <a
-                            href={msg.content}
-                            download={msg.fileName || 'download'}
-                            className={`flex items-center gap-3 p-3 rounded-lg transition-colors cursor-pointer text-inherit no-underline ${isMe ? 'bg-white/10 hover:bg-white/20' : 'bg-slate-50 hover:bg-slate-100'}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <div className={`p-2 rounded-lg ${isMe ? 'bg-white/20' : 'bg-slate-200'}`}>
-                              <File className="w-5 h-5" />
-                            </div>
-                            <span className="truncate font-medium hover:underline">{msg.fileName}</span>
-                          </a>
-                        )}
-                        <p className={`text-[10px] mt-2 text-right opacity-70 ${isMe ? 'text-slate-300' : 'text-slate-400'}`}>
-                          {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-                <div ref={messagesEndRef} />
-              </div>
-
-              {/* Input Area */}
-              <div className="bg-white p-3 border-t border-slate-100 pb-24 md:pb-3">
-                {/* Preview Area */}
-                {previewAttachment && (
-                  <div className="p-2 bg-slate-50 border border-slate-200 flex items-center justify-between mb-2 rounded-2xl mx-1">
-                    <div className="flex items-center gap-3 overflow-hidden ml-1">
-                      {previewAttachment.type === 'image' ? (
-                        <img src={previewAttachment.content} alt="Preview" className="h-10 w-10 object-cover rounded-xl border border-slate-200" />
-                      ) : (
-                        <div className="h-10 w-10 bg-slate-200 flex items-center justify-center rounded-xl">
-                          <File className="w-5 h-5 text-slate-500" />
-                        </div>
-                      )}
-                      <span className="text-slate-700 text-xs font-bold truncate max-w-[200px]">{previewAttachment.name}</span>
-                    </div>
-                    <button onClick={cancelAttachment} className="p-1 hover:bg-slate-200 rounded-full text-slate-400 transition-colors">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                    </button>
-                  </div>
-                )}
-
-                {/* Controls */}
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => imageInputRef.current?.click()}
-                      className={`p-2.5 rounded-full transition-all duration-200 ${previewAttachment ? 'text-slate-300 cursor-not-allowed' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-600 hover:scale-105 active:scale-95'}`}
-                      disabled={!!previewAttachment}
-                      title="Upload Image"
-                    >
-                      <Image className="w-5 h-5" />
-                    </button>
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      className={`hidden sm:block p-2.5 rounded-full transition-all duration-200 ${previewAttachment ? 'text-slate-300 cursor-not-allowed' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-600 hover:scale-105 active:scale-95'}`}
-                      disabled={!!previewAttachment}
-                      title="Upload File"
-                    >
-                      <Plus className="w-5 h-5" />
-                    </button>
-                    <div className="w-px h-6 bg-slate-200 mx-1 hidden sm:block"></div>
-                    <button
-                      onClick={() => setIsAiComposerOpen(true)}
-                      className="p-2.5 rounded-full transition-all duration-200 text-slate-400 hover:bg-purple-50 hover:text-purple-600 hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
-                      disabled={!!previewAttachment || !selectedConversation}
-                      title="Talk to AI and draft a message"
-                      aria-label="Talk to AI and draft a message"
-                    >
-                      <Sparkles className="w-5 h-5" />
-                    </button>
-                  </div>
-
-                  <div className="flex-1 relative">
-                    <input
-                      type="text"
-                      value={messageText}
-                      onChange={e => setMessageText(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && sendMessage(messageText)}
-                      placeholder={previewAttachment ? "Add a caption..." : "Message securely..."}
-                      disabled={!!previewAttachment}
-                      className="w-full bg-slate-50 text-slate-900 placeholder-slate-400 rounded-full px-5 py-3 border border-transparent focus:bg-white focus:border-slate-200 focus:outline-none focus:ring-4 focus:ring-slate-100 transition-all font-medium text-sm"
-                    />
-                  </div>
-
-                  <button
-                    onClick={() => sendMessage(messageText)}
-                    className={`p-3 rounded-full shadow-md transform transition-all duration-200 flex items-center justify-center ${!messageText && !previewAttachment ? 'bg-slate-100 text-slate-300' : 'bg-slate-900 text-white hover:bg-slate-800 hover:scale-105 active:scale-95'}`}
-                    disabled={!messageText && !previewAttachment}
-                  >
-                    <SendIcon className="w-5 h-5" />
-                  </button>
-
-                  <input type="file" ref={imageInputRef} className="hidden" accept="image/*" onChange={e => handleFileChange(e, 'image')} />
-                  <input type="file" ref={fileInputRef} className="hidden" onChange={e => handleFileChange(e, 'file')} />
-                </div>
-
-                {/* Security Footer */}
-                <div className="mt-2 py-1 flex items-center justify-center gap-1.5 select-none opacity-60 hover:opacity-100 transition-opacity">
-                  <Lock className="w-2.5 h-2.5 text-slate-400" />
-                  <p className="text-[9px] text-slate-400 font-medium tracking-wide">
-                    End-to-End Encrypted via <span className="font-semibold">Decentralized Ledger</span>
-                  </p>
-                </div>
-              </div>
-
+              {renderTopProfiles(activeTab === 'founders' ? founders : investors)}
             </div>
-          ) : (
-            <div className="hidden md:flex flex-1 flex-col items-center justify-center bg-slate-50 text-slate-400">
-              <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-sm mb-6">
-                <MessageSquare className="w-10 h-10 text-slate-300" />
+
+            {/* Grid Grid */}
+            <div>
+              <div className="flex items-center justify-between mb-4 px-1">
+                <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{activeTab === 'founders' ? 'Discover Founders' : 'Explore Investors'}</h4>
+                <span className="h-px flex-1 bg-slate-200 ml-4"></span>
               </div>
-              <p className="text-lg font-medium text-slate-600">No chat selected</p>
-              <p className="text-sm mt-2 max-w-xs text-center text-slate-500">Choose a person from the sidebar to start messaging securely.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {(activeTab === 'founders' ? founders : investors).map(renderUserCard)}
+              </div>
             </div>
-          )}
+          </div>
         </div>
-      </div >
+      </div>
 
       {/* --- Mobile Bottom Nav --- */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-6 py-3 z-[80] flex justify-between items-center shadow-[0_-4px_10px_rgba(0,0,0,0.02)] safe-area-pb">
         <ActionItem icon={<Home />} label="Home" onClick={() => onNavigate('home')} />
-        <ActionItem icon={<Users className="w-6 h-6" />} label="Network" onClick={() => onNavigate('network')} />
+        <ActionItem icon={<Users className="w-6 h-6" />} label="Network" onClick={() => onNavigate('network')} active={true} />
         <ActionItem icon={<BrainCircuit className="w-6 h-6" />} label="Analyze" onClick={() => onNavigate('conflict-report')} />
         <ActionItem icon={<Bell className="w-6 h-6" />} label="Alerts" badge={unreadAlerts > 0} onClick={() => onNavigate('notifications')} />
-        <ActionItem icon={<MessageSquare className="w-6 h-6" />} label="Inbox" badge={unreadInbox > 0} onClick={() => onNavigate('messages')} active={true} />
+        <ActionItem icon={<MessageSquare className="w-6 h-6" />} label="Inbox" badge={unreadInbox > 0} onClick={() => onNavigate('messages')} />
       </div>
 
-      {/* Investment Confirmation Modal */}
-      {
-        showInvModal && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
-            <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl p-6 relative animate-in zoom-in-95 ring-1 ring-white/50">
-              <button onClick={() => setShowInvModal(false)} className="absolute top-4 right-4 p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all">
-                <X className="w-5 h-5" />
-              </button>
-
-              <div className="mb-6">
-                <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center mb-4">
-                  <Briefcase className="w-6 h-6 text-blue-600" />
-                </div>
-                <h2 className="text-xl font-bold text-slate-900 mb-1">
-                  Confirm Investment
-                </h2>
-                <p className="text-sm text-slate-500 leading-relaxed">
-                  Both parties must submit identical details (Round, Year, Amount) to verify this transaction on the ledger.
-                </p>
-              </div>
-
-              <div className="space-y-5">
-                {/* Auto-filled names */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Startup</label>
-                    <p className="font-bold text-slate-900 truncate text-sm">
-                      {currentUser.role === 'founder' ? currentUser.company || currentUser.name : selectedUser?.userName}
-                    </p>
-                  </div>
-                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Investor</label>
-                    <p className="font-bold text-slate-900 truncate text-sm">
-                      {currentUser.role === 'investor' ? currentUser.company || currentUser.name : selectedUser?.userName}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Inputs */}
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1.5">Investment Round</label>
-                    <div className="relative">
-                      <select
-                        value={invFormData.round}
-                        onChange={e => setInvFormData({ ...invFormData, round: e.target.value })}
-                        className="w-full appearance-none bg-white rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium focus:ring-4 focus:ring-blue-50 focus:border-blue-500 outline-none transition-all text-slate-700 hover:border-slate-300"
-                      >
-                        <option>Pre-seed</option>
-                        <option>Seed</option>
-                        <option>Series A</option>
-                        <option>Series B</option>
-                        <option>Series C+</option>
-                      </select>
-                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-500">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1.5">Year</label>
-                      <input
-                        type="number"
-                        value={invFormData.year}
-                        onChange={e => setInvFormData({ ...invFormData, year: e.target.value })}
-                        className="w-full bg-white rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium focus:ring-4 focus:ring-blue-50 focus:border-blue-500 outline-none transition-all placeholder-slate-400 text-slate-700 hover:border-slate-300"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1.5">Amount (USD)</label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">$</span>
-                        <input
-                          type="text"
-                          value={invFormData.amount}
-                          onChange={e => setInvFormData({ ...invFormData, amount: e.target.value })}
-                          placeholder="e.g. 1000000"
-                          className="w-full bg-white rounded-xl border border-slate-200 pl-7 pr-4 py-2.5 text-sm font-medium focus:ring-4 focus:ring-blue-50 focus:border-blue-500 outline-none transition-all placeholder-slate-400 text-slate-700 hover:border-slate-300"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {submissionFeedback && (
-                <div className={`mt-5 p-3 rounded-xl text-xs font-bold flex items-center gap-2 ${submissionFeedback.includes('Mismatch') ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-green-50 text-green-600 border border-green-100'}`}>
-                  {submissionFeedback.includes('Mismatch') ? <AlertTriangle className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
-                  {submissionFeedback}
-                </div>
-              )}
-
-              <div className="mt-8 flex justify-end gap-3">
-                <button
-                  onClick={() => setShowInvModal(false)}
-                  className="px-5 py-2.5 text-slate-600 hover:bg-slate-50 rounded-xl font-bold text-sm transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={submitInvestment}
-                  className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-sm shadow-lg shadow-slate-200 hover:shadow-xl hover:shadow-slate-200 transition-all transform active:scale-95"
-                >
-                  Confirm & Record
-                </button>
-              </div>
-            </div>
-          </div>
-        )
-      }
-      {isAiComposerOpen && selectedUser && (
-        <AiChatComposer
+      {/* --- Profile Modal --- */}
+      {showProfileModal && (
+        <ProfileModal
           currentUser={currentUser}
-          recipientName={selectedUser.userName}
-          conversation={messages.slice(-8).filter(message => message.type === 'text').map(message => ({
-            role: message.senderId === currentUser.id ? 'user' as const : 'assistant' as const,
-            content: message.content,
-          }))}
-          onClose={() => setIsAiComposerOpen(false)}
-          onUseInChat={draft => { setMessageText(draft); setIsAiComposerOpen(false); }}
+          onClose={() => setShowProfileModal(false)}
+          onNavigate={onNavigate}
         />
       )}
-    </div >
+
+      {/* --- Mobile Chat Overlay --- */}
+      <MobileChatOverlay currentUser={currentUser} />
+    </div>
   );
 }
+
+// --- Sub-components ---
+
+function ActionItem({ icon, label, onClick, badge, active }: { icon: any, label: string, onClick: () => void, badge?: boolean, active?: boolean }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex flex-col items-center justify-center gap-1.5 p-1.5 md:p-2 rounded-2xl transition-all duration-300 group min-w-16 md:min-w-20 relative ${active ? 'bg-indigo-50/80' : 'hover:bg-slate-50'}`}
+    >
+      <div className={`relative transform transition-transform duration-300 ${active ? 'scale-105' : 'group-hover:scale-110'}`}>
+        <div className={`p-1.5 rounded-xl transition-colors duration-300 ${active ? 'bg-indigo-100 text-indigo-600' : 'text-slate-400 group-hover:text-slate-700 bg-transparent'}`}>
+          {React.cloneElement(icon, {
+            strokeWidth: active ? 2.5 : 2,
+            className: "w-5 h-5 md:w-6 md:h-6"
+          })}
+        </div>
+        {badge && <span className="absolute -top-1 -right-1 w-3 h-3 bg-rose-500 rounded-full border-2 border-white shadow-sm animate-pulse"></span>}
+      </div>
+      <span className={`text-[9px] md:text-[11px] font-bold tracking-tight transition-colors duration-300 ${active ? 'text-indigo-700' : 'text-slate-400 group-hover:text-slate-600'}`}>{label}</span>
+    </button>
+  );
+}
+
+function ProfileModal({ currentUser, onClose, onNavigate }: { currentUser: User, onClose: () => void, onNavigate: (p: string) => void }) {
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 relative">
+        <button onClick={onClose} className="absolute top-3 right-3 p-2 bg-black/10 hover:bg-black/20 text-white rounded-full transition-colors z-10 backdrop-blur-md">
+          <X className="w-4 h-4" />
+        </button>
+        <div className="h-28 bg-gradient-to-r from-gray-800 to-gray-900"></div>
+        <div className="px-6 pb-6 -mt-12 text-center">
+          <img src={currentUser.avatar} alt={currentUser.name} className="w-24 h-24 rounded-full border-4 border-white shadow-md mx-auto object-cover bg-white" />
+          <h2 className="mt-3 text-xl font-bold text-gray-900">{currentUser.name}</h2>
+          <p className="text-sm text-gray-500 mb-4">{currentUser.headline}</p>
+          <button onClick={() => { onClose(); onNavigate('profile'); }} className="w-full py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-bold transition-all shadow-lg">
+            View Full Profile
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
