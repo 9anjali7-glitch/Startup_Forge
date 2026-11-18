@@ -84,6 +84,11 @@ export function NetworkPage({
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false); // Mobile search toggle
   const [activeTab, setActiveTab] = useState<'founders' | 'investors'>('founders');
+  const isConnectedTo = (user: User) => {
+    const role = (user.role || (activeTab === 'investors' ? 'investor' : 'founder')).toLowerCase();
+    const identityId = `demo-${role}-${user.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
+    return connectedUsers.has(user.id) || (currentUser.isDemo && connectedUsers.has(identityId)) || Boolean((user as any).isConnected);
+  };
 
   // Fetch Connection Requests (Invitations)
   const fetchRequests = async () => {
@@ -189,7 +194,7 @@ export function NetworkPage({
               alt={user.name}
               className="w-16 h-16 rounded-full border-[3px] border-white shadow-md object-cover relative z-10"
             />
-            {connectedUsers.has(user.id) && (
+            {isConnectedTo(user) && (
               <div className="absolute bottom-1 right-0 bg-emerald-500 border-[3px] border-white rounded-full p-0.5 z-20 shadow-sm">
                 <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
               </div>
@@ -209,7 +214,7 @@ export function NetworkPage({
           <div className="relative">
             <img src={user.avatar} alt={user.name} className="w-14 h-14 rounded-2xl object-cover border border-slate-100 shadow-sm group-hover:shadow-md transition-all cursor-pointer" />
             <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow-sm">
-              <div className={`w-2.5 h-2.5 rounded-full ${connectedUsers.has(user.id) ? 'bg-emerald-500' : 'bg-slate-300'}`}></div>
+              <div className={`w-2.5 h-2.5 rounded-full ${isConnectedTo(user) ? 'bg-emerald-500' : 'bg-slate-300'}`}></div>
             </div>
           </div>
           <div className="flex-1 min-w-0 py-0.5">
@@ -226,7 +231,7 @@ export function NetworkPage({
         <button
           onClick={() => {
             if (user.id === currentUser.id || (user.role === currentUser.role && user.name.trim().toLowerCase() === currentUser.name.trim().toLowerCase())) return;
-            if (!connectedUsers.has(user.id) && !(user as any).isConnected) {
+            if (!isConnectedTo(user)) {
               void onFollowUser(
                 user.id,
                 user.role || (activeTab === 'investors' ? 'investor' : 'founder'),
@@ -238,15 +243,15 @@ export function NetworkPage({
               });
             }
           }}
-          disabled={user.id === currentUser.id || (user.role === currentUser.role && user.name.trim().toLowerCase() === currentUser.name.trim().toLowerCase()) || connectedUsers.has(user.id) || (user as any).isConnected}
-          className={`h-10 w-10 flex items-center justify-center rounded-xl transition-all shadow-sm flex-shrink-0 ${connectedUsers.has(user.id) || (user as any).isConnected
+          disabled={user.id === currentUser.id || (user.role === currentUser.role && user.name.trim().toLowerCase() === currentUser.name.trim().toLowerCase()) || isConnectedTo(user)}
+          className={`h-10 w-10 flex items-center justify-center rounded-xl transition-all shadow-sm flex-shrink-0 ${isConnectedTo(user)
             ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
             : followedUsers.has(user.id)
               ? 'bg-slate-50 text-slate-400 border border-slate-200'
               : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-900 hover:text-white hover:border-slate-900 hover:shadow-md'
             }`}
         >
-          {connectedUsers.has(user.id) || (user as any).isConnected ? <UserCheck className="w-5 h-5" /> : followedUsers.has(user.id) ? <Check className="w-5 h-5" /> : <UserPlus className="w-5 h-5" />}
+          {isConnectedTo(user) ? <UserCheck className="w-5 h-5" /> : followedUsers.has(user.id) ? <Check className="w-5 h-5" /> : <UserPlus className="w-5 h-5" />}
         </button>
       </div>
     </div>
