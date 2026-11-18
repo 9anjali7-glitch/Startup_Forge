@@ -215,7 +215,10 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
         if (currentUser.isDemo) {
           const roomKey = `demo-${[String(currentUser.id), String(targetUserId)].sort().join('--')}`;
           setCurrentRoomKey(roomKey);
-          setCurrentConnectionId(null);
+          const acceptedDemoConnection = demoConnections.find((request: any) => request.status === 'ACCEPTED'
+            && ((String(request.senderId) === String(currentUser.id) && String(request.receiverId) === String(targetUserId))
+              || (String(request.receiverId) === String(currentUser.id) && String(request.senderId) === String(targetUserId))));
+          setCurrentConnectionId(acceptedDemoConnection?.id || null);
           chatNode = gun.get('startupforge-demo-v1').get('messages').get(roomKey);
           chatNode.map().on((node: any, msgId: string) => {
             if (node && typeof node === 'object' && typeof node.text === 'string') processIncomingMessage(node, msgId);
@@ -298,9 +301,11 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
     const checkStatus = async () => {
       try {
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-        const res = await apiFetch(`${apiUrl}/api/investments/status/${currentConnectionId}`, {
+        const route = currentUser.isDemo ? '/api/demo-investments' : '/api/investments';
+        const res = await apiFetch(`${apiUrl}${route}/status/${encodeURIComponent(currentConnectionId)}`, {
           headers: { 'x-user-id': currentUser.id }
         });
+        if (!res.ok) throw new Error(`Investment status failed (${res.status})`);
         const data = await res.json();
 
         if (data.status === 'PENDING') {
@@ -435,10 +440,14 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
   };
 
   const handleReportInvestment = async () => {
-    if (!currentConnectionId) return;
+    if (!currentConnectionId) {
+      window.alert('Open a conversation with an accepted connection before reporting an investment.');
+      return;
+    }
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      await apiFetch(`${apiUrl}/api/investments/report`, {
+      const route = currentUser.isDemo ? '/api/demo-investments' : '/api/investments';
+      const response = await apiFetch(`${apiUrl}${route}/report`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -446,15 +455,24 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
         },
         body: JSON.stringify({ connectionId: currentConnectionId })
       });
-      setInvStatus('PENDING'); // Optimistic update
-    } catch (e) { console.error(e); }
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.error || `Report failed (${response.status})`);
+      }
+      setInvStatus('PENDING');
+      setSubmissionFeedback(null);
+    } catch (e) {
+      console.error('Investment report failed:', e);
+      window.alert(e instanceof Error ? e.message : 'Could not report this investment. Please try again.');
+    }
   };
 
   const submitInvestment = async () => {
     if (!currentConnectionId) return;
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const res = await apiFetch(`${apiUrl}/api/investments/confirm`, {
+      const route = currentUser.isDemo ? '/api/demo-investments' : '/api/investments';
+      const res = await apiFetch(`${apiUrl}${route}/confirm`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -467,6 +485,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
         })
       });
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error || `Confirmation failed (${res.status})`);
 
       if (data.status === 'MATCHED') {
         setInvStatus('MATCHED');
@@ -485,7 +504,10 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
           setSubmissionFeedback(null);
         }, 1500);
       }
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error('Investment confirmation failed:', e);
+      setSubmissionFeedback(e instanceof Error ? e.message : 'Could not confirm investment details.');
+    }
   };
 
   const processIncomingMessage = async (node: any, id: string) => {
@@ -1165,4 +1187,5 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
     </div >
   );
 }
+
 
