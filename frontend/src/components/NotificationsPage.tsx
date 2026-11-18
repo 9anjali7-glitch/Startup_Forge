@@ -126,7 +126,7 @@ export function NotificationsPage({ currentUser, demoConnectionRequests = [], de
             setRefreshing(true);
             try {
                 if (currentUser.isDemo) {
-                    const requestNotifications = demoConnectionRequests.map((request: any) => ({
+                    const requestNotifications = demoConnectionRequests.filter((request: any) => request.status === 'PENDING').map((request: any) => ({
                         id: `req-${request.id}`, type: 'request', avatar: request.senderAvatar,
                         message: `${request.senderName || 'Someone'} sent you a connection request${request.senderHeadline ? ` · ${request.senderHeadline}` : ''}`,
                         timestamp: request.createdAt && Number.isFinite(Date.parse(request.createdAt)) ? new Date(request.createdAt).toLocaleString() : 'Recently',
