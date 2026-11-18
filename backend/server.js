@@ -89,6 +89,12 @@ app.use('/api/auth', authRoutes);
  * 1. Server is running
  * 2. Database is reachable
  */
+// Render uses this process liveness endpoint to decide whether the container
+// can serve requests. Dependency readiness remains visible from /health.
+app.get('/live', (_req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 app.get('/health', async (req, res) => {
   const dependencies = { db: 'unknown', graph: 'unknown' };
   try {
@@ -485,4 +491,5 @@ process.on('uncaughtException', (err) => {
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
+
 
