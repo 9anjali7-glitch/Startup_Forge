@@ -39,7 +39,7 @@ export const LandingPage = ({ onLogin }: LandingPageProps) => {
             const demoName = normalizedName === 'mark suster' ? 'Mark Suster' : normalizedName === '1uphealth' ? '1upHealth' : enteredName;
             const demoRole = normalizedName === 'mark suster' ? 'investor' : normalizedName === '1uphealth' ? 'founder' : role;
             const demoOrganization = normalizedName === 'mark suster' ? 'Demo Investor Profile' : normalizedName === '1uphealth' ? '1upHealth sample' : 'StartupForge Demo';
-            const demoId = `demo-${demoRole}-${demoName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+            const demoId = `demo-${demoRole}-${demoName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
             setError('');
             onLogin(demoId, demoRole, demoName, undefined, demoOrganization, true);
             return;
@@ -236,3 +236,4 @@ export const LandingPage = ({ onLogin }: LandingPageProps) => {
         </div>
     );
 };
+

@@ -107,6 +107,7 @@ app.post('/seed-full', requireAdmin, (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/demo-connections', require('./demoConnections.routes'));
 
 /* ---------------- HEALTH CHECK ---------------- */
 /**
@@ -517,5 +518,6 @@ process.on('uncaughtException', (err) => {
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
+
 
 

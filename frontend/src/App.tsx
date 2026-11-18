@@ -102,14 +102,6 @@ const demoDirectoryProfileId = (role: string, name: string) => {
   return investor ? `investor-${investor.id}` : demoIdentityId(role, name);
 };
 
-const putGunValue = (node: any, value: unknown) => new Promise<boolean>((resolve) => {
-  const timeout = window.setTimeout(() => resolve(false), 8000);
-  node.put(value, (ack: any) => {
-    window.clearTimeout(timeout);
-    resolve(!ack?.err);
-  });
-});
-
 const cacheDemoConnectionActivity = (userId: string, direction: 'incoming' | 'outgoing', request: DemoConnectionRequest) => {
   const key = `startupforge:demo-connections:${userId}`;
   let current: { incoming: DemoConnectionRequest[]; accepted: DemoConnectionRequest[] } = { incoming: [], accepted: [] };
@@ -502,7 +494,7 @@ function App() {
       const receiverHeadline = targetHeadline || targetProfile?.headline || targetCompany || '';
       const receiverRole = (targetProfile?.role || targetRole || 'founder').toLowerCase();
       const receiverId = demoIdentityId(receiverRole, receiverName);
-      if (!gun || receiverId === currentUser.id) return false;
+      if (receiverId === currentUser.id) return false;
       const isCancelling = followedUsers.has(targetUserId);
       const requestId = `${currentUser.id}__${receiverId}`;
       const prior = demoOutgoingRequests.find(request => request.id === requestId);
@@ -522,12 +514,28 @@ function App() {
         createdAt: prior?.createdAt || new Date().toISOString(),
         ...(isCancelling ? { respondedAt: new Date().toISOString() } : {})
       };
-      const root = gun.get('startupforge-demo-v1').get('connections');
-      // The receiver's inbox is authoritative. A stale/missing sender mirror must
-      // not make an already delivered request look like a failed Follow action.
-      const inboxSaved = await putGunValue(root.get('incoming').get(receiverId).get(requestId), request);
-      if (!inboxSaved) return false;
-      void putGunValue(root.get('outgoing').get(currentUser.id).get(requestId), request);
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      try {
+        const response = await apiFetch(isCancelling
+          ? `${apiUrl}/api/demo-connections/${encodeURIComponent(requestId)}/respond`
+          : `${apiUrl}/api/demo-connections/request`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(isCancelling
+            ? { userId: currentUser.id, status: 'CANCELLED', requestId }
+            : {
+                senderId: currentUser.id, senderRole: currentUser.role || 'founder', senderName: currentUser.name,
+                senderHeadline: currentUser.headline || currentUser.company || '', senderAvatar: currentUser.avatar,
+                receiverId, receiverRole, receiverName, receiverHeadline,
+                receiverAvatar: targetProfile?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(receiverName)}&background=e2e8f0&color=334155&size=256`,
+                message: `Hi, I'd like to connect!`
+              })
+        });
+        if (!response.ok) throw new Error((await response.json().catch(() => ({}))).error || `Request failed (${response.status})`);
+      } catch (error) {
+        console.error('Demo connection request failed:', error);
+        return false;
+      }
       setDemoOutgoingRequests(previous => [...previous.filter(item => item.id !== requestId), request]);
       cacheDemoConnectionActivity(currentUser.id, 'outgoing', request);
       setFollowedUsers(previous => {
@@ -667,14 +675,17 @@ function App() {
 
   const handleRespondToDemoRequest = async (requestId: string, status: 'ACCEPTED' | 'REJECTED') => {
     const request = demoIncomingRequests.find(item => item.id === requestId);
-    if (!request || !gun) throw new Error('This request is no longer available.');
-    const updated: DemoConnectionRequest = { ...request, status, respondedAt: new Date().toISOString() };
-    const root = gun.get('startupforge-demo-v1').get('connections');
-    const inboxSaved = await putGunValue(root.get('incoming').get(currentUser.id).get(requestId), updated);
-    if (!inboxSaved) throw new Error('Could not update the request. Check your connection and try again.');
-    void putGunValue(root.get('outgoing').get(request.senderId).get(requestId), updated);
+    if (!request) throw new Error('This request is no longer available.');
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    const response = await apiFetch(`${apiUrl}/api/demo-connections/${encodeURIComponent(requestId)}/respond`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: currentUser.id, status })
+    });
+    if (!response.ok) throw new Error((await response.json().catch(() => ({}))).error || 'Could not update the request.');
+    const updated: DemoConnectionRequest = await response.json();
     setDemoIncomingRequests(previous => previous.filter(item => item.id !== requestId));
     if (status === 'ACCEPTED') setDemoIncomingRequests(previous => [...previous, updated]);
+    setDemoOutgoingRequests(previous => previous.map(item => item.id === requestId ? updated : item));
     cacheDemoConnectionActivity(currentUser.id, 'incoming', updated);
     if (status === 'ACCEPTED') setConnectedUsers(previous => new Set(previous).add(demoDirectoryProfileId(request.senderRole, request.senderName)));
   };
@@ -897,71 +908,32 @@ function App() {
   useEffect(() => {
     setDemoIncomingRequests([]);
     setDemoOutgoingRequests([]);
-    if (!isLoggedIn || !currentUser.isDemo || !currentUser.id || !gun) return;
-    const root = gun.get('startupforge-demo-v1').get('connections');
-    const incomingMap = root.get('incoming').get(currentUser.id).map();
-    const outgoingMap = root.get('outgoing').get(currentUser.id).map();
-    const peerInboxListeners = new Map<string, any>();
-    incomingMap.on((value: DemoConnectionRequest | null, key: string) => {
-      if (!value || typeof value !== 'object') return;
-      const request = { ...value, id: value.id || key };
-      cacheDemoConnectionActivity(currentUser.id, 'incoming', request);
-      setDemoIncomingRequests(previous => {
-        const withoutCurrent = previous.filter(item => item.id !== request.id);
-        return request.status === 'PENDING' || request.status === 'ACCEPTED' ? [...withoutCurrent, request] : withoutCurrent;
-      });
-    });
-    outgoingMap.on((value: DemoConnectionRequest | null, key: string) => {
-      if (!value || typeof value !== 'object') return;
-      const request = { ...value, id: value.id || key };
-      if (!peerInboxListeners.has(request.id)) {
-        const peerInbox = root.get('incoming').get(request.receiverId).get(request.id);
-        peerInbox.on((latest: DemoConnectionRequest | null) => {
-          if (!latest || latest.status !== 'ACCEPTED') return;
-          const accepted = { ...latest, id: latest.id || request.id };
-          cacheDemoConnectionActivity(currentUser.id, 'outgoing', accepted);
-          setDemoOutgoingRequests(previous => [...previous.filter(item => item.id !== accepted.id), accepted]);
-          const profileId = demoDirectoryProfileId(accepted.receiverRole, accepted.receiverName);
-          setFollowedUsers(previous => new Set(previous).add(profileId));
-          setConnectedUsers(previous => new Set(previous).add(profileId));
-        });
-        peerInboxListeners.set(request.id, peerInbox);
-      }
-      cacheDemoConnectionActivity(currentUser.id, 'outgoing', request);
-      setDemoOutgoingRequests(previous => {
-        const withoutCurrent = previous.filter(item => item.id !== request.id);
-        return request.status === 'CANCELLED' || request.status === 'REJECTED' ? withoutCurrent : [...withoutCurrent, request];
-      });
-      const profileId = demoDirectoryProfileId(request.receiverRole, request.receiverName);
-      if (request.status === 'PENDING' || request.status === 'ACCEPTED') {
-        setFollowedUsers(previous => new Set(previous).add(profileId));
-      } else if (request.status === 'CANCELLED' || request.status === 'REJECTED') {
-        setFollowedUsers(previous => { const next = new Set(previous); next.delete(profileId); return next; });
-      }
-      if (request.status === 'ACCEPTED') setConnectedUsers(previous => new Set(previous).add(profileId));
-    });
-    return () => { incomingMap.off(); outgoingMap.off(); peerInboxListeners.forEach(node => node.off()); };
-  }, [gun, isLoggedIn, currentUser.id, currentUser.isDemo]);
-
-  const pendingDemoRequestIds = demoOutgoingRequests.filter(request => request.status === 'PENDING').map(request => request.id).join('|');
-  useEffect(() => {
-    if (!gun || !isLoggedIn || !currentUser.isDemo || !pendingDemoRequestIds) return;
-    const root = gun.get('startupforge-demo-v1').get('connections');
-    const listeners = demoOutgoingRequests.filter(request => request.status === 'PENDING').map(request => {
-      const node = root.get('incoming').get(request.receiverId).get(request.id);
-      node.on((latest: DemoConnectionRequest | null) => {
-        if (!latest || latest.status !== 'ACCEPTED') return;
-        const accepted = { ...latest, id: latest.id || request.id };
-        cacheDemoConnectionActivity(currentUser.id, 'outgoing', accepted);
-        setDemoOutgoingRequests(previous => [...previous.filter(item => item.id !== accepted.id), accepted]);
-        const profileId = demoDirectoryProfileId(accepted.receiverRole, accepted.receiverName);
-        setFollowedUsers(previous => new Set(previous).add(profileId));
-        setConnectedUsers(previous => new Set(previous).add(profileId));
-      });
-      return node;
-    });
-    return () => listeners.forEach(node => node.off());
-  }, [gun, isLoggedIn, currentUser.id, currentUser.isDemo, pendingDemoRequestIds]);
+    if (!isLoggedIn || !currentUser.isDemo || !currentUser.id) return;
+    let active = true;
+    const loadRequests = async () => {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      try {
+        const [incomingResponse, outgoingResponse] = await Promise.all([
+          apiFetch(`${apiUrl}/api/demo-connections/${encodeURIComponent(currentUser.id)}/incoming`),
+          apiFetch(`${apiUrl}/api/demo-connections/${encodeURIComponent(currentUser.id)}/outgoing`)
+        ]);
+        if (!incomingResponse.ok || !outgoingResponse.ok) throw new Error('Could not load demo connection requests.');
+        const [incoming, outgoing]: [DemoConnectionRequest[], DemoConnectionRequest[]] = await Promise.all([incomingResponse.json(), outgoingResponse.json()]);
+        if (!active) return;
+        setDemoIncomingRequests(incoming.filter(request => request.status === 'PENDING' || request.status === 'ACCEPTED'));
+        setDemoOutgoingRequests(outgoing.filter(request => request.status === 'PENDING' || request.status === 'ACCEPTED'));
+        incoming.forEach(request => cacheDemoConnectionActivity(currentUser.id, 'incoming', request));
+        outgoing.forEach(request => cacheDemoConnectionActivity(currentUser.id, 'outgoing', request));
+        const liveOutgoing = outgoing.filter(request => request.status === 'PENDING' || request.status === 'ACCEPTED');
+        setFollowedUsers(new Set(liveOutgoing.map(request => demoDirectoryProfileId(request.receiverRole, request.receiverName))));
+        setConnectedUsers(new Set([...incoming, ...outgoing].filter(request => request.status === 'ACCEPTED').map(request =>
+          request.senderId === currentUser.id ? demoDirectoryProfileId(request.receiverRole, request.receiverName) : demoDirectoryProfileId(request.senderRole, request.senderName))));
+      } catch (error) { console.warn('Unable to refresh demo connections:', error); }
+    };
+    void loadRequests();
+    const timer = window.setInterval(loadRequests, 5000);
+    return () => { active = false; window.clearInterval(timer); };
+  }, [isLoggedIn, currentUser.id, currentUser.isDemo]);
 
   const handleAppLogout = () => {
     if (!currentUser.isDemo) void apiFetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/auth/logout`, { method: 'POST' });
@@ -1238,6 +1210,7 @@ function App() {
 }
 
 export default App;
+
 
 
 
