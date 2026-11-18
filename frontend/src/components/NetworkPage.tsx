@@ -204,7 +204,7 @@ export function NetworkPage({
                 user.headline,
                 user.company || ''
               ).then(sent => {
-                if (sent) (user as any).isConnected = true;
+                if (sent && !currentUser.isDemo) (user as any).isConnected = true;
               });
             }
           }}

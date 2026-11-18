@@ -442,7 +442,15 @@ function App() {
 
   // --- Connection Request Logic ---
   const handleSendConnectionRequest = async (targetUserId: string, targetRole = 'founder', targetName = '', targetHeadline = '', targetCompany = ''): Promise<boolean> => {
-    if (currentUser.isDemo) return false;
+    if (currentUser.isDemo) {
+      setFollowedUsers(previous => {
+        const next = new Set(previous);
+        if (next.has(targetUserId)) next.delete(targetUserId);
+        else next.add(targetUserId);
+        return next;
+      });
+      return true;
+    }
     console.log("targetUserId =", targetUserId);
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';

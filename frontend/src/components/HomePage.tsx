@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User } from '../App';
 import investorsData from '../data/investors.json';
+import foundersData from '../data/founders.json';
 import { SearchResultsDropdown } from './SearchResultsDropdown';
 import { Bell, MessageSquare, BrainCircuit, Sparkles, Home, X, ArrowUpRight, Users } from 'lucide-react';
 import { Drawer } from 'vaul';
@@ -26,12 +27,25 @@ type HomePageProps = {
   onCheckConflict?: (investor: string, company: string) => void;
 };
 
+const directoryFounders = (foundersData as any[]).slice(0, 10).map((founder, index) => {
+  const latestRound = Array.isArray(founder.fundingHistory) ? founder.fundingHistory[founder.fundingHistory.length - 1] : undefined;
+  return {
+    id: `founder-${index}`,
+    name: founder.name,
+    company: founder.company,
+    round: latestRound?.round,
+    year: latestRound?.year,
+    umbrella: founder.primaryDomain || founder.secondaryDomain || founder.domain,
+    avatar: founder.avatar || undefined,
+  };
+});
+
 export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, ragResults, isSearching, onCheckConflict }: HomePageProps) {
   const { unreadAlerts, unreadInbox } = useUnreadBadges(String(currentUser?.id || ''));
   const [searchQuery, setSearchQuery] = useState('');
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [topFounders, setTopFounders] = useState<any[]>([]);
-  const [topFoundersLoading, setTopFoundersLoading] = useState(true);
+  const [topFounders, setTopFounders] = useState<any[]>(directoryFounders);
+  const [topFoundersLoading, setTopFoundersLoading] = useState(false);
   const [topFoundersError, setTopFoundersError] = useState<string | null>(null);
   const [founderRetry, setFounderRetry] = useState(0);
   const [investedCompanies, setInvestedCompanies] = useState<any[]>([]);
@@ -107,23 +121,22 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
   useEffect(() => {
     // Fetch Dynamic Founder Data based on User Domain
     const fetchFounders = async () => {
-      setTopFoundersLoading(true);
       setTopFoundersError(null);
       try {
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
         const res = await apiFetch(`${apiUrl}/api/founders/rising`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: currentUser.id, role: currentUser.role })
+          body: JSON.stringify({ userId: currentUser.id, role: currentUser.role }),
+          signal: AbortSignal.timeout(8000),
         });
         const data = await res.json();
         if (!res.ok || !data.success || !Array.isArray(data.founders)) throw new Error(data.error || 'Founder profiles could not be loaded.');
-        setTopFounders(data.founders);
+        setTopFounders(data.founders.length ? data.founders : directoryFounders);
       } catch (err) {
         console.error('Error loading founder profiles:', err);
-        setTopFoundersError(err instanceof Error ? err.message : 'Founder profiles could not be loaded.');
-      } finally {
-        setTopFoundersLoading(false);
+        setTopFounders(directoryFounders);
+        setTopFoundersError(null);
       }
     };
 

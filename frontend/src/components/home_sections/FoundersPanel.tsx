@@ -21,7 +21,7 @@ export const FoundersPanel = ({ topFounders, onNavigate, loading = false, error,
                 </div>
                 <button type="button" onClick={() => onNavigate('network')} className="text-[10px] font-semibold text-indigo-600 hover:text-indigo-800 hover:underline">View all founders</button>
             </div>
-            <p className="px-5 pt-2 text-[10px] text-slate-500">Profiles ordered by valuation recorded in the database; amounts and profile details are not independently verified.</p>
+            <p className="px-5 pt-2 text-[10px] text-slate-500">Explore founders and the companies they are building.</p>
             <div className="p-4 bg-gray-50/20 grid grid-cols-1 sm:grid-cols-2 gap-3 content-start">
                 {loading && <div role="status" className="col-span-full rounded-xl border border-slate-100 bg-white p-5 text-sm text-slate-500">Loading founder profiles…</div>}
                 {!loading && error && <div role="alert" className="col-span-full rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900"><p>{error}</p><button type="button" onClick={onRetry} className="mt-2 font-bold underline">Try again</button></div>}
@@ -34,16 +34,13 @@ export const FoundersPanel = ({ topFounders, onNavigate, loading = false, error,
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between mb-1">
                                     <h4 className="font-bold text-gray-900 text-base truncate pr-2">{founder.name}</h4>
-                                    <span className="shrink-0 text-[10px] font-bold text-white bg-green-700 px-2 py-0.5 rounded-full shadow-sm">
-                                        Reported ${(Number(founder.valuation) / 1000000).toFixed(1)}M
-                                    </span>
                                 </div>
                                 <p className="text-sm font-semibold text-teal-700">{founder.company}</p>
                                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs text-gray-500">
-                                    <span className="flex items-center gap-1 bg-gray-100 px-2 py-0.5 rounded-md">
+                                    {founder.round && founder.year && <span className="flex items-center gap-1 bg-gray-100 px-2 py-0.5 rounded-md">
                                         <TrendingUp className="w-3 h-3 text-gray-400" />
                                         {founder.round} • {founder.year}
-                                    </span>
+                                    </span>}
                                     {founder.umbrella && (
                                         <span className="flex items-center gap-1 bg-gray-100 px-2 py-0.5 rounded-md truncate max-w-[150px]">
                                             <ShieldCheck className="w-3 h-3 text-gray-400" />
