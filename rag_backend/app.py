@@ -1,10 +1,17 @@
 import os
+import time
+import xml.etree.ElementTree as ET
+from datetime import datetime, timezone
 
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 from rag import ingest_data, query_founders, query_investors, chat_with_rag
 
 app = FastAPI(title="Startup Forge RAG Backend")
+
+SEC_FEED_URL = "https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=D&owner=include&count=40&output=atom"
+SEC_CACHE_TTL_SECONDS = 300
+sec_feed_cache = {"entries": [], "fetchedAt": None, "expiresAt": 0}
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -78,6 +85,64 @@ def health_check():
         "ai_provider": "gemini" if os.getenv("GEMINI_API_KEY") else ("ollama" if local_model_ready else ("mistral" if os.getenv("MISTRAL_API_KEY") and os.getenv("ENABLE_MISTRAL_API", "false").lower() == "true" else "profile_search")),
     }
 
+
+@app.get("/market/updates")
+def market_updates():
+    """Public, read-only SEC Form D feed for the dashboard."""
+    global sec_feed_cache
+    if sec_feed_cache["entries"] and time.time() < sec_feed_cache["expiresAt"]:
+        return {
+            "source": "SEC EDGAR",
+            "sourceUrl": "https://www.sec.gov/search-filings",
+            "fetchedAt": sec_feed_cache["fetchedAt"],
+            "stale": False,
+            "entries": sec_feed_cache["entries"],
+        }
+
+    try:
+        import httpx
+
+        response = httpx.get(
+            SEC_FEED_URL,
+            headers={
+                "User-Agent": os.getenv("SEC_USER_AGENT", "StartupForge/1.0 market feed"),
+                "Accept": "application/atom+xml, application/xml, text/xml",
+            },
+            timeout=8.0,
+        )
+        response.raise_for_status()
+        root = ET.fromstring(response.text)
+        atom = "{http://www.w3.org/2005/Atom}"
+        entries = []
+        for item in root.findall(f"{atom}entry"):
+            title = (item.findtext(f"{atom}title") or "").strip()
+            updated = (item.findtext(f"{atom}updated") or item.findtext(f"{atom}published") or "").strip()
+            summary = " ".join("".join(item.findtext(f"{atom}summary") or "").split())
+            link = item.find(f"{atom}link")
+            href = link.attrib.get("href", "") if link is not None else ""
+            if title and href:
+                entries.append({"title": title, "url": href, "filedAt": updated or None, "summary": summary[:600], "form": "D"})
+        if not entries:
+            raise ValueError("SEC filing feed contained no entries")
+        fetched_at = datetime.now(timezone.utc).isoformat()
+        sec_feed_cache = {"entries": entries[:30], "fetchedAt": fetched_at, "expiresAt": time.time() + SEC_CACHE_TTL_SECONDS}
+        return {
+            "source": "SEC EDGAR",
+            "sourceUrl": "https://www.sec.gov/search-filings",
+            "fetchedAt": fetched_at,
+            "stale": False,
+            "entries": sec_feed_cache["entries"],
+        }
+    except Exception as error:
+        return {
+            "source": "SEC EDGAR",
+            "sourceUrl": "https://www.sec.gov/search-filings",
+            "fetchedAt": sec_feed_cache["fetchedAt"],
+            "stale": bool(sec_feed_cache["entries"]),
+            "entries": sec_feed_cache["entries"],
+            "error": "SEC filing feed is temporarily unavailable.",
+        }
+
 # ---------- APIs ----------
 @app.post("/search/founders")
 def search_founders(req: QueryRequest):
@@ -144,3 +209,4 @@ def chat_autocomplete(req: AutocompleteRequest):
 @app.get("/")
 def root_status():
     return {"status": "ok"}
+
