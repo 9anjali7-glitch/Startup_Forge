@@ -71,6 +71,31 @@ async function requireAuthenticatedSessions(req, res, next) {
   }
 }
 
+// Anonymous demo sessions have no account token, but the conflict-screening
+// page still needs to run its published sample cases. Keep that access limited
+// to the fixed, synthetic/public examples; all other COI checks require login.
+const publicDemoCoiCases = new Set([
+  'jordan lee|northstar care systems',
+  'jordan lee|cedarline health',
+  'jordan lee|bluewater patient systems',
+  'berkshire hathaway inc.|samsung electronics co., ltd.',
+  'berkshire hathaway inc.|bose corporation',
+]);
+
+function requireCoiSessionOrDemo(req, res, next) {
+  const token = req.get('authorization')?.replace(/^Bearer\s+/i, '');
+  if (token) return requireAuthenticatedSessions(req, res, next);
+  if (process.env.NODE_ENV !== 'production') return next();
+
+  const normalizeDemoName = value => String(value || '').trim().toLowerCase().replace(/\s+\((?:demo investor|public example)\)$/i, '');
+  const investor = normalizeDemoName(req.body?.investorName);
+  const target = normalizeDemoName(req.body?.targetCompany);
+  if (req.method === 'POST' && req.path === '/check' && publicDemoCoiCases.has(`${investor}|${target}`)) {
+    return next();
+  }
+  return res.status(401).json({ error: 'Sign in to run a conflict check.' });
+}
+
 app.post('/setup-db', requireAdmin, (req, res) => {
   setupDatabase(res);
 });
@@ -121,7 +146,7 @@ app.get('/health', async (req, res) => {
 });
 
 /* ---------------- ROUTES ---------------- */
-app.use(['/chat', '/inbox', '/connections', '/api/investments', '/api/coi'], requireAuthenticatedSessions);
+app.use(['/chat', '/inbox', '/connections', '/api/investments'], requireAuthenticatedSessions);
 app.use('/chat', chatRoutes);
 app.use('/inbox', inboxRoutes);
 app.use('/connections', connectionRoutes);
@@ -129,6 +154,7 @@ app.use('/api/investments', investmentRoutes);
 app.use('/api/market', marketRoutes);
 
 const coiRouter = require('./coiService');
+app.use('/api/coi', requireCoiSessionOrDemo);
 app.use('/api/coi', coiRouter);
 
 const foundersRoutes = require('./founders.routes');
