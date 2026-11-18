@@ -57,8 +57,13 @@
             "typescript": "^5.9.3",
             "vite": "6.3.5"
       },
+      "allowScripts": {
+            "@swc/core@1.15.7": true,
+            "esbuild@0.25.12": true
+      },
       "scripts": {
             "dev": "vite",
             "build": "vite build"
       }
 }
+
