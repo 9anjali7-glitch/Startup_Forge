@@ -7,7 +7,7 @@ services:
     dockerfilePath: ./backend/Dockerfile
     plan: free
     numInstances: 1
-    healthCheckPath: /health
+    healthCheckPath: /live
     envVars:
       - key: DATABASE_URL
         fromDatabase:
