@@ -8,17 +8,13 @@ import {
 } from 'lucide-react';
 
 interface LandingPageProps {
-    onLogin: (id: string, role: string, name: string, token?: string, organization?: string) => void;
+    onLogin: (id: string, role: string, name: string, token?: string, organization?: string, isDemo?: boolean) => void;
 }
 
 export const LandingPage = ({ onLogin }: LandingPageProps) => {
     const productionAuth = import.meta.env.PROD;
     const [name, setName] = useState('');
     const [role, setRole] = useState('investor');
-    const [mode, setMode] = useState<'login' | 'register'>('login');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [organization, setOrganization] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const nameInputRef = useRef<HTMLInputElement>(null);
@@ -29,27 +25,35 @@ export const LandingPage = ({ onLogin }: LandingPageProps) => {
         let cancelled = false;
         apiFetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/auth/me`)
             .then(response => response.ok ? response.json() : Promise.reject(new Error('Session expired')))
-            .then(data => { if (!cancelled && data.user) onLogin(data.user.id, data.user.role, data.user.name, getAuthToken(), data.user.organization); })
+        .then(data => { if (!cancelled && data.user) onLogin(data.user.id, data.user.role, data.user.name, getAuthToken(), data.user.organization, data.user.isDemo === true); })
             .catch(() => setAuthToken(''));
         return () => { cancelled = true; };
     }, [onLogin]);
 
     const handleLogin = async (e?: React.FormEvent) => {
         if (e) e.preventDefault();
-        if (!import.meta.env.PROD && !name.trim()) return setError('Please enter your name');
-        if (import.meta.env.PROD && (!email.trim() || !password)) return setError('Enter your email and password.');
-        if (mode === 'register' && (!name.trim() || !organization.trim())) return setError('Enter your name and company or fund.');
+        if (!name.trim()) return setError('Please enter your name.');
+        if (productionAuth) {
+            const enteredName = name.trim();
+            const normalizedName = enteredName.toLowerCase();
+            const demoName = normalizedName === 'mark suster' ? 'Mark Suster' : normalizedName === '1uphealth' ? '1upHealth' : enteredName;
+            const demoRole = normalizedName === 'mark suster' ? 'investor' : normalizedName === '1uphealth' ? 'founder' : role;
+            const demoOrganization = normalizedName === 'mark suster' ? 'Demo Investor Profile' : normalizedName === '1uphealth' ? '1upHealth sample' : 'StartupForge Demo';
+            const demoId = `demo-${demoRole}-${demoName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+            setError('');
+            onLogin(demoId, demoRole, demoName, undefined, demoOrganization, true);
+            return;
+        }
         setLoading(true);
         setError('');
 
         try {
             const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:3000';
             const productionAuth = import.meta.env.PROD;
-            const authPath = productionAuth ? `/api/auth/${mode}` : '/api/login';
-            const res = await apiFetch(`${apiUrl}${authPath}`, {
+            const res = await apiFetch(`${apiUrl}/api/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(productionAuth ? (mode === 'register' ? { name, email, password, role, organization } : { email, password }) : { name, role })
+                body: JSON.stringify({ name, role })
             });
 
             const data = await res.json();
@@ -128,40 +132,17 @@ export const LandingPage = ({ onLogin }: LandingPageProps) => {
                         </div>
 
                         <div className="mb-8">
-                            <h2 className="text-2xl font-bold text-slate-900">{productionAuth && mode === 'register' ? 'Create your account' : 'Welcome Back'}</h2>
-                            <p className="text-slate-500 mt-1">{productionAuth ? 'Sign in to your secure StartupForge account.' : 'Access your deal flow dashboard.'}</p>
+                            <h2 className="text-2xl font-bold text-slate-900">{productionAuth ? 'Welcome to StartupForge' : 'Welcome Back'}</h2>
+                            <p className="text-slate-500 mt-1">{productionAuth ? 'Enter a name to explore the read-only demo.' : 'Access your deal flow dashboard.'}</p>
                         </div>
 
                         <form onSubmit={handleLogin} className="space-y-5">
                             <div>
-                                {!productionAuth && <>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Full Name</label>
-                                    <input ref={nameInputRef} type="text" value={name} onChange={e => setName(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:bg-white transition-all shadow-sm" placeholder="e.g. Mark Suster" />
-                                </>}
-                                {productionAuth && <div className="space-y-4">
-                                    {mode === 'register' && <>
-                                        <p className="rounded-xl bg-amber-50 px-4 py-3 text-xs leading-relaxed text-amber-800">Your founder or investor profile is self-reported until independently verified.</p>
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Full name</label>
-                                            <input autoComplete="name" value={name} onChange={e => setName(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:bg-white" placeholder="Your name" />
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Company or fund</label>
-                                            <input autoComplete="organization" value={organization} onChange={e => setOrganization(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:bg-white" placeholder="Organization name" />
-                                        </div>
-                                    </>}
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Email</label>
-                                        <input ref={nameInputRef} type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:bg-white" placeholder="you@company.com" />
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Password</label>
-                                        <input type="password" autoComplete={mode === 'register' ? 'new-password' : 'current-password'} minLength={mode === 'register' ? 12 : undefined} value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:bg-white" placeholder={mode === 'register' ? 'At least 12 characters' : 'Your password'} />
-                                    </div>
-                                </div>}
+                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">{productionAuth ? 'Your name' : 'Full Name'}</label>
+                                <input ref={nameInputRef} type="text" autoComplete="name" value={name} onChange={e => setName(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:bg-white transition-all shadow-sm" placeholder="e.g. Mark Suster" />
                             </div>
 
-                            {(!productionAuth || mode === 'register') && <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-2 gap-3">
                                 <button
                                     type="button"
                                     onClick={() => setRole('investor')}
@@ -182,7 +163,7 @@ export const LandingPage = ({ onLogin }: LandingPageProps) => {
                                 >
                                     Founder
                                 </button>
-                            </div>}
+                            </div>
 
                             {error && (
                                 <div className="p-3 bg-red-50 text-red-600 rounded-xl text-sm font-medium flex items-center gap-2">
@@ -195,16 +176,15 @@ export const LandingPage = ({ onLogin }: LandingPageProps) => {
                                 disabled={loading}
                                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-xl shadow-indigo-200 transition-all flex items-center justify-center gap-2"
                             >
-                                {loading ? 'Please wait...' : productionAuth && mode === 'register' ? 'Create account' : 'Enter Dashboard'}
+                                {loading ? 'Please wait...' : productionAuth ? 'Enter Demo Dashboard' : 'Enter Dashboard'}
                                 {!loading && <ArrowRight className="w-5 h-5" />}
                             </button>
                         </form>
 
-                        {productionAuth ? <div className="mt-6 text-center text-sm text-slate-500">
-                            {mode === 'login' ? <>New to StartupForge? <button type="button" className="font-bold text-indigo-600 hover:underline" onClick={() => { setMode('register'); setError(''); }}>Create an account</button></> : <>Already registered? <button type="button" className="font-bold text-indigo-600 hover:underline" onClick={() => { setMode('login'); setError(''); }}>Sign in</button></>}
-                        </div> : <div className="mt-6 text-center text-xs text-slate-400">
-                            Sample profiles: <span className="text-indigo-600 font-bold cursor-pointer hover:underline" onClick={() => { setName('Mark Suster'); setRole('investor'); }}>Mark Suster</span> or <span className="text-emerald-600 font-bold cursor-pointer hover:underline" onClick={() => { setName('1upHealth'); setRole('founder'); }}>1upHealth</span>
-                        </div>}
+                        <div className="mt-6 text-center text-sm text-slate-500">
+                            Try a sample: <button type="button" className="font-bold text-indigo-600 hover:underline" onClick={() => { setName('Mark Suster'); setRole('investor'); }}>Mark Suster</button> or <button type="button" className="font-bold text-emerald-600 hover:underline" onClick={() => { setName('1upHealth'); setRole('founder'); }}>1upHealth</button>
+                        </div>
+                        {productionAuth && <p className="mt-3 text-center text-xs text-slate-500">Read-only demo. Changes are temporary and are not saved.</p>}
                     </div>
                 </div>
             </header>

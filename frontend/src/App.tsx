@@ -32,6 +32,7 @@ export type User = {
   experience: string;
   education: string;
   role?: string;
+  isDemo?: boolean;
   // Enhanced Profile Data
   pastInvestments?: string;
   companyFunding?: string;
@@ -441,6 +442,7 @@ function App() {
 
   // --- Connection Request Logic ---
   const handleSendConnectionRequest = async (targetUserId: string, targetRole = 'founder', targetName = '', targetHeadline = '', targetCompany = ''): Promise<boolean> => {
+    if (currentUser.isDemo) return false;
     console.log("targetUserId =", targetUserId);
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -549,6 +551,7 @@ function App() {
   };
 
   const handleRejectRequest = async (requestId: string) => {
+    if (currentUser.isDemo) return;
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       const res = await apiFetch(`${apiUrl}/connections/reject/${requestId}`, {
@@ -703,7 +706,25 @@ function App() {
     // For this flow, let's init in login handler to keep it simple.
   }, []);
 
-  const handleAppLogin = (id: string, role: string, name: string, token?: string, organization?: string) => {
+  const handleAppLogin = (id: string, role: string, name: string, token?: string, organization?: string, isDemo = false) => {
+    if (isDemo) {
+      setAuthToken('');
+      setGun(null);
+      setGunUser(null);
+      setCurrentUser(prev => ({
+        ...prev,
+        id,
+        name,
+        headline: `${role === 'investor' ? 'Investor' : 'Founder'} demo profile`,
+        company: organization,
+        role,
+        isDemo: true
+      }));
+      setCurrentPage('home');
+      setViewingUserId('current-user');
+      setIsLoggedIn(true);
+      return;
+    }
     setAuthToken(token || '');
     // 1. Init Gun
     // 1. Init Gun with backend URL
@@ -749,7 +770,8 @@ function App() {
         name: name,
         headline: `${role === 'investor' ? 'Investor' : 'Founder'} at ${organization || 'Startup Forge'}`,
         company: organization,
-        role
+        role,
+        isDemo: false
       }));
 
       // Load Inbox logic here potentially
@@ -758,7 +780,7 @@ function App() {
   };
 
   const handleAppLogout = () => {
-    void apiFetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/auth/logout`, { method: 'POST' });
+    if (!currentUser.isDemo) void apiFetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/auth/logout`, { method: 'POST' });
     setAuthToken('');
     try {
       if (typeof gunUser?.leave === 'function') gunUser.leave();
@@ -779,6 +801,7 @@ function App() {
       about: 'Waiting for bio...',
       experience: '-',
       education: '-',
+      isDemo: false,
     });
     setCurrentPage('home');
     setViewingUserId('current-user');
@@ -802,6 +825,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Toaster />
+      {currentUser.isDemo && <div className="fixed top-0 inset-x-0 z-[80] bg-amber-100 px-4 py-2 text-center text-sm font-semibold text-amber-950">Read-only demo · sample data only; changes are temporary and are not saved to an account.</div>}
       <button
         type="button"
         onClick={handleAppLogout}
