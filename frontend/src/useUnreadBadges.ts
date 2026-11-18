@@ -30,12 +30,25 @@ export const saveSeenConversation = (userId: string, conversationId: string) => 
   window.dispatchEvent(new Event('startupforge:unread-changed'));
 };
 
-export function useUnreadBadges(userId: string) {
+export function useUnreadBadges(userId: string, demoActivity?: { incoming: any[]; accepted: any[] }) {
   const [unreadAlerts, setUnreadAlerts] = useState(0);
   const [unreadInbox, setUnreadInbox] = useState(0);
+  const demoActivityKey = demoActivity
+    ? `${demoActivity.incoming.map(item => item.id).join(',')}|${demoActivity.accepted.map(item => item.id).join(',')}`
+    : '';
 
   const refresh = useCallback(async () => {
     if (!userId) { setUnreadAlerts(0); setUnreadInbox(0); return; }
+    if (demoActivity || userId.startsWith('demo-')) {
+      const read = new Set(readArray(alertReadKey(userId)));
+      const eventIds = [
+        ...(demoActivity?.incoming || []).map(item => `req-${item.id}`),
+        ...(demoActivity?.accepted || []).map(item => `conn-${item.id}`)
+      ];
+      setUnreadAlerts(eventIds.filter(id => !read.has(id)).length);
+      setUnreadInbox(0);
+      return;
+    }
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
     const headers = { 'x-user-id': userId };
     const [acceptedResult, requestsResult, updatesResult, inboxResult] = await Promise.allSettled([
@@ -71,7 +84,7 @@ export function useUnreadBadges(userId: string) {
     const unreadMessages = new Set(readArray(inboxUnreadKey(userId)));
     const unreadConnections = connections.filter(item => !seen.has(String(item.other_user_id))).map(item => String(item.other_user_id));
     setUnreadInbox(new Set([...unreadConnections, ...unreadMessages]).size);
-  }, [userId]);
+  }, [userId, demoActivityKey]);
 
   useEffect(() => {
     refresh();
@@ -88,3 +101,4 @@ export function useUnreadBadges(userId: string) {
 
   return { unreadAlerts, unreadInbox, refresh };
 }
+
