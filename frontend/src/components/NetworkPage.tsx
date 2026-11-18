@@ -95,7 +95,7 @@ export function NetworkPage({
     try {
       if (!currentUser.id) return;
       if (currentUser.isDemo) {
-        setRequests(demoConnectionRequests.map(request => ({
+        setRequests(demoConnectionRequests.filter(request => request.status === 'PENDING').map(request => ({
           id: request.id,
           userId: request.senderId,
           userName: request.senderName,
