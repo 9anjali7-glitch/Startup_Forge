@@ -31,10 +31,13 @@ function buildGraph(investor, target, paths, level) {
             edges.push({ from: subsidiaryId, to: "target", relation: "COMPETES_WITH", ...(path.competition || {}) });
         } else {
             if (path.relationship === "SHARES_SECTOR") {
-                const sectorId = `sector-${index}`;
-                addNode(sectorId, path.competition?.sector || "Shared sector", "sector");
-                edges.push({ from: entityId, to: sectorId, relation: "OPERATES_IN", evidence_type: path.competition?.evidence_type });
-                edges.push({ from: "target", to: sectorId, relation: "OPERATES_IN", evidence_type: path.competition?.evidence_type });
+                const sectorLabel = path.competition?.sector || "Shared sector";
+                const sectorId = `sector-${String(sectorLabel).toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+                addNode(sectorId, sectorLabel, "sector");
+                edges.push({ from: entityId, to: sectorId, relation: "OPERATES_IN", ...(path.competition || {}) });
+                if (!edges.some(edge => edge.from === "target" && edge.to === sectorId)) {
+                    edges.push({ from: "target", to: sectorId, relation: "OPERATES_IN", ...(path.competition || {}) });
+                }
             } else {
                 edges.push({
                     from: entityId,
@@ -237,3 +240,4 @@ router.post("/check", async (req, res) => {
 });
 
 module.exports = router;
+
