@@ -25,31 +25,13 @@ router.get('/status/:connectionId', async (req, res) => {
         // Find reports linked to this connection
         const result = await session.run(`
             MATCH (r:InvestmentReport {connectionId: $connectionId})
-            RETURN r
+            RETURN r ORDER BY r.updated_at DESC
         `, { connectionId });
 
-        const reports = result.records.map(rec => rec.get('r').properties);
-        const dataReports = reports.filter(r => r.amount !== null && r.year !== null);
-
-        if (dataReports.length >= 2) {
-            const r1 = dataReports[0];
-            const r2 = dataReports[1];
-
-            // Loose comparison since Neo4j might store numbers differently
-            if (normalizeAmount(r1.amount) === normalizeAmount(r2.amount) &&
-                String(r1.year) === String(r2.year) &&
-                r1.round === r2.round) {
-                return res.json({ status: 'MATCHED', deal: { round: r1.round, year: r1.year, amount: r1.amount } });
-            } else {
-                return res.json({ status: 'PENDING', mismatch: true });
-            }
-        }
-
-        if (reports.length > 0) {
-            return res.json({ status: 'PENDING' });
-        }
-
-        return res.json({ status: 'NONE' });
+        const report = result.records.map(rec => rec.get('r').properties).find(r => r.role === 'investor' && r.amount != null);
+        return report
+            ? res.json({ status: report.approvalStatus || 'PENDING_FOUNDER', deal: { round: report.round, year: report.year, amount: report.amount }, investorId: report.submittedBy })
+            : res.json({ status: 'NONE' });
 
     } catch (e) {
         console.error("Inv Status Error:", e);
@@ -101,6 +83,7 @@ router.post('/confirm', async (req, res) => {
 
     const session = driver.session();
     try {
+        if (req.auth?.role !== 'investor') return res.status(403).json({ error: 'Only the investor can submit investment details.' });
         // Update the report
         await session.run(`
             MERGE (r:InvestmentReport {connectionId: $connectionId, submittedBy: $submittedBy})
@@ -108,6 +91,7 @@ router.post('/confirm', async (req, res) => {
                 r.round = $round,
                 r.year = $year,
                 r.amount = $amount,
+                r.approvalStatus = 'PENDING_FOUNDER',
                 r.updated_at = datetime()
         `, {
             connectionId,
@@ -118,31 +102,7 @@ router.post('/confirm', async (req, res) => {
             amount: String(data.amount)
         });
 
-        // Check for match immediately
-        const matchResult = await session.run(`
-            MATCH (r:InvestmentReport {connectionId: $connectionId})
-            WHERE r.amount IS NOT NULL
-            RETURN r
-        `, { connectionId });
-
-        const reports = matchResult.records.map(rec => rec.get('r').properties);
-
-        let status = 'PENDING';
-        let mismatch = false;
-
-        if (reports.length >= 2) {
-            const r1 = reports[0];
-            const r2 = reports[1];
-            if (normalizeAmount(r1.amount) === normalizeAmount(r2.amount) &&
-                String(r1.year) === String(r2.year) &&
-                r1.round === r2.round) {
-                status = 'MATCHED';
-            } else {
-                mismatch = true;
-            }
-        }
-
-        res.json({ status, mismatch, deal: status === 'MATCHED' ? { round: reports[0].round, year: reports[0].year, amount: reports[0].amount } : undefined });
+        res.json({ status: 'PENDING_FOUNDER' });
 
     } catch (e) {
         console.error("Inv Confirm Error:", e);
@@ -150,6 +110,29 @@ router.post('/confirm', async (req, res) => {
     } finally {
         session.close();
     }
+});
+
+router.post('/respond', async (req, res) => {
+    const { connectionId, decision } = req.body || {};
+    const userId = req.headers['x-user-id'];
+    const status = String(decision || '').toUpperCase();
+    if (!connectionId || !userId || !['ACCEPTED', 'REJECTED'].includes(status)) return res.status(400).json({ error: 'A valid founder decision is required.' });
+    if (req.auth?.role !== 'founder') return res.status(403).json({ error: 'Only the founder can accept or reject this report.' });
+    const session = driver.session();
+    try {
+        const result = await session.run(`
+            MATCH (r:InvestmentReport {connectionId: $connectionId, role: 'investor'})
+            WHERE r.amount IS NOT NULL AND coalesce(r.approvalStatus, 'PENDING_FOUNDER') = 'PENDING_FOUNDER'
+            SET r.approvalStatus = $status, r.reviewedBy = $userId, r.reviewedAt = datetime(), r.updated_at = datetime()
+            RETURN r.round AS round, r.year AS year, r.amount AS amount, r.approvalStatus AS status
+        `, { connectionId, status, userId });
+        if (!result.records.length) return res.status(409).json({ error: 'There is no pending investor report to review.' });
+        const row = result.records[0];
+        res.json({ status: row.get('status'), deal: { round: row.get('round'), year: row.get('year'), amount: row.get('amount') } });
+    } catch (error) {
+        console.error('Investment decision failed:', error);
+        res.status(500).json({ error: 'Could not record the founder decision.' });
+    } finally { await session.close(); }
 });
 
 /**
@@ -205,3 +188,4 @@ router.get('/updates', async (req, res) => {
 });
 
 module.exports = router;
+
