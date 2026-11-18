@@ -523,11 +523,13 @@ function App() {
         ...(isCancelling ? { respondedAt: new Date().toISOString() } : {})
       };
       const root = gun.get('startupforge-demo-v1').get('connections');
-      const [inboxSaved, sentSaved] = await Promise.all([
-        putGunValue(root.get('incoming').get(receiverId).get(requestId), request),
-        putGunValue(root.get('outgoing').get(currentUser.id).get(requestId), request)
-      ]);
-      if (!inboxSaved || !sentSaved) return false;
+      // The receiver's inbox is authoritative. A stale/missing sender mirror must
+      // not make an already delivered request look like a failed Follow action.
+      const inboxSaved = await putGunValue(root.get('incoming').get(receiverId).get(requestId), request);
+      if (!inboxSaved) return false;
+      void putGunValue(root.get('outgoing').get(currentUser.id).get(requestId), request);
+      setDemoOutgoingRequests(previous => [...previous.filter(item => item.id !== requestId), request]);
+      cacheDemoConnectionActivity(currentUser.id, 'outgoing', request);
       setFollowedUsers(previous => {
         const next = new Set(previous);
         if (isCancelling) next.delete(targetUserId);
@@ -645,15 +647,7 @@ function App() {
 
   const handleRejectRequest = async (requestId: string) => {
     if (currentUser.isDemo) {
-      const request = demoIncomingRequests.find(item => item.id === requestId);
-      if (!request || !gun) return;
-      const updated = { ...request, status: 'REJECTED' as const, respondedAt: new Date().toISOString() };
-      const root = gun.get('startupforge-demo-v1').get('connections');
-      const [inboxSaved, sentSaved] = await Promise.all([
-        putGunValue(root.get('incoming').get(currentUser.id).get(requestId), updated),
-        putGunValue(root.get('outgoing').get(request.senderId).get(requestId), updated)
-      ]);
-      if (!inboxSaved || !sentSaved) throw new Error('Could not update the request. Try again.');
+      await handleRespondToDemoRequest(requestId, 'REJECTED');
       return;
     }
     try {
@@ -676,11 +670,12 @@ function App() {
     if (!request || !gun) throw new Error('This request is no longer available.');
     const updated: DemoConnectionRequest = { ...request, status, respondedAt: new Date().toISOString() };
     const root = gun.get('startupforge-demo-v1').get('connections');
-    const [inboxSaved, sentSaved] = await Promise.all([
-      putGunValue(root.get('incoming').get(currentUser.id).get(requestId), updated),
-      putGunValue(root.get('outgoing').get(request.senderId).get(requestId), updated)
-    ]);
-    if (!inboxSaved || !sentSaved) throw new Error('Could not update the request. Try again.');
+    const inboxSaved = await putGunValue(root.get('incoming').get(currentUser.id).get(requestId), updated);
+    if (!inboxSaved) throw new Error('Could not update the request. Check your connection and try again.');
+    void putGunValue(root.get('outgoing').get(request.senderId).get(requestId), updated);
+    setDemoIncomingRequests(previous => previous.filter(item => item.id !== requestId));
+    if (status === 'ACCEPTED') setDemoIncomingRequests(previous => [...previous, updated]);
+    cacheDemoConnectionActivity(currentUser.id, 'incoming', updated);
     if (status === 'ACCEPTED') setConnectedUsers(previous => new Set(previous).add(demoDirectoryProfileId(request.senderRole, request.senderName)));
   };
 
@@ -906,18 +901,32 @@ function App() {
     const root = gun.get('startupforge-demo-v1').get('connections');
     const incomingMap = root.get('incoming').get(currentUser.id).map();
     const outgoingMap = root.get('outgoing').get(currentUser.id).map();
+    const peerInboxListeners = new Map<string, any>();
     incomingMap.on((value: DemoConnectionRequest | null, key: string) => {
       if (!value || typeof value !== 'object') return;
       const request = { ...value, id: value.id || key };
       cacheDemoConnectionActivity(currentUser.id, 'incoming', request);
       setDemoIncomingRequests(previous => {
         const withoutCurrent = previous.filter(item => item.id !== request.id);
-        return request.status === 'PENDING' ? [...withoutCurrent, request] : withoutCurrent;
+        return request.status === 'PENDING' || request.status === 'ACCEPTED' ? [...withoutCurrent, request] : withoutCurrent;
       });
     });
     outgoingMap.on((value: DemoConnectionRequest | null, key: string) => {
       if (!value || typeof value !== 'object') return;
       const request = { ...value, id: value.id || key };
+      if (!peerInboxListeners.has(request.id)) {
+        const peerInbox = root.get('incoming').get(request.receiverId).get(request.id);
+        peerInbox.on((latest: DemoConnectionRequest | null) => {
+          if (!latest || latest.status !== 'ACCEPTED') return;
+          const accepted = { ...latest, id: latest.id || request.id };
+          cacheDemoConnectionActivity(currentUser.id, 'outgoing', accepted);
+          setDemoOutgoingRequests(previous => [...previous.filter(item => item.id !== accepted.id), accepted]);
+          const profileId = demoDirectoryProfileId(accepted.receiverRole, accepted.receiverName);
+          setFollowedUsers(previous => new Set(previous).add(profileId));
+          setConnectedUsers(previous => new Set(previous).add(profileId));
+        });
+        peerInboxListeners.set(request.id, peerInbox);
+      }
       cacheDemoConnectionActivity(currentUser.id, 'outgoing', request);
       setDemoOutgoingRequests(previous => {
         const withoutCurrent = previous.filter(item => item.id !== request.id);
@@ -931,8 +940,28 @@ function App() {
       }
       if (request.status === 'ACCEPTED') setConnectedUsers(previous => new Set(previous).add(profileId));
     });
-    return () => { incomingMap.off(); outgoingMap.off(); };
+    return () => { incomingMap.off(); outgoingMap.off(); peerInboxListeners.forEach(node => node.off()); };
   }, [gun, isLoggedIn, currentUser.id, currentUser.isDemo]);
+
+  const pendingDemoRequestIds = demoOutgoingRequests.filter(request => request.status === 'PENDING').map(request => request.id).join('|');
+  useEffect(() => {
+    if (!gun || !isLoggedIn || !currentUser.isDemo || !pendingDemoRequestIds) return;
+    const root = gun.get('startupforge-demo-v1').get('connections');
+    const listeners = demoOutgoingRequests.filter(request => request.status === 'PENDING').map(request => {
+      const node = root.get('incoming').get(request.receiverId).get(request.id);
+      node.on((latest: DemoConnectionRequest | null) => {
+        if (!latest || latest.status !== 'ACCEPTED') return;
+        const accepted = { ...latest, id: latest.id || request.id };
+        cacheDemoConnectionActivity(currentUser.id, 'outgoing', accepted);
+        setDemoOutgoingRequests(previous => [...previous.filter(item => item.id !== accepted.id), accepted]);
+        const profileId = demoDirectoryProfileId(accepted.receiverRole, accepted.receiverName);
+        setFollowedUsers(previous => new Set(previous).add(profileId));
+        setConnectedUsers(previous => new Set(previous).add(profileId));
+      });
+      return node;
+    });
+    return () => listeners.forEach(node => node.off());
+  }, [gun, isLoggedIn, currentUser.id, currentUser.isDemo, pendingDemoRequestIds]);
 
   const handleAppLogout = () => {
     if (!currentUser.isDemo) void apiFetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/auth/logout`, { method: 'POST' });
@@ -1097,6 +1126,7 @@ function App() {
           gun={gun}
           gunUser={gunUser}
           currentUser={currentUser}
+          demoConnections={[...demoIncomingRequests, ...demoOutgoingRequests].filter((request, index, all) => request.status === 'ACCEPTED' && all.findIndex(item => item.id === request.id) === index)}
           onViewProfile={(userId) => navigateTo('profile', userId)}
           targetUserId={targetChatUserId}
           onNavigate={(page) => {
