@@ -72,6 +72,33 @@ export type User = {
   umbrella?: string[];
 };
 
+type DemoConnectionRequest = {
+  id: string;
+  senderId: string;
+  senderName: string;
+  senderHeadline: string;
+  senderAvatar: string;
+  receiverId: string;
+  receiverName: string;
+  receiverAvatar: string;
+  receiverHeadline: string;
+  receiverRole: string;
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELLED';
+  createdAt: string;
+  respondedAt?: string;
+};
+
+const demoIdentityId = (role: string, name: string) =>
+  `demo-${role.toLowerCase()}-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
+
+const putGunValue = (node: any, value: unknown) => new Promise<boolean>((resolve) => {
+  const timeout = window.setTimeout(() => resolve(false), 8000);
+  node.put(value, (ack: any) => {
+    window.clearTimeout(timeout);
+    resolve(!ack?.err);
+  });
+});
+
 const getFounderProfile = (userId: string): User | undefined => {
   if (!userId.startsWith('founder-')) return undefined;
   const founder = (foundersData as any[])[Number(userId.slice('founder-'.length))];
@@ -222,6 +249,8 @@ function App() {
   // Domain State
   const [connectedUsers, setConnectedUsers] = useState<Set<string>>(new Set());
   const [followedUsers, setFollowedUsers] = useState<Set<string>>(new Set());
+  const [demoIncomingRequests, setDemoIncomingRequests] = useState<DemoConnectionRequest[]>([]);
+  const [demoOutgoingRequests, setDemoOutgoingRequests] = useState<DemoConnectionRequest[]>([]);
 
   const [currentUser, setCurrentUser] = useState<User>({
     id: '',
@@ -443,9 +472,39 @@ function App() {
   // --- Connection Request Logic ---
   const handleSendConnectionRequest = async (targetUserId: string, targetRole = 'founder', targetName = '', targetHeadline = '', targetCompany = ''): Promise<boolean> => {
     if (currentUser.isDemo) {
+      const targetProfile = getFounderProfile(targetUserId) || getInvestorProfile(targetUserId) || users.find(user => user.id === targetUserId) || extraSearchResults.find(user => user.id === targetUserId);
+      const receiverName = targetName || targetProfile?.name || targetUserId;
+      const receiverHeadline = targetHeadline || targetProfile?.headline || targetCompany || '';
+      const receiverRole = (targetProfile?.role || targetRole || 'founder').toLowerCase();
+      const receiverId = demoIdentityId(receiverRole, receiverName);
+      if (!gun || receiverId === currentUser.id) return false;
+      const isCancelling = followedUsers.has(targetUserId);
+      const requestId = `${currentUser.id}__${receiverId}`;
+      const prior = demoOutgoingRequests.find(request => request.id === requestId);
+      const request: DemoConnectionRequest = {
+        id: requestId,
+        senderId: currentUser.id,
+        senderName: currentUser.name,
+        senderHeadline: currentUser.headline || currentUser.company || '',
+        senderAvatar: currentUser.avatar,
+        receiverId,
+        receiverName,
+        receiverAvatar: targetProfile?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(receiverName)}&background=e2e8f0&color=334155&size=256`,
+        receiverHeadline,
+        receiverRole,
+        status: isCancelling ? 'CANCELLED' : 'PENDING',
+        createdAt: prior?.createdAt || new Date().toISOString(),
+        ...(isCancelling ? { respondedAt: new Date().toISOString() } : {})
+      };
+      const root = gun.get('startupforge-demo-v1').get('connections');
+      const [inboxSaved, sentSaved] = await Promise.all([
+        putGunValue(root.get('incoming').get(receiverId).get(requestId), request),
+        putGunValue(root.get('outgoing').get(currentUser.id).get(requestId), request)
+      ]);
+      if (!inboxSaved || !sentSaved) return false;
       setFollowedUsers(previous => {
         const next = new Set(previous);
-        if (next.has(targetUserId)) next.delete(targetUserId);
+        if (isCancelling) next.delete(targetUserId);
         else next.add(targetUserId);
         return next;
       });
@@ -559,7 +618,18 @@ function App() {
   };
 
   const handleRejectRequest = async (requestId: string) => {
-    if (currentUser.isDemo) return;
+    if (currentUser.isDemo) {
+      const request = demoIncomingRequests.find(item => item.id === requestId);
+      if (!request || !gun) return;
+      const updated = { ...request, status: 'REJECTED' as const, respondedAt: new Date().toISOString() };
+      const root = gun.get('startupforge-demo-v1').get('connections');
+      const [inboxSaved, sentSaved] = await Promise.all([
+        putGunValue(root.get('incoming').get(currentUser.id).get(requestId), updated),
+        putGunValue(root.get('outgoing').get(request.senderId).get(requestId), updated)
+      ]);
+      if (!inboxSaved || !sentSaved) throw new Error('Could not update the request. Try again.');
+      return;
+    }
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       const res = await apiFetch(`${apiUrl}/connections/reject/${requestId}`, {
@@ -573,6 +643,19 @@ function App() {
       console.error('Failed to reject connection request', err);
       throw err;
     }
+  };
+
+  const handleRespondToDemoRequest = async (requestId: string, status: 'ACCEPTED' | 'REJECTED') => {
+    const request = demoIncomingRequests.find(item => item.id === requestId);
+    if (!request || !gun) throw new Error('This request is no longer available.');
+    const updated: DemoConnectionRequest = { ...request, status, respondedAt: new Date().toISOString() };
+    const root = gun.get('startupforge-demo-v1').get('connections');
+    const [inboxSaved, sentSaved] = await Promise.all([
+      putGunValue(root.get('incoming').get(currentUser.id).get(requestId), updated),
+      putGunValue(root.get('outgoing').get(request.senderId).get(requestId), updated)
+    ]);
+    if (!inboxSaved || !sentSaved) throw new Error('Could not update the request. Try again.');
+    if (status === 'ACCEPTED') setConnectedUsers(previous => new Set(previous).add(request.senderId));
   };
 
   const handleSendMessage = (userId: string, content: string, type: 'text' | 'voice' | 'image' | 'file' = 'text', fileName?: string) => {
@@ -717,8 +800,11 @@ function App() {
   const handleAppLogin = (id: string, role: string, name: string, token?: string, organization?: string, isDemo = false) => {
     if (isDemo) {
       setAuthToken('');
-      setGun(null);
+      const gunUrl = import.meta.env.VITE_GUN_URL || 'https://startupforge-gun-n6e0.onrender.com/gun';
+      setGun(Gun([gunUrl]));
       setGunUser(null);
+      setDemoIncomingRequests([]);
+      setDemoOutgoingRequests([]);
       setCurrentUser(prev => ({
         ...prev,
         id,
@@ -786,6 +872,33 @@ function App() {
       // loadInbox(id, role);
     }
   };
+
+  useEffect(() => {
+    setDemoIncomingRequests([]);
+    setDemoOutgoingRequests([]);
+    if (!isLoggedIn || !currentUser.isDemo || !currentUser.id || !gun) return;
+    const root = gun.get('startupforge-demo-v1').get('connections');
+    const incomingMap = root.get('incoming').get(currentUser.id).map();
+    const outgoingMap = root.get('outgoing').get(currentUser.id).map();
+    incomingMap.on((value: DemoConnectionRequest | null, key: string) => {
+      if (!value || typeof value !== 'object') return;
+      const request = { ...value, id: value.id || key };
+      setDemoIncomingRequests(previous => {
+        const withoutCurrent = previous.filter(item => item.id !== request.id);
+        return request.status === 'PENDING' ? [...withoutCurrent, request] : withoutCurrent;
+      });
+    });
+    outgoingMap.on((value: DemoConnectionRequest | null, key: string) => {
+      if (!value || typeof value !== 'object') return;
+      const request = { ...value, id: value.id || key };
+      setDemoOutgoingRequests(previous => {
+        const withoutCurrent = previous.filter(item => item.id !== request.id);
+        return request.status === 'CANCELLED' ? withoutCurrent : [...withoutCurrent, request];
+      });
+      if (request.status === 'ACCEPTED') setConnectedUsers(previous => new Set(previous).add(request.receiverId));
+    });
+    return () => { incomingMap.off(); outgoingMap.off(); };
+  }, [gun, isLoggedIn, currentUser.id, currentUser.isDemo]);
 
   const handleAppLogout = () => {
     if (!currentUser.isDemo) void apiFetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/auth/logout`, { method: 'POST' });
@@ -975,6 +1088,9 @@ function App() {
           investors={investorsData.map((i: any) => ({ ...getInvestorProfile(`investor-${i.id}`)!, connections: 0 }))}
           followedUsers={followedUsers}
           connectedUsers={connectedUsers}
+          demoConnectionRequests={demoIncomingRequests}
+          demoAcceptedConnections={demoOutgoingRequests.filter(request => request.status === 'ACCEPTED')}
+          onRespondToDemoConnectionRequest={handleRespondToDemoRequest}
           onRejectRequest={handleRejectRequest}
           onFollowUser={handleSendConnectionRequest}
           onViewProfile={(userId) => navigateTo('profile', userId)}
@@ -999,6 +1115,8 @@ function App() {
       {currentPage === 'notifications' && (
         <NotificationsPage
           currentUser={currentUser}
+          demoConnectionRequests={demoIncomingRequests}
+          demoAcceptedConnections={demoOutgoingRequests.filter(request => request.status === 'ACCEPTED')}
           onViewJob={(jobId) => navigateTo('jobs')}
           onNavigate={(page, userId) => {
             if (userId) navigateTo('profile', userId);
@@ -1056,5 +1174,6 @@ function App() {
 }
 
 export default App;
+
 
 
