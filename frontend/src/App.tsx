@@ -75,6 +75,7 @@ export type User = {
 type DemoConnectionRequest = {
   id: string;
   senderId: string;
+  senderRole: string;
   senderName: string;
   senderHeadline: string;
   senderAvatar: string;
@@ -91,6 +92,16 @@ type DemoConnectionRequest = {
 const demoIdentityId = (role: string, name: string) =>
   `demo-${role.toLowerCase()}-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
 
+const demoDirectoryProfileId = (role: string, name: string) => {
+  const normalizedName = name.trim().toLowerCase();
+  if (role.toLowerCase() === 'founder') {
+    const index = (foundersData as any[]).findIndex(profile => String(profile.name || '').trim().toLowerCase() === normalizedName);
+    if (index >= 0) return `founder-${index}`;
+  }
+  const investor = (investorsData as any[]).find(profile => String(profile.name || '').trim().toLowerCase() === normalizedName);
+  return investor ? `investor-${investor.id}` : demoIdentityId(role, name);
+};
+
 const putGunValue = (node: any, value: unknown) => new Promise<boolean>((resolve) => {
   const timeout = window.setTimeout(() => resolve(false), 8000);
   node.put(value, (ack: any) => {
@@ -98,6 +109,20 @@ const putGunValue = (node: any, value: unknown) => new Promise<boolean>((resolve
     resolve(!ack?.err);
   });
 });
+
+const cacheDemoConnectionActivity = (userId: string, direction: 'incoming' | 'outgoing', request: DemoConnectionRequest) => {
+  const key = `startupforge:demo-connections:${userId}`;
+  let current: { incoming: DemoConnectionRequest[]; accepted: DemoConnectionRequest[] } = { incoming: [], accepted: [] };
+  try { current = { ...current, ...JSON.parse(localStorage.getItem(key) || '{}') }; } catch { /* Start with empty activity. */ }
+  const update = (items: DemoConnectionRequest[], value: DemoConnectionRequest, keep: boolean) => {
+    const filtered = items.filter(item => item.id !== value.id);
+    return keep ? [...filtered, value] : filtered;
+  };
+  current.incoming = update(current.incoming, request, direction === 'incoming' && request.status === 'PENDING');
+  current.accepted = update(current.accepted, request, direction === 'outgoing' && request.status === 'ACCEPTED');
+  localStorage.setItem(key, JSON.stringify(current));
+  window.dispatchEvent(new Event('startupforge:unread-changed'));
+};
 
 const getFounderProfile = (userId: string): User | undefined => {
   if (!userId.startsWith('founder-')) return undefined;
@@ -484,6 +509,7 @@ function App() {
       const request: DemoConnectionRequest = {
         id: requestId,
         senderId: currentUser.id,
+        senderRole: currentUser.role || 'founder',
         senderName: currentUser.name,
         senderHeadline: currentUser.headline || currentUser.company || '',
         senderAvatar: currentUser.avatar,
@@ -655,7 +681,7 @@ function App() {
       putGunValue(root.get('outgoing').get(request.senderId).get(requestId), updated)
     ]);
     if (!inboxSaved || !sentSaved) throw new Error('Could not update the request. Try again.');
-    if (status === 'ACCEPTED') setConnectedUsers(previous => new Set(previous).add(request.senderId));
+    if (status === 'ACCEPTED') setConnectedUsers(previous => new Set(previous).add(demoDirectoryProfileId(request.senderRole, request.senderName)));
   };
 
   const handleSendMessage = (userId: string, content: string, type: 'text' | 'voice' | 'image' | 'file' = 'text', fileName?: string) => {
@@ -883,6 +909,7 @@ function App() {
     incomingMap.on((value: DemoConnectionRequest | null, key: string) => {
       if (!value || typeof value !== 'object') return;
       const request = { ...value, id: value.id || key };
+      cacheDemoConnectionActivity(currentUser.id, 'incoming', request);
       setDemoIncomingRequests(previous => {
         const withoutCurrent = previous.filter(item => item.id !== request.id);
         return request.status === 'PENDING' ? [...withoutCurrent, request] : withoutCurrent;
@@ -891,11 +918,18 @@ function App() {
     outgoingMap.on((value: DemoConnectionRequest | null, key: string) => {
       if (!value || typeof value !== 'object') return;
       const request = { ...value, id: value.id || key };
+      cacheDemoConnectionActivity(currentUser.id, 'outgoing', request);
       setDemoOutgoingRequests(previous => {
         const withoutCurrent = previous.filter(item => item.id !== request.id);
-        return request.status === 'CANCELLED' ? withoutCurrent : [...withoutCurrent, request];
+        return request.status === 'CANCELLED' || request.status === 'REJECTED' ? withoutCurrent : [...withoutCurrent, request];
       });
-      if (request.status === 'ACCEPTED') setConnectedUsers(previous => new Set(previous).add(request.receiverId));
+      const profileId = demoDirectoryProfileId(request.receiverRole, request.receiverName);
+      if (request.status === 'PENDING' || request.status === 'ACCEPTED') {
+        setFollowedUsers(previous => new Set(previous).add(profileId));
+      } else if (request.status === 'CANCELLED' || request.status === 'REJECTED') {
+        setFollowedUsers(previous => { const next = new Set(previous); next.delete(profileId); return next; });
+      }
+      if (request.status === 'ACCEPTED') setConnectedUsers(previous => new Set(previous).add(profileId));
     });
     return () => { incomingMap.off(); outgoingMap.off(); };
   }, [gun, isLoggedIn, currentUser.id, currentUser.isDemo]);
