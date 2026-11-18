@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "npm --prefix frontend install --include=dev --no-audit --no-fund && npm --prefix frontend run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -20,3 +21,4 @@
     "pg": "^8.16.3"
   }
 }
+
