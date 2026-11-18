@@ -30,7 +30,12 @@ const ComplianceActions = ({
 
     try {
       const escapePdf = (value: unknown) => String(value ?? "—").replace(/[^\x20-\x7E]/g, "?").replace(/([\\()])/g, "\\$1");
-      const lines = [
+      const findings = reportData.conflictLevel === 2
+        ? (reportData.conflicts || []).map((c: any) => `Investor exposure: ${c.investedParent} owns ${c.competingSubsidiary}, which is linked to the target as a competitor. Evidence: ${c.evidenceType || "recorded relationship"}. ${c.notes || ""}`)
+        : reportData.conflictType?.includes("sector")
+          ? (reportData.conflictingCompanies || []).map((company: string) => `${company} shares the ${reportData.sector || "operating"} sector with the target. This is a screening signal, not proof of direct competition.`)
+          : (reportData.conflictingCompanies || []).map((company: string) => `${company} has a recorded competition relationship with the target. Verify the source and current status.`);
+      const content = [
         "STARTUPFORGE | CONFLICT SCREENING RECORD",
         `Generated: ${new Date().toISOString()}`,
         `Investor / fund: ${reportData.investor || reportData.investorName || "Not supplied"}`,
@@ -42,22 +47,26 @@ const ComplianceActions = ({
         `Data classification: ${reportData.dataClassification || "StartupForge relationship graph"}`,
         "",
         "Findings",
-        ...(reportData.conflictLevel === 2
-          ? (reportData.conflicts || []).map((c: any) => `Investor exposure to ${c.investedParent} -> subsidiary ${c.competingSubsidiary} -> target competitor. Evidence: ${c.evidenceType || "graph relationship"}. ${c.notes || ""}`)
-          : reportData.conflictType?.includes("sector")
-            ? (reportData.conflictingCompanies || []).map((company: string) => `Portfolio company ${company} shares sector ${reportData.sector || "overlap"} with target. Screening signal only; this does not establish direct competition.`)
-            : (reportData.conflictingCompanies || []).map((company: string) => `Portfolio company ${company} has a recorded COMPETES_WITH relationship to target. Verify the relationship source and current status.`)),
+        ...(findings.length ? findings : ["No matching conflict paths were found in the available records."]),
         ...(reportData.hasConflict ? ["", "Recommended next step: verify the relationship and obtain independent legal/compliance review before relying on this screening."] : ["", "This result covers relationships present in the connected StartupForge records at the time of screening."]),
         "This screening record is informational and is not legal advice or a legal determination.",
       ];
-      const commands = ["BT", "/F1 10 Tf", "50 790 Td", "14 TL", ...lines.slice(0, 48).map((line, index) => `${index ? "T* " : ""}(${escapePdf(line)}) Tj`), "ET", "BT", "/F1 8 Tf", "50 35 Td", "(StartupForge screening record - verify source data before use.) Tj", "ET"].join("\n");
-      const objects = [
-        "<< /Type /Catalog /Pages 2 0 R >>",
-        "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
-        "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>",
-        "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
-        `<< /Length ${new TextEncoder().encode(commands).length} >>\nstream\n${commands}\nendstream`,
-      ];
+      const lines = content.flatMap(line => {
+        const words = String(line).split(/\s+/); const wrapped: string[] = []; let current = "";
+        words.forEach(word => { if (current && `${current} ${word}`.length > 88) { wrapped.push(current); current = word; } else current = current ? `${current} ${word}` : word; });
+        if (current) wrapped.push(current); return wrapped;
+      });
+      const pages = Array.from({ length: Math.max(1, Math.ceil(lines.length / 48)) }, (_, i) => lines.slice(i * 48, (i + 1) * 48));
+      const objects: string[] = ["", "", "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>"];
+      const pageIds: number[] = [];
+      pages.forEach((pageLines, pageIndex) => {
+        const pageId = objects.length + 1; const contentId = pageId + 1; pageIds.push(pageId);
+        const commands = ["BT", "/F1 10 Tf", "50 790 Td", "14 TL", ...pageLines.map((line, index) => `${index ? "T* " : ""}(${escapePdf(line)}) Tj`), "ET", "BT", "/F1 8 Tf", "50 35 Td", `(${escapePdf(`StartupForge screening record - page ${pageIndex + 1} of ${pages.length}`)}) Tj`, "ET"].join("\n");
+        objects.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 842] /Resources << /Font << /F1 3 0 R >> >> /Contents ${contentId} 0 R >>`);
+        objects.push(`<< /Length ${new TextEncoder().encode(commands).length} >>\nstream\n${commands}\nendstream`);
+      });
+      objects[0] = "<< /Type /Catalog /Pages 2 0 R >>";
+      objects[1] = `<< /Type /Pages /Kids [${pageIds.map(id => `${id} 0 R`).join(" ")}] /Count ${pageIds.length} >>`;
       let pdf = "%PDF-1.4\n";
       const offsets = [0];
       objects.forEach((object, index) => { offsets.push(new TextEncoder().encode(pdf).length); pdf += `${index + 1} 0 obj\n${object}\nendobj\n`; });
@@ -136,18 +145,21 @@ const ComplianceActions = ({
       });
     }
 
-    const blob = new Blob([JSON.stringify(graphData, null, 2)], { type: 'application/json' });
+    const nodeNames = new Map(graphData.nodes.map((node: any) => [String(node.id), node.label || node.name || node.id]));
+    const csvCell = (value: unknown) => `"${String(value ?? "").replace(/"/g, '""')}"`;
+    const rows = [["From", "Relationship", "To", "Evidence / notes"], ...graphData.edges.map((edge: any) => [nodeNames.get(String(edge.from ?? edge.source)) || edge.from || edge.source, String(edge.relation || edge.type || "related to").replace(/_/g, " ").toLowerCase(), nodeNames.get(String(edge.to ?? edge.target)) || edge.to || edge.target, edge.evidence_type || edge.evidence || edge.notes || ""]), ...(!graphData.edges.length ? [[reportData.investor || reportData.investorName || "Investor", "screened against", reportData.targetCompany || "Target company", reportData.hasConflict ? "Potential conflict identified" : "No conflict identified in available records"]] : [])];
+    const blob = new Blob(["\uFEFF" + rows.map(row => row.map(csvCell).join(",")).join("\r\n")], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${fileNamePrefix}_graph.json`;
+    link.download = `${fileNamePrefix}_relationships.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 
     toast.success("Graph Data Exported", {
-      description: "Relationship data saved as JSON.",
+      description: "Readable relationship table saved as CSV for Excel or Google Sheets.",
     });
   };
 
@@ -219,24 +231,34 @@ const ComplianceActions = ({
       <Dialog open={showRawData} onOpenChange={setShowRawData}>
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col rounded-3xl">
           <DialogHeader>
-            <DialogTitle>Raw Analysis Data</DialogTitle>
+            <DialogTitle>Conflict screening details</DialogTitle>
             <DialogDescription>
-              Complete JSON response from the conflict engine.
+              A readable summary of the records used for this screening.
             </DialogDescription>
           </DialogHeader>
-
-          <div className="flex-1 overflow-auto bg-slate-950 p-4 rounded-xl relative group">
-            <Button
-              size="icon"
-              variant="ghost"
-              className="absolute top-2 right-2 text-slate-400 hover:text-white bg-slate-900/50 hover:bg-slate-800"
-              onClick={handleCopyRaw}
-            >
-              {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-            </Button>
-            <pre className="text-xs font-mono text-green-400 whitespace-pre-wrap break-all">
-              {JSON.stringify(reportData, null, 2)}
-            </pre>
+          <div className="flex-1 overflow-auto space-y-4 pr-1">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-xl border p-4"><p className="text-xs text-muted-foreground">Investor / fund</p><p className="mt-1 font-semibold">{reportData?.investor || reportData?.investorName || "Not provided"}</p></div>
+              <div className="rounded-xl border p-4"><p className="text-xs text-muted-foreground">Target company</p><p className="mt-1 font-semibold">{reportData?.targetCompany || "Not provided"}</p></div>
+              <div className="rounded-xl border p-4"><p className="text-xs text-muted-foreground">Screening result</p><p className="mt-1 font-semibold">{reportData?.hasConflict ? "Potential conflict identified" : "No conflict found in available records"}</p></div>
+              <div className="rounded-xl border p-4"><p className="text-xs text-muted-foreground">Screening signal</p><p className="mt-1 font-semibold">{reportData?.conflictType?.replace(/[_-]/g, " ") || "No matching relationship"}{reportData?.sector ? ` · ${reportData.sector}` : ""}</p></div>
+            </div>
+            <section className="rounded-xl border p-4">
+              <h3 className="font-semibold">Companies and relationships found</h3>
+              {reportData?.conflictLevel === 2 && reportData?.conflicts?.length ? <ul className="mt-3 space-y-3">{reportData.conflicts.map((item: any, index: number) => <li key={index} className="rounded-lg bg-muted/40 p-3 text-sm"><p><strong>{item.investedParent || "Portfolio company"}</strong> owns <strong>{item.competingSubsidiary || "a subsidiary"}</strong>, which is linked to the target as a competitor.</p><p className="mt-1 text-muted-foreground">Evidence: {item.evidenceType || "Recorded graph relationship"}{item.notes ? ` · ${item.notes}` : ""}</p></li>)}</ul>
+                : reportData?.conflictingCompanies?.length ? <ul className="mt-2 list-inside list-disc space-y-1 text-sm">{reportData.conflictingCompanies.map((company: string, index: number) => <li key={index}>{company}{reportData?.sector ? ` — shares the ${reportData.sector} sector` : " — recorded as a related or competing company"}</li>)}</ul>
+                  : <p className="mt-2 text-sm text-muted-foreground">No matching company relationships were returned for this screening.</p>}
+            </section>
+            {reportData?.graph?.edges?.length > 0 && <section className="rounded-xl border p-4"><h3 className="font-semibold">Relationship path</h3><ol className="mt-2 space-y-2 text-sm">{reportData.graph.edges.map((edge: any, index: number) => { const nodes = new Map(reportData.graph.nodes.map((n: any) => [String(n.id), n.label || n.name || n.id])); return <li key={index} className="flex flex-wrap items-center gap-2"><span className="font-medium">{nodes.get(String(edge.from ?? edge.source)) || edge.from || edge.source}</span><span className="rounded bg-muted px-2 py-1 text-xs">{String(edge.relation || edge.type || "related to").replace(/_/g, " ").toLowerCase()}</span><span className="font-medium">{nodes.get(String(edge.to ?? edge.target)) || edge.to || edge.target}</span></li>; })}</ol></section>}
+            <details className="rounded-xl border p-4">
+              <summary className="cursor-pointer text-sm font-medium">Technical data (JSON)</summary>
+              <div className="relative mt-3 rounded-lg bg-slate-950 p-4">
+                <Button size="sm" variant="ghost" className="absolute right-2 top-2 text-slate-300" onClick={handleCopyRaw}>
+                  {copied ? <Check className="mr-2 h-4 w-4 text-green-500" /> : <Copy className="mr-2 h-4 w-4" />}{copied ? "Copied" : "Copy data"}
+                </Button>
+                <pre className="max-h-64 overflow-auto pt-10 text-xs text-green-300 whitespace-pre-wrap break-words">{JSON.stringify(reportData, null, 2)}</pre>
+              </div>
+            </details>
           </div>
         </DialogContent>
       </Dialog>
@@ -245,3 +267,4 @@ const ComplianceActions = ({
 };
 
 export default ComplianceActions;
+
