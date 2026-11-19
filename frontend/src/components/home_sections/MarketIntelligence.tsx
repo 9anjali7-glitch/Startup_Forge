@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, BarChart3, ExternalLink, Newspaper, X, RefreshCw, TrendingUp, Activity } from 'lucide-react';
 import { apiFetch } from '../../apiFetch';
 
@@ -53,6 +53,7 @@ export function MarketIntelligence({ compact = false }: { compact?: boolean }) {
   const [selected, setSelected] = useState<Insight | null>(null);
   const [live, setLive] = useState<{ entries: { title: string; url: string; filedAt: string | null; summary: string }[]; fetchedAt: string | null; stale: boolean; error?: string } | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const lastAutomaticRefresh = useRef(0);
   const refreshFilings = useCallback(async () => {
     setRefreshing(true);
     try {
@@ -66,16 +67,26 @@ export function MarketIntelligence({ compact = false }: { compact?: boolean }) {
     } finally { setRefreshing(false); }
   }, []);
   useEffect(() => {
-    refreshFilings();
-    const interval = window.setInterval(refreshFilings, 5 * 60 * 1000);
-    return () => window.clearInterval(interval);
+    const refreshIfDue = () => {
+      if (Date.now() - lastAutomaticRefresh.current < 24 * 60 * 60 * 1000) return;
+      lastAutomaticRefresh.current = Date.now();
+      void refreshFilings();
+    };
+    refreshIfDue();
+    // Check on resume too, since browsers may pause timers while a tab is asleep.
+    const interval = window.setInterval(refreshIfDue, 60 * 1000);
+    document.addEventListener('visibilitychange', refreshIfDue);
+    return () => {
+      window.clearInterval(interval);
+      document.removeEventListener('visibilitychange', refreshIfDue);
+    };
   }, [refreshFilings]);
   return (
     <section className="rounded-3xl border border-slate-200 bg-white shadow-sm flex flex-col min-h-[580px]">
       <div className="rounded-t-3xl border-b border-slate-100 bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-900 px-5 py-5 text-white md:px-7">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3"><div className="rounded-2xl bg-white/10 p-3 ring-1 ring-white/15"><Newspaper className="h-5 w-5 text-indigo-200" /></div><div><div className="flex items-center gap-2"><h3 className="text-lg font-bold">Market Intelligence</h3><span className="rounded-full bg-emerald-400/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-200">Updated Nov 1</span></div><p className="mt-0.5 text-xs text-slate-300">Current venture signals, public filings, and founder-ready context</p></div></div>
-          <button type="button" onClick={refreshFilings} disabled={refreshing} className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-white/15 disabled:opacity-60" aria-label="Refresh SEC filings"><RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />{refreshing ? 'Refreshing' : 'Refresh filings'}</button>
+          <div className="flex items-center gap-3"><div className="rounded-2xl bg-white/10 p-3 ring-1 ring-white/15"><Newspaper className="h-5 w-5 text-indigo-200" /></div><div><div className="flex flex-wrap items-center gap-2"><h3 className="text-lg font-bold">Market Intelligence</h3><span className="rounded-full bg-emerald-400/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-200">{live?.fetchedAt ? `${live.stale ? 'Last source update' : 'SEC feed updated'} ${new Date(live.fetchedAt).toLocaleString()}` : 'SEC feed connecting'}</span></div><p className="mt-0.5 text-xs text-slate-300">Dated venture research and a live feed of public filings</p></div></div>
+          <button type="button" onClick={refreshFilings} disabled={refreshing} className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-white/15 disabled:opacity-60" aria-label="Refresh SEC filings"><RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />{refreshing ? 'Refreshing' : 'Refresh now'}</button>
         </div>
         <div className="mt-5 grid gap-2 sm:grid-cols-3">
           <div className="rounded-xl bg-white/10 px-3 py-2"><p className="text-[9px] font-semibold uppercase tracking-wider text-slate-300">Global VC · Q3</p><p className="mt-0.5 text-sm font-bold">$159B deployed</p></div>
@@ -90,7 +101,7 @@ export function MarketIntelligence({ compact = false }: { compact?: boolean }) {
           {live?.error && <p role="status" className="mt-2 text-[10px] font-medium text-amber-800">{live.error}{live.stale ? ' Showing the last cached feed.' : ''}</p>}
           {live?.entries?.length ? <div className="mt-3 grid gap-2 sm:grid-cols-2">{live.entries.slice(0, compact ? 3 : 6).map((entry, index) => <a key={`${entry.url}-${index}`} href={entry.url} target="_blank" rel="noreferrer" className="flex min-w-0 items-center justify-between gap-3 rounded-xl border border-emerald-100 bg-white/90 px-3 py-2.5 transition hover:border-emerald-300"><span className="truncate text-[10px] font-semibold text-slate-800">{entry.title}</span><span className="shrink-0 text-[9px] text-slate-500">{entry.filedAt && Number.isFinite(Date.parse(entry.filedAt)) ? new Date(entry.filedAt).toLocaleDateString() : 'EDGAR'} <ExternalLink className="inline h-3 w-3" /></span></a>)}</div> : !live?.error ? <p className="mt-3 text-[10px] text-slate-500">Loading current filings…</p> : null}
         </div>
-        <div className="flex items-center gap-2 px-1"><TrendingUp className="h-4 w-4 text-indigo-600"/><div><h4 className="text-sm font-bold text-slate-900">Signals to watch</h4><p className="text-[10px] text-slate-500">Latest published quarter: Q3 2026 · source dates shown on each brief</p></div></div>
+        <div className="flex items-center gap-2 px-1"><TrendingUp className="h-4 w-4 text-indigo-600"/><div><h4 className="text-sm font-bold text-slate-900">Signals to watch</h4><p className="text-[10px] text-slate-500">Research snapshots are dated by their publishers; the SEC filing feed refreshes daily while this dashboard is open.</p></div></div>
         <div className={`grid grid-cols-1 gap-3 ${compact ? '' : 'md:grid-cols-2'}`}>
           {insights.map((item, index) => (
             <button key={item.title} type="button" onClick={() => setSelected(item)} className="group w-full rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-400 md:p-5">
@@ -113,4 +124,5 @@ export function MarketIntelligence({ compact = false }: { compact?: boolean }) {
     </section>
   );
 }
+
 
