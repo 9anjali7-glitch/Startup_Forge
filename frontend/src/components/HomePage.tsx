@@ -153,10 +153,23 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
       } catch (e) { console.error(e); }
     };
 
+    const refreshInvestments = () => { void fetchInvestments(); };
+
     if (currentUser.id) {
       fetchFounders();
       fetchInvestments();
     }
+    const refreshInterval = window.setInterval(refreshInvestments, 30_000);
+    window.addEventListener('startupforge:investment-updated', refreshInvestments);
+    window.addEventListener('focus', refreshInvestments);
+    const refreshOnVisible = () => { if (document.visibilityState === 'visible') refreshInvestments(); };
+    document.addEventListener('visibilitychange', refreshOnVisible);
+    return () => {
+      window.clearInterval(refreshInterval);
+      window.removeEventListener('startupforge:investment-updated', refreshInvestments);
+      window.removeEventListener('focus', refreshInvestments);
+      document.removeEventListener('visibilitychange', refreshOnVisible);
+    };
   }, [currentUser.id, currentUser.role, currentUser.isDemo, founderRetry]);
 
   // Chat State

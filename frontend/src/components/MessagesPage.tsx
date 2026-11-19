@@ -499,6 +499,7 @@ export function MessagesPage({ gun, gunUser, currentUser, onViewProfile, targetU
       if (!res.ok) throw new Error(data.error || 'Could not record your decision.');
       setInvStatus(data.status);
       if (data.deal) setInvFormData({ round: String(data.deal.round), year: String(data.deal.year), amount: String(data.deal.amount) });
+      if (data.status === 'ACCEPTED') window.dispatchEvent(new Event('startupforge:investment-updated'));
     } catch (error) { window.alert(error instanceof Error ? error.message : 'Could not record your decision.'); }
   };
 

@@ -133,9 +133,9 @@ export const StatsPanel = ({
                 </div>
                 <p className="mb-3 text-xs leading-relaxed text-slate-500">An investor’s report appears here after the founder accepts it in Inbox.</p>
                 {investedCompanies.length ? (
-                    <div className="space-y-2">
-                        {investedCompanies.slice(0, 5).map((deal, index) => (
-                            <div key={deal.founder_id || `${deal.company}-${index}`} className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5">
+                    <div className="max-h-96 space-y-2 overflow-y-auto pr-1">
+                        {investedCompanies.map((deal, index) => (
+                            <div key={`${deal.founder_id || deal.company || 'deal'}-${deal.round || ''}-${deal.year || ''}-${index}`} className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5">
                                 <div className="flex items-center justify-between gap-2">
                                     <span className="truncate text-sm font-bold text-slate-800">{deal.company || 'Company name not provided'}</span>
                                     <span className="shrink-0 rounded-full bg-white px-2 py-1 text-[10px] font-semibold text-slate-600">{deal.round || 'Round not provided'}</span>
@@ -147,7 +147,6 @@ export const StatsPanel = ({
                                 {(deal.founder || deal.investor) && <p className="mt-1 text-[10px] text-slate-500">{deal.founder ? `Founder: ${deal.founder}` : ''}{deal.founder && deal.investor ? ' · ' : ''}{deal.investor ? `Investor: ${deal.investor}` : ''} · Accepted</p>}
                             </div>
                         ))}
-                        {investedCompanies.length > 5 && <p className="text-right text-[10px] font-medium text-slate-500">+{investedCompanies.length - 5} more matched deals</p>}
                     </div>
                 ) : (
                     <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-5 text-center">

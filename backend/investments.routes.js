@@ -169,7 +169,6 @@ router.get('/updates', async (req, res) => {
                 r.year AS year,
                 toString(r.updated_at) AS time
             ORDER BY time DESC
-            LIMIT 10
         `;
 
         const result = await session.run(query, { userId });

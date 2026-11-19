@@ -63,7 +63,7 @@ router.get('/updates', async (req, res) => {
       WHERE c.status = 'ACCEPTED' AND r.role = 'investor'
         AND r.approval_status = 'ACCEPTED' AND r.amount IS NOT NULL
         AND ($1 = c.sender_id OR $1 = c.receiver_id)
-      ORDER BY r.updated_at DESC LIMIT 10
+      ORDER BY r.updated_at DESC
     `, [userId]);
     const stripRole = value => String(value || '').replace(/^(?:(?:co-)?founder|ceo|investor)(?:\s*&\s*ceo)?\s+(?:at|of)\s+/i, '').trim();
     return res.json(result.rows.map(row => {
