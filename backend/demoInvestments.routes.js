@@ -49,6 +49,44 @@ function normalizeAmount(value) {
   return String(value ?? '').replace(/[^0-9.]/g, '').replace(/\.00$/, '');
 }
 
+router.get('/updates', async (req, res) => {
+  const userId = String(req.get('x-user-id') || '');
+  if (!userId) return res.status(401).json({ error: 'Sign in to view confirmed investment activity.' });
+  try {
+    await ensureSchema();
+    const result = await pool.query(`
+      SELECT r.round, r.year, r.amount, r.updated_at,
+        c.sender_id, c.sender_role, c.sender_name, c.sender_headline,
+        c.receiver_id, c.receiver_role, c.receiver_name, c.receiver_headline
+      FROM demo_investment_reports r
+      JOIN demo_connection_requests c ON c.id = r.connection_id
+      WHERE c.status = 'ACCEPTED' AND r.role = 'investor'
+        AND r.approval_status = 'ACCEPTED' AND r.amount IS NOT NULL
+        AND ($1 = c.sender_id OR $1 = c.receiver_id)
+      ORDER BY r.updated_at DESC LIMIT 10
+    `, [userId]);
+    const stripRole = value => String(value || '').replace(/^(?:(?:co-)?founder|ceo|investor)(?:\s*&\s*ceo)?\s+(?:at|of)\s+/i, '').trim();
+    return res.json(result.rows.map(row => {
+      const founderIsSender = row.sender_role === 'founder';
+      const founder = founderIsSender ? row.sender_name : row.receiver_name;
+      const founderHeadline = founderIsSender ? row.sender_headline : row.receiver_headline;
+      const investor = founderIsSender ? row.receiver_name : row.sender_name;
+      return {
+        company: stripRole(founderHeadline) || founder,
+        founder,
+        investor,
+        round: row.round,
+        year: row.year,
+        amount: row.amount,
+        time: row.updated_at,
+      };
+    }));
+  } catch (error) {
+    console.error('Demo confirmed investment activity failed:', error.message);
+    return res.status(503).json({ error: 'Confirmed investment activity is temporarily unavailable.' });
+  }
+});
+
 router.get('/status/:connectionId', async (req, res) => {
   const userId = String(req.get('x-user-id') || '');
   const connectionId = String(req.params.connectionId || '');

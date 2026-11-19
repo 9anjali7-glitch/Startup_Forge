@@ -144,7 +144,8 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
     const fetchInvestments = async () => {
       try {
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-        const res = await apiFetch(`${apiUrl}/api/investments/updates`, {
+        const route = currentUser.isDemo ? '/api/demo-investments' : '/api/investments';
+        const res = await apiFetch(`${apiUrl}${route}/updates`, {
           headers: { 'x-user-id': currentUser.id }
         });
         const data = await res.json();
@@ -156,7 +157,7 @@ export function HomePage({ currentUser, onNavigate, onSearch, onQueryChange, rag
       fetchFounders();
       fetchInvestments();
     }
-  }, [currentUser.id, currentUser.role, founderRetry]);
+  }, [currentUser.id, currentUser.role, currentUser.isDemo, founderRetry]);
 
   // Chat State
   const [chatInput, setChatInput] = useState('');
@@ -580,3 +581,4 @@ function ProfileModal({ currentUser, onClose, onNavigate }: { currentUser: User,
     </div>
   );
 }
+

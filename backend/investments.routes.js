@@ -140,28 +140,34 @@ router.post('/respond', async (req, res) => {
  * Returns confirmed investments from the network
  */
 router.get('/updates', async (req, res) => {
-    const userId = req.headers['x-user-id'];
+    const userId = req.auth?.id || req.headers['x-user-id'];
     if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
     const session = driver.session();
     try {
-        // Find investments where:
-        // 1. A report exists by a Founder
-        // 2. The report is MATCHED (exists another report with same values by investor)
-        // 3. The founder is connected to the requester via :CONNECTED_TO
+        // An investor submits one report and the founder accepts it in the inbox.
+        // The accepted report is the agreed record; a second founder report is not created.
         const query = `
-            MATCH (me {id: $userId})-[:CONNECTED_TO]-(f:Company)
-            MATCH (r1:InvestmentReport {submittedBy: f.id, role: 'founder'})
-            MATCH (r2:InvestmentReport {connectionId: r1.connectionId, role: 'investor'})
-            WHERE r1.amount = r2.amount AND r1.year = r2.year AND r1.round = r2.round
-            RETURN DISTINCT 
-                f.id as founder_id,
-                f.name as company,
-                f.valuation as valuation,
-                r1.round as round,
-                r1.amount as amount,
-                r1.year as year,
-                toString(r1.created_at) as time
+            MATCH (me {id: $userId})-[:CONNECTED_TO]-(other)
+            WITH me, other,
+              CASE WHEN toString(me.id) < toString(other.id)
+                THEN 'conn_' + toString(me.id) + '_' + toString(other.id)
+                ELSE 'conn_' + toString(other.id) + '_' + toString(me.id)
+              END AS connectionId
+            MATCH (r:InvestmentReport {connectionId: connectionId, role: 'investor', approvalStatus: 'ACCEPTED'})
+            WHERE r.amount IS NOT NULL
+              AND toString(r.submittedBy) IN [toString(me.id), toString(other.id)]
+            WITH DISTINCT r,
+              CASE WHEN 'Company' IN labels(me) THEN me ELSE other END AS founderNode,
+              CASE WHEN 'Investor' IN labels(me) THEN me ELSE other END AS investorNode
+            RETURN founderNode.id AS founder_id,
+                coalesce(founderNode.name, founderNode.company, founderNode.founder) AS company,
+                founderNode.founder AS founder,
+                investorNode.name AS investor,
+                r.round AS round,
+                r.amount AS amount,
+                r.year AS year,
+                toString(r.updated_at) AS time
             ORDER BY time DESC
             LIMIT 10
         `;
@@ -170,7 +176,8 @@ router.get('/updates', async (req, res) => {
         const updates = result.records.map(rec => ({
             founder_id: rec.get('founder_id'),
             company: rec.get('company'),
-            valuation: rec.get('valuation'),
+            founder: rec.get('founder'),
+            investor: rec.get('investor'),
             round: rec.get('round'),
             amount: rec.get('amount'),
             year: rec.get('year'),

@@ -131,7 +131,7 @@ export const StatsPanel = ({
                     <PieChart className="w-4 h-4 text-slate-800" />
                     <h3 className="font-bold text-gray-800 text-base">Matched Investment Activity</h3>
                 </div>
-                <p className="mb-3 text-xs leading-relaxed text-slate-500">Deals appear here after both sides submit matching round, amount, and year details.</p>
+                <p className="mb-3 text-xs leading-relaxed text-slate-500">An investor’s report appears here after the founder accepts it in Inbox.</p>
                 {investedCompanies.length ? (
                     <div className="space-y-2">
                         {investedCompanies.slice(0, 5).map((deal, index) => (
@@ -144,17 +144,19 @@ export const StatsPanel = ({
                                     <span>Reported amount: {deal.amount || 'Not provided'}</span>
                                     <span>{deal.year || 'Year not provided'}</span>
                                 </div>
+                                {(deal.founder || deal.investor) && <p className="mt-1 text-[10px] text-slate-500">{deal.founder ? `Founder: ${deal.founder}` : ''}{deal.founder && deal.investor ? ' · ' : ''}{deal.investor ? `Investor: ${deal.investor}` : ''} · Accepted</p>}
                             </div>
                         ))}
                         {investedCompanies.length > 5 && <p className="text-right text-[10px] font-medium text-slate-500">+{investedCompanies.length - 5} more matched deals</p>}
                     </div>
                 ) : (
                     <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-5 text-center">
-                        <p className="text-sm font-semibold text-slate-700">No matched deals yet</p>
-                        <p className="mt-1 text-xs leading-relaxed text-slate-500">Confirmed details from your connected investors and founders will appear here.</p>
+                        <p className="text-sm font-semibold text-slate-700">No accepted investment reports yet</p>
+                        <p className="mt-1 text-xs leading-relaxed text-slate-500">Founder-accepted investment details from your connected conversations will appear here.</p>
                     </div>
                 )}
             </div>
         </div>
     );
 };
+
